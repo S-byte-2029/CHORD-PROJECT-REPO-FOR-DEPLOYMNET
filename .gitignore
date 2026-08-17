@@ -1,0 +1,59 @@
+# Environments & Secrets
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+
+# Dependencies & Build Artifacts
+node_modules/
+dist/
+build/
+.npm/
+.parcel-cache/
+
+# Python & Django Artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# SQLite Database (Local dev only)
+*.sqlite3
+db.sqlite3-journal
+
+# Django Static & Media Artifacts in Production
+backend/staticfiles/
+backend/media/
+staticfiles/
+media/
+
+# IDEs & System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+
+# Railway & Netlify temporary logs
+.netlify/
+.railway/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chord — Login &amp; Role Authentication</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#ffffff;
+  --surface:#f5f7fb;
+  --surface-2:#eef1f7;
+  --ink:#10192b;
+  --ink-soft:#4c586c;
+  --ink-faint:#8792a3;
+  --line:#e3e7ee;
+  --blue:#1b3f8b;
+  --blue-deep:#112B63;
+  --amber:#c8791f;
+  --amber-soft:#fdf2e2;
+  --green:#1f7a54;
+  --green-soft:#e9f5ef;
+  --red:#c0463f;
+  --red-soft:#fbeceb;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(16,25,43,0.04),
+           0 12px 28px -14px rgba(16,25,43,0.16);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'IBM Plex Sans',system-ui,sans-serif;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+
+a{
+  color:inherit;
+  text-decoration:none;
+}
+
+::selection{
+  background:var(--amber-soft);
+  color:var(--blue-deep);
+}
+
+:focus-visible{
+  outline:3px solid var(--amber);
+  outline-offset:2px;
+  border-radius:4px;
+}
+
+h1,h2{
+  font-family:'Fraunces',serif;
+  font-weight:600;
+  margin:0;
+  letter-spacing:-0.01em;
+}
+
+p{
+  margin:0;
+}
+
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  font-weight:500;
+}
+
+.eyebrow::before{
+  content:"";
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:var(--amber);
+}
+
+/* ================= PAGE LAYOUT ================= */
+
+.shell{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+
+/* ================= LEFT BRAND PANEL ================= */
+
+.brand-panel{
+  background:var(--blue-deep);
+  color:#fff;
+  padding:48px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  position:relative;
+  overflow:hidden;
+}
+
+.brand-panel::after{
+  content:"";
+  position:absolute;
+  right:-140px;
+  bottom:-160px;
+  width:420px;
+  height:420px;
+  border-radius:50%;
+  background:radial-gradient(
+    circle,
+    rgba(200,121,31,0.32),
+    rgba(200,121,31,0) 70%
+  );
+}
+
+.brand-top{
+  position:relative;
+  z-index:1;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-family:'Fraunces',serif;
+  font-weight:700;
+  font-size:21px;
+  color:#fff;
+}
+
+.brand-mark{
+  width:30px;
+  height:30px;
+  border-radius:8px;
+  background:linear-gradient(
+    155deg,
+    var(--blue) 0%,
+    #0c2049 65%
+  );
+  position:relative;
+  flex:none;
+  border:1px solid rgba(255,255,255,0.18);
+}
+
+.brand-mark::after{
+  content:"";
+  position:absolute;
+  inset:8px;
+  border:1.6px solid rgba(255,255,255,0.85);
+  border-radius:4px;
+  border-bottom-color:var(--amber);
+  border-right-color:var(--amber);
+}
+
+.brand-copy{
+  position:relative;
+  z-index:1;
+  max-width:420px;
+}
+
+.brand-copy .eyebrow{
+  color:#a9c1f0;
+}
+
+.brand-copy .eyebrow::before{
+  box-shadow:0 0 0 3px rgba(200,121,31,0.35);
+}
+
+.brand-copy h1{
+  color:#fff;
+  font-size:clamp(26px,2.6vw,34px);
+  margin-top:16px;
+  line-height:1.18;
+}
+
+.brand-copy p{
+  margin-top:14px;
+  color:#c6d2ea;
+  font-size:15px;
+  line-height:1.7;
+}
+
+.twin-card{
+  position:relative;
+  z-index:1;
+  margin-top:36px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.14);
+  border-radius:14px;
+  padding:20px 22px;
+}
+
+.twin-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:9px 0;
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  font-size:13.5px;
+}
+
+.twin-row:last-child{
+  border-bottom:none;
+}
+
+.twin-row .lbl{
+  color:#a9b6d4;
+}
+
+.twin-row .val{
+  font-family:'IBM Plex Mono',monospace;
+  color:#fff;
+}
+
+.twin-row .val.new{
+  color:#7ce3a6;
+}
+
+.brand-bottom{
+  position:relative;
+  z-index:1;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;
+  color:#8fa0c4;
+}
+
+.brand-bottom a{
+  color:#c6d2ea;
+  border-bottom:1px dotted rgba(198,210,234,0.5);
+}
+
+/* ================= RIGHT FORM PANEL ================= */
+
+.form-panel{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:48px 40px;
+}
+
+.form-wrap{
+  width:100%;
+  max-width:420px;
+}
+
+.form-head{
+  margin-bottom:22px;
+}
+
+.form-head h2{
+  font-size:29px;
+  font-weight:700;
+  color:var(--ink);
+  letter-spacing:-0.02em;
+}
+
+.form-head p{
+  margin-top:6px;
+  color:var(--ink-soft);
+  font-size:14.5px;
+}
+
+/* ================= ROLE TOGGLE (Citizen / Admin) ================= */
+
+.role-toggle{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  background:#f0f4f9;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:4px;
+  margin-bottom:24px;
+}
+
+.role-btn{
+  border:none;
+  padding:10px 14px;
+  border-radius:9px;
+  font-family:'IBM Plex Sans',sans-serif;
+  font-weight:700;
+  font-size:13.5px;
+  background:transparent;
+  color:var(--ink-soft);
+  cursor:pointer;
+  transition:all .18s ease;
+  text-align:center;
+}
+
+.role-btn.active{
+  background:var(--blue-deep);
+  color:#ffffff;
+  box-shadow:var(--shadow);
+}
+
+/* ================= TABS (Log In / Sign Up) ================= */
+
+.tabs{
+  display:flex;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:4px;
+  margin-bottom:24px;
+}
+
+.tab-btn{
+  flex:1;
+  text-align:center;
+  padding:8px 0;
+  border:none;
+  background:transparent;
+  border-radius:7px;
+  font-family:'IBM Plex Sans',sans-serif;
+  font-weight:600;
+  font-size:13.5px;
+  color:var(--ink-soft);
+  cursor:pointer;
+  transition:background .18s ease,color .18s ease;
+}
+
+.tab-btn.active{
+  background:#fff;
+  color:var(--ink);
+  box-shadow:var(--shadow);
+}
+
+/* ================= FIELDS ================= */
+
+.field{
+  margin-bottom:18px;
+}
+
+.field label{
+  display:block;
+  font-size:13px;
+  font-weight:700;
+  color:var(--ink);
+  margin-bottom:7px;
+}
+
+.input-wrap{
+  position:relative;
+}
+
+.field input{
+  width:100%;
+  padding:12px 14px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  font-family:'IBM Plex Sans',sans-serif;
+  font-size:14.5px;
+  color:var(--ink);
+  background:#fff;
+  transition:border-color .15s ease,box-shadow .15s ease;
+}
+
+.field input::placeholder{
+  color:var(--ink-faint);
+}
+
+.field input:focus{
+  outline:none;
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(27,63,139,0.12);
+}
+
+.field input.err{
+  border-color:var(--red);
+  box-shadow:0 0 0 3px rgba(192,70,63,0.1);
+}
+
+.field-err{
+  display:none;
+  font-size:12px;
+  color:var(--red);
+  margin-top:6px;
+  font-family:'IBM Plex Mono',monospace;
+}
+
+.field-err.show{
+  display:block;
+}
+
+.toggle-eye{
+  position:absolute;
+  right:12px;
+  top:50%;
+  transform:translateY(-50%);
+  background:none;
+  border:none;
+  cursor:pointer;
+  padding:4px;
+  color:var(--ink-faint);
+  display:flex;
+}
+
+/* ================= BUTTONS ================= */
+
+.btn{
+  width:100%;
+  padding:13px 0;
+  border-radius:10px;
+  border:none;
+  font-family:'IBM Plex Sans',sans-serif;
+  font-weight:700;
+  font-size:15px;
+  cursor:pointer;
+  transition:background .15s ease,
+              transform .15s ease,
+              box-shadow .15s ease;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+
+.btn-primary{
+  background:var(--blue-deep);
+  color:#fff;
+}
+
+.btn-primary:hover{
+  background:#0c1f47;
+  transform:translateY(-1px);
+}
+
+.btn-primary:disabled{
+  background:var(--ink-faint);
+  cursor:not-allowed;
+  transform:none;
+}
+
+.btn-ghost-full{
+  width:100%;
+  padding:12px 0;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--ink);
+  font-weight:600;
+  font-size:14px;
+  cursor:pointer;
+  margin-top:10px;
+}
+
+.btn-ghost-full:hover{
+  border-color:var(--ink-faint);
+}
+
+/* ================= OTHER HELPERS ================= */
+
+.field-row-between{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.remember{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13.5px;
+  color:var(--ink-soft);
+}
+
+.remember input{
+  accent-color:var(--blue);
+  width:15px;
+  height:15px;
+}
+
+.link-btn{
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-family:'IBM Plex Sans',sans-serif;
+  font-size:13px;
+  font-weight:600;
+  color:var(--blue);
+  padding:0;
+}
+
+.divider{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin:20px 0;
+  color:var(--ink-faint);
+  font-size:12px;
+  font-family:'IBM Plex Mono',monospace;
+  text-transform:uppercase;
+  letter-spacing:0.05em;
+}
+
+.divider::before,
+.divider::after{
+  content:"";
+  flex:1;
+  height:1px;
+  background:var(--line);
+}
+
+.helper-text{
+  margin-top:20px;
+  text-align:center;
+  font-size:13.5px;
+  color:var(--ink-soft);
+}
+
+.switch-link{
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-weight:700;
+  color:var(--blue);
+  font-size:13.5px;
+  padding:0;
+}
+
+/* ================= VIEWS ================= */
+
+.view{
+  display:none;
+}
+
+.view.active{
+  display:block;
+  animation:fadeUp .35s ease;
+}
+
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform:translateY(8px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+/* ================= FORGOT VIEW ================= */
+
+.back-link{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-size:13.5px;
+  font-weight:600;
+  color:var(--ink-soft);
+  padding:0;
+  margin-bottom:20px;
+}
+
+/* ================= SUCCESS RESET VIEW ================= */
+
+.success-box{
+  text-align:center;
+  padding:12px 0 4px;
+}
+
+.success-icon{
+  width:54px;
+  height:54px;
+  border-radius:50%;
+  background:var(--green-soft);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 20px;
+}
+
+.success-box h2{
+  font-size:22px;
+}
+
+.success-box p{
+  margin-top:10px;
+  color:var(--ink-soft);
+  font-size:14.5px;
+  line-height:1.6;
+}
+
+.success-email{
+  font-family:'IBM Plex Mono',monospace;
+  color:var(--ink);
+  font-weight:500;
+}
+
+/* ================= PASSWORD STRENGTH ================= */
+
+.strength{
+  display:flex;
+  gap:5px;
+  margin-top:9px;
+}
+
+.strength span{
+  height:4px;
+  flex:1;
+  border-radius:3px;
+  background:var(--line);
+}
+
+.strength-label{
+  margin-top:7px;
+  font-size:11.5px;
+  font-family:'IBM Plex Mono',monospace;
+  color:var(--ink-faint);
+}
+
+/* ================= OTP VERIFICATION VIEW ================= */
+
+.otp-info{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+.otp-icon{
+  width:62px;
+  height:62px;
+  margin:0 auto 18px;
+  border-radius:50%;
+  background:var(--amber-soft);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--amber);
+}
+
+.otp-info h2{
+  font-size:27px;
+}
+
+.otp-info p{
+  margin-top:9px;
+  color:var(--ink-soft);
+  font-size:14px;
+  line-height:1.6;
+}
+
+.otp-target{
+  font-family:'IBM Plex Mono',monospace;
+  color:var(--ink);
+  font-weight:600;
+}
+
+.otp-container{
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  margin:25px 0;
+}
+
+.otp-input{
+  width:48px !important;
+  height:54px;
+  padding:0 !important;
+  text-align:center;
+  font-size:21px !important;
+  font-weight:700;
+  font-family:'IBM Plex Mono',monospace !important;
+  border:1.5px solid var(--line);
+  border-radius:10px;
+}
+
+.otp-input:focus{
+  border-color:var(--blue-deep);
+  box-shadow:0 0 0 3px rgba(17,43,99,0.15);
+  outline:none;
+}
+
+.otp-error{
+  display:none;
+  text-align:center;
+  color:var(--red);
+  font-size:12.5px;
+  font-family:'IBM Plex Mono',monospace;
+  margin-top:-12px;
+  margin-bottom:15px;
+}
+
+.otp-error.show{
+  display:block;
+}
+
+.resend-text{
+  text-align:center;
+  color:var(--ink-soft);
+  font-size:13.5px;
+  margin-top:18px;
+}
+
+.resend-btn{
+  border:none;
+  background:none;
+  color:var(--blue);
+  font-weight:700;
+  cursor:pointer;
+  font-size:13.5px;
+}
+
+.resend-btn:disabled{
+  color:var(--ink-faint);
+  cursor:not-allowed;
+}
+
+/* ================= TOAST NOTIFICATION ================= */
+
+.toast{
+  position:fixed;
+  bottom:26px;
+  left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:var(--ink);
+  color:#fff;
+  padding:13px 20px;
+  border-radius:10px;
+  font-size:13.5px;
+  box-shadow:var(--shadow);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s ease,
+              transform .25s ease;
+  z-index:100;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+.toast .dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#4ade80;
+  flex:none;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:900px){
+  .shell{
+    grid-template-columns:1fr;
+  }
+  .brand-panel{
+    display:none;
+  }
+  .form-panel{
+    padding:32px 20px;
+    min-height:100vh;
+  }
+}
+
+@media(max-width:500px){
+  .otp-container{
+    gap:6px;
+  }
+  .otp-input{
+    width:42px !important;
+    height:50px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="shell">
+
+<!-- ================= LEFT BRAND PANEL ================= -->
+
+<div class="brand-panel">
+
+  <div class="brand-top">
+    <a href="land.html" class="brand">
+      <span class="brand-mark"></span>
+      Chord
+    </a>
+  </div>
+
+  <div class="brand-copy">
+
+    <span class="eyebrow" id="brandRoleEyebrow">Citizen Gateway</span>
+
+    <h1 id="brandRoleHeadline">
+      Every scheme you qualify for, in one place.
+    </h1>
+
+    <p id="brandRoleDesc">
+      Log in to your welfare twin to see benefits already claimed,
+      entitlements you've missed, and new eligibility as soon as it opens up.
+    </p>
+
+    <div class="twin-card" id="brandTwinCard">
+
+      <div class="twin-row">
+        <span class="lbl">Schemes currently claimed</span>
+        <span class="val">3</span>
+      </div>
+
+      <div class="twin-row">
+        <span class="lbl">Entitlements missing</span>
+        <span class="val">2</span>
+      </div>
+
+      <div class="twin-row">
+        <span class="lbl">Newly eligible this month</span>
+        <span class="val new">
+          Scheme X — Skill Development
+        </span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="brand-bottom">
+    <a href="land.html">← Back to Chord home</a>
+  </div>
+
+</div>
+
+
+<!-- ================= RIGHT FORM PANEL ================= -->
+
+<div class="form-panel">
+
+<div class="form-wrap">
+
+
+<!-- =====================================================
+     AUTH VIEW (Role Selection + Forms)
+===================================================== -->
+
+<div class="view active" id="viewAuth">
+
+  <div class="form-head">
+    <h2>Sign In to Chord</h2>
+    <p>Select your designated role to continue.</p>
+  </div>
+
+  <!-- ROLE TOGGLE BAR (Citizen vs Admin) -->
+  <div class="role-toggle" role="tablist">
+    <button
+      type="button"
+      class="role-btn active"
+      id="roleCitizenBtn"
+      onclick="setRole('citizen')">
+      Citizen Access
+    </button>
+    <button
+      type="button"
+      class="role-btn"
+      id="roleAdminBtn"
+      onclick="setRole('admin')">
+      Govt / Admin
+    </button>
+  </div>
+
+  <!-- TABS FOR CITIZEN: LOG IN / SIGN UP -->
+  <div class="tabs" id="citizenTabs">
+    <button
+      class="tab-btn active"
+      id="tabLogin"
+      type="button">
+      Log in
+    </button>
+    <button
+      class="tab-btn"
+      id="tabSignup"
+      type="button">
+      Sign up
+    </button>
+  </div>
+
+
+  <!-- ================= LOGIN FORM ================= -->
+
+  <form id="formLogin" novalidate>
+
+    <div class="field">
+      <label for="loginId" id="loginIdLabel">
+        Email Address / Phone Number
+      </label>
+      <input
+        type="text"
+        id="loginId"
+        placeholder="e.g. citizen@example.com or mobile number"
+        value="chetan.rawat@example.com"
+        autocomplete="username">
+      <div
+        class="field-err"
+        id="loginIdErr">
+        Enter a valid email address or phone number.
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="loginPass">
+        Password
+      </label>
+      <div class="input-wrap">
+        <input
+          type="password"
+          id="loginPass"
+          placeholder="Enter your password"
+          value="••••••••••••"
+          autocomplete="current-password">
+        <button
+          type="button"
+          class="toggle-eye"
+          data-target="loginPass"
+          aria-label="Toggle password visibility">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8">
+            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+      <div
+        class="field-err"
+        id="loginPassErr">
+        Enter your password.
+      </div>
+    </div>
+
+    <div class="field-row-between">
+      <label class="remember">
+        <input
+          type="checkbox"
+          id="rememberMe"
+          checked>
+        Remember me
+      </label>
+      <button
+        type="button"
+        class="link-btn"
+        id="goForgot">
+        Forgot password?
+      </button>
+    </div>
+
+    <button
+      type="submit"
+      class="btn btn-primary"
+      id="loginSubmit">
+      Request Verification OTP →
+    </button>
+
+  </form>
+
+
+  <!-- ================= SIGNUP FORM ================= -->
+
+  <form
+    id="formSignup"
+    novalidate
+    style="display:none;">
+
+    <div class="field">
+      <label for="suUsername">
+        Full Name
+      </label>
+      <input
+        type="text"
+        id="suUsername"
+        placeholder="e.g. Chetan Rawat">
+      <div
+        class="field-err"
+        id="suUsernameErr">
+        Full name must be at least 3 characters.
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="suEmail">
+        Email Address / Phone Number
+      </label>
+      <input
+        type="text"
+        id="suEmail"
+        placeholder="you@example.com or 10-digit mobile">
+      <div
+        class="field-err"
+        id="suEmailErr">
+        Enter a valid email address or phone number.
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="suPass">
+        Create Password
+      </label>
+      <div class="input-wrap">
+        <input
+          type="password"
+          id="suPass"
+          placeholder="Create a strong password">
+        <button
+          type="button"
+          class="toggle-eye"
+          data-target="suPass"
+          aria-label="Toggle password visibility">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8">
+            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="strength" id="strengthBar">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+
+      <div
+        class="strength-label"
+        id="strengthLabel">
+        Password strength
+      </div>
+
+      <div
+        class="field-err"
+        id="suPassErr">
+        Use at least 8 characters with letters &amp; numbers.
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="suConfirm">
+        Confirm Password
+      </label>
+      <input
+        type="password"
+        id="suConfirm"
+        placeholder="Re-enter password">
+      <div
+        class="field-err"
+        id="suConfirmErr">
+        Passwords do not match.
+      </div>
+    </div>
+
+    <button
+      type="submit"
+      class="btn btn-primary"
+      id="signupSubmit">
+      Create Account &amp; Verify OTP →
+    </button>
+
+  </form>
+
+
+  <div id="extraAuthOptions">
+    <div class="divider">
+      or continue with
+    </div>
+
+    <button
+      type="button"
+      class="btn-ghost-full"
+      id="ssoBtn">
+      Continue with government SSO (DigiLocker)
+    </button>
+
+    <p
+      class="helper-text"
+      id="switchHelper">
+      Don't have an account?
+      <button
+        class="switch-link"
+        id="helperToSignup">
+        Sign up
+      </button>
+    </p>
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     OTP VERIFICATION VIEW (Routes to dashboard or admin)
+===================================================== -->
+
+<div class="view" id="viewOTP">
+
+  <div class="otp-info">
+    <div class="otp-icon">
+      <svg
+        width="30"
+        height="30"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8">
+        <rect x="3" y="5" width="18" height="14" rx="2"/>
+        <path d="M3 7l9 6 9-6"/>
+      </svg>
+    </div>
+
+    <h2>Enter Verification Code</h2>
+
+    <p>
+      We've sent a 6-digit OTP code to
+      <br>
+      <span
+        class="otp-target"
+        id="otpTargetDisplay">
+        chetan.rawat@example.com
+      </span>
+    </p>
+    <div style="font-size:12px; color:var(--amber); margin-top:8px; font-family:'IBM Plex Mono',monospace;">
+      Demo verification OTP: <b>123456</b>
+    </div>
+  </div>
+
+  <!-- OTP 6-DIGIT INPUTS -->
+  <div class="otp-container">
+    <input class="otp-input" maxlength="1" inputmode="numeric" id="otp1">
+    <input class="otp-input" maxlength="1" inputmode="numeric" id="otp2">
+    <input class="otp-input" maxlength="1" inputmode="numeric" id="otp3">
+    <input class="otp-input" maxlength="1" inputmode="numeric" id="otp4">
+    <input class="otp-input" maxlength="1" inputmode="numeric" id="otp5">
+    <input class="otp-input" maxlength="1" inputmode="numeric" id="otp6">
+  </div>
+
+  <div
+    class="otp-error"
+    id="otpError">
+    Incorrect OTP. Please enter 123456.
+  </div>
+
+  <button
+    class="btn btn-primary"
+    id="verifyOTP">
+    Verify &amp; Proceed
+  </button>
+
+  <p class="resend-text">
+    Didn't receive the code?
+    <button
+      class="resend-btn"
+      id="resendOTP"
+      type="button">
+      Resend OTP
+    </button>
+  </p>
+
+  <button
+    class="btn-ghost-full"
+    id="backToAuth"
+    type="button">
+    ← Back to Sign In
+  </button>
+
+</div>
+
+
+<!-- =====================================================
+     FORGOT PASSWORD VIEW
+===================================================== -->
+
+<div class="view" id="viewForgot">
+
+  <button
+    class="back-link"
+    id="backToLogin">
+    ← Back to login
+  </button>
+
+  <div class="form-head">
+    <h2>Reset your password</h2>
+    <p>
+      Enter the registered email or mobile number and we'll send a reset link.
+    </p>
+  </div>
+
+  <form id="formForgot">
+    <div class="field">
+      <label for="forgotEmail">
+        Email Address / Mobile Number
+      </label>
+      <input
+        type="text"
+        id="forgotEmail"
+        placeholder="you@example.com or 10-digit mobile">
+      <div
+        class="field-err"
+        id="forgotEmailErr">
+        Enter a valid registered email or mobile number.
+      </div>
+    </div>
+
+    <button
+      type="submit"
+      class="btn btn-primary">
+      Send reset link
+    </button>
+  </form>
+
+</div>
+
+
+<!-- =====================================================
+     RESET SENT VIEW
+===================================================== -->
+
+<div class="view" id="viewSent">
+
+  <div class="success-box">
+    <div class="success-icon">
+      <svg
+        width="26"
+        height="26"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#1f7a54"
+        stroke-width="2">
+        <path d="M3 8l9 6 9-6"/>
+        <path d="M4 6h16v12H4z"/>
+      </svg>
+    </div>
+
+    <h2>Check your inbox</h2>
+    <p>
+      We've sent a password reset link to
+      <br>
+      <span
+        class="success-email"
+        id="sentToEmail">
+        you@example.com
+      </span>
+    </p>
+  </div>
+
+  <button
+    class="btn btn-primary"
+    id="resendBtn"
+    style="margin-top:26px;">
+    Resend link
+  </button>
+
+  <button
+    class="btn-ghost-full"
+    id="doneBackToLogin">
+    Back to login
+  </button>
+
+</div>
+
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- ================= TOAST NOTIFICATION ================= -->
+
+<div
+  class="toast"
+  id="toast">
+  <span class="dot"></span>
+  <span id="toastMsg">Message</span>
+</div>
+
+
+<script src="env-config.js"></script>
+<script src="api.js"></script>
+<script>
+
+/* =====================================================
+   ACTIVE STATE & ROLE TRACKING
+===================================================== */
+
+let currentRole = 'citizen'; // 'citizen' | 'admin'
+
+const viewAuth = document.getElementById("viewAuth");
+const viewOTP = document.getElementById("viewOTP");
+const viewForgot = document.getElementById("viewForgot");
+const viewSent = document.getElementById("viewSent");
+
+const roleCitizenBtn = document.getElementById("roleCitizenBtn");
+const roleAdminBtn = document.getElementById("roleAdminBtn");
+const citizenTabs = document.getElementById("citizenTabs");
+const extraAuthOptions = document.getElementById("extraAuthOptions");
+
+const loginIdLabel = document.getElementById("loginIdLabel");
+const loginIdInput = document.getElementById("loginId");
+const brandRoleEyebrow = document.getElementById("brandRoleEyebrow");
+const brandRoleHeadline = document.getElementById("brandRoleHeadline");
+const brandRoleDesc = document.getElementById("brandRoleDesc");
+const brandTwinCard = document.getElementById("brandTwinCard");
+
+function showView(view){
+  [viewAuth, viewOTP, viewForgot, viewSent].forEach(v => v.classList.remove("active"));
+  view.classList.add("active");
+}
+
+function setRole(role){
+  currentRole = role;
+  
+  if(role === 'admin'){
+    roleAdminBtn.classList.add("active");
+    roleCitizenBtn.classList.remove("active");
+    citizenTabs.style.display = "none";
+    extraAuthOptions.style.display = "none";
+    
+    // Switch to login form only for admin
+    formLogin.style.display = "block";
+    formSignup.style.display = "none";
+    
+    loginIdLabel.textContent = "Admin Official ID / Gov Email";
+    loginIdInput.placeholder = "e.g. admin@gov.in or officer ID";
+    loginIdInput.value = "admin.officer@gov.in";
+    
+    brandRoleEyebrow.textContent = "Govt / Ministry Workspace";
+    brandRoleHeadline.textContent = "National Scheme Governance & Oversight.";
+    brandRoleDesc.textContent = "Sign in with multi-factor authentication to moderate scheme databases, review citizen telemetry, and approve updates.";
+    brandTwinCard.innerHTML = `
+      <div class="twin-row"><span class="lbl">Registered Schemes</span><span class="val">1,240+</span></div>
+      <div class="twin-row"><span class="lbl">Pending Update Reviews</span><span class="val new">14</span></div>
+      <div class="twin-row"><span class="lbl">Grievance / Feedback Queue</span><span class="val">8 Open</span></div>
+    `;
+  } else {
+    roleCitizenBtn.classList.add("active");
+    roleAdminBtn.classList.remove("active");
+    citizenTabs.style.display = "flex";
+    extraAuthOptions.style.display = "block";
+    
+    loginIdLabel.textContent = "Email Address / Phone Number";
+    loginIdInput.placeholder = "e.g. citizen@example.com or mobile number";
+    loginIdInput.value = "chetan.rawat@example.com";
+    
+    brandRoleEyebrow.textContent = "Citizen Gateway";
+    brandRoleHeadline.textContent = "Every scheme you qualify for, in one place.";
+    brandRoleDesc.textContent = "Log in to your welfare twin to see benefits already claimed, entitlements you've missed, and new eligibility as soon as it opens up.";
+    brandTwinCard.innerHTML = `
+      <div class="twin-row"><span class="lbl">Schemes currently claimed</span><span class="val">3</span></div>
+      <div class="twin-row"><span class="lbl">Entitlements missing</span><span class="val">2</span></div>
+      <div class="twin-row"><span class="lbl">Newly eligible this month</span><span class="val new">Scheme X — Skill Development</span></div>
+    `;
+  }
+}
+
+
+/* =====================================================
+   LOGIN / SIGNUP TABS
+===================================================== */
+
+const tabLogin = document.getElementById("tabLogin");
+const tabSignup = document.getElementById("tabSignup");
+const formLogin = document.getElementById("formLogin");
+const formSignup = document.getElementById("formSignup");
+const switchHelper = document.getElementById("switchHelper");
+
+function activateLoginTab(){
+  tabLogin.classList.add("active");
+  tabSignup.classList.remove("active");
+  formLogin.style.display = "block";
+  formSignup.style.display = "none";
+  switchHelper.innerHTML = `Don't have an account? <button class="switch-link" id="helperToSignup" type="button">Sign up</button>`;
+  document.getElementById("helperToSignup").addEventListener("click", activateSignupTab);
+}
+
+function activateSignupTab(){
+  tabSignup.classList.add("active");
+  tabLogin.classList.remove("active");
+  formSignup.style.display = "block";
+  formLogin.style.display = "none";
+  switchHelper.innerHTML = `Already have an account? <button class="switch-link" id="helperToLogin" type="button">Log in</button>`;
+  document.getElementById("helperToLogin").addEventListener("click", activateLoginTab);
+}
+
+tabLogin.addEventListener("click", activateLoginTab);
+tabSignup.addEventListener("click", activateSignupTab);
+document.getElementById("helperToSignup").addEventListener("click", activateSignupTab);
+
+
+/* =====================================================
+   PASSWORD SHOW / HIDE
+===================================================== */
+
+document.querySelectorAll(".toggle-eye").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const target = document.getElementById(btn.dataset.target);
+    const isPass = target.type === "password";
+    target.type = isPass ? "text" : "password";
+  });
+});
+
+
+/* =====================================================
+   TOAST NOTIFIER
+===================================================== */
+
+const toast = document.getElementById("toast");
+const toastMsg = document.getElementById("toastMsg");
+
+function fireToast(message){
+  toastMsg.textContent = message;
+  toast.classList.add("show");
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2600);
+}
+
+
+/* =====================================================
+   VALIDATION HELPERS
+===================================================== */
+
+function setError(input, error, invalid){
+  input.classList.toggle("err", invalid);
+  error.classList.toggle("show", invalid);
+}
+
+function isValidEmailOrPhone(val){
+  const clean = val.trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const phoneRegex = /^[0-9+\s-]{8,15}$/;
+  return emailRegex.test(clean) || phoneRegex.test(clean);
+}
+
+
+/* =====================================================
+   LOGIN SUBMIT (Triggers OTP Flow via Backend API)
+===================================================== */
+
+formLogin.addEventListener("submit", async function(e){
+  e.preventDefault();
+  const idInput = document.getElementById("loginId");
+  const passInput = document.getElementById("loginPass");
+  let valid = true;
+
+  if(!isValidEmailOrPhone(idInput.value)){
+    setError(idInput, document.getElementById("loginIdErr"), true);
+    valid = false;
+  } else {
+    setError(idInput, document.getElementById("loginIdErr"), false);
+  }
+
+  if(passInput.value.length < 1){
+    setError(passInput, document.getElementById("loginPassErr"), true);
+    valid = false;
+  } else {
+    setError(passInput, document.getElementById("loginPassErr"), false);
+  }
+
+  if(!valid) return;
+
+  const btn = document.getElementById("loginSubmit");
+  btn.disabled = true;
+  btn.textContent = "Sending OTP…";
+
+  try {
+    const res = await api.post('/auth/login/', {
+      loginId: idInput.value.trim(),
+      loginPass: passInput.value,
+      role: currentRole
+    });
+    
+    document.getElementById("otpTargetDisplay").textContent = idInput.value.trim();
+    showView(viewOTP);
+    clearOtpInputs();
+    fireToast(res.message || "Demo Verification OTP: 123456");
+  } catch (err) {
+    // Fallback gracefully
+    document.getElementById("otpTargetDisplay").textContent = idInput.value.trim();
+    showView(viewOTP);
+    clearOtpInputs();
+    fireToast("Demo Verification OTP: 123456");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Request Verification OTP →";
+  }
+});
+
+
+/* =====================================================
+   PASSWORD STRENGTH METER
+===================================================== */
+
+const suPass = document.getElementById("suPass");
+const strengthBars = document.querySelectorAll("#strengthBar span");
+const strengthLabel = document.getElementById("strengthLabel");
+
+suPass.addEventListener("input", function(){
+  const v = suPass.value;
+  let score = 0;
+  if(v.length >= 8) score++;
+  if(/[A-Z]/.test(v) && /[a-z]/.test(v)) score++;
+  if(/[0-9]/.test(v)) score++;
+  if(/[^A-Za-z0-9]/.test(v)) score++;
+
+  strengthBars.forEach((bar, i) => {
+    bar.style.background = i < score ? (score < 2 ? "#c0463f" : score < 4 ? "#c8791f" : "#1f7a54") : "var(--line)";
+  });
+
+  const labels = ["Too weak", "Weak", "Good", "Strong"];
+  strengthLabel.textContent = v.length === 0 ? "Password strength" : labels[Math.max(score-1, 0)];
+});
+
+
+/* =====================================================
+   SIGNUP SUBMIT (Triggers OTP Flow via Backend API)
+===================================================== */
+
+formSignup.addEventListener("submit", async function(e){
+  e.preventDefault();
+  const username = document.getElementById("suUsername");
+  const email = document.getElementById("suEmail");
+  const password = document.getElementById("suPass");
+  const confirm = document.getElementById("suConfirm");
+  let valid = true;
+
+  if(username.value.trim().length < 3){
+    setError(username, document.getElementById("suUsernameErr"), true);
+    valid = false;
+  } else {
+    setError(username, document.getElementById("suUsernameErr"), false);
+  }
+
+  if(!isValidEmailOrPhone(email.value)){
+    setError(email, document.getElementById("suEmailErr"), true);
+    valid = false;
+  } else {
+    setError(email, document.getElementById("suEmailErr"), false);
+  }
+
+  if(password.value.length < 8){
+    setError(password, document.getElementById("suPassErr"), true);
+    valid = false;
+  } else {
+    setError(password, document.getElementById("suPassErr"), false);
+  }
+
+  if(confirm.value !== password.value || confirm.value.length === 0){
+    setError(confirm, document.getElementById("suConfirmErr"), true);
+    valid = false;
+  } else {
+    setError(confirm, document.getElementById("suConfirmErr"), false);
+  }
+
+  if(!valid) return;
+
+  const btn = document.getElementById("signupSubmit");
+  btn.disabled = true;
+  btn.textContent = "Creating account…";
+
+  try {
+    const res = await api.post('/auth/signup/', {
+      full_name: username.value.trim(),
+      email_or_phone: email.value.trim(),
+      password: password.value,
+      role: currentRole
+    });
+
+    document.getElementById("otpTargetDisplay").textContent = email.value.trim();
+    showView(viewOTP);
+    clearOtpInputs();
+    fireToast(res.message || "Demo Verification OTP: 123456");
+  } catch (err) {
+    document.getElementById("otpTargetDisplay").textContent = email.value.trim();
+    showView(viewOTP);
+    clearOtpInputs();
+    fireToast("Demo Verification OTP: 123456");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Create Account & Verify OTP →";
+  }
+});
+
+
+/* =====================================================
+   OTP INPUT BEHAVIOR
+===================================================== */
+
+const otpInputs = document.querySelectorAll(".otp-input");
+
+function clearOtpInputs(){
+  otpInputs.forEach(input => input.value = "");
+  document.getElementById("otpError").classList.remove("show");
+  setTimeout(() => otpInputs[0].focus(), 150);
+}
+
+otpInputs.forEach((input, index) => {
+  input.addEventListener("input", function(){
+    this.value = this.value.replace(/[^0-9]/g, "");
+    if(this.value && index < otpInputs.length - 1){
+      otpInputs[index + 1].focus();
+    }
+  });
+
+  input.addEventListener("keydown", function(e){
+    if(e.key === "Backspace" && !this.value && index > 0){
+      otpInputs[index - 1].focus();
+    }
+  });
+});
+
+
+/* =====================================================
+   VERIFY OTP & REDIRECT BY ROLE (Backend Verification)
+===================================================== */
+
+document.getElementById("verifyOTP").addEventListener("click", async function(){
+  let enteredOTP = "";
+  otpInputs.forEach(input => enteredOTP += input.value);
+  const error = document.getElementById("otpError");
+  const targetEmail = document.getElementById("otpTargetDisplay").textContent.trim();
+
+  if(enteredOTP.length !== 6){
+    error.textContent = "Please enter all 6 digits.";
+    error.classList.add("show");
+    return;
+  }
+
+  error.classList.remove("show");
+  const btn = document.getElementById("verifyOTP");
+  btn.disabled = true;
+  btn.textContent = "Verifying authentication…";
+
+  try {
+    const res = await api.post('/auth/verify-otp/', {
+      email_or_phone: targetEmail,
+      otp: enteredOTP,
+      role: currentRole
+    });
+
+    if (res.token) {
+      api.setToken(res.token);
+      api.setUser(res.user);
+    }
+
+    fireToast("Authentication verified!");
+    setTimeout(() => {
+      if(currentRole === 'admin' || res.redirect === 'admin.html'){
+        window.location.href = "admin.html";
+      } else {
+        window.location.href = "dashboard.html";
+      }
+    }, 600);
+  } catch (err) {
+    if (enteredOTP === "123456") {
+      fireToast("Authentication verified (demo mode)!");
+      setTimeout(() => {
+        if(currentRole === 'admin'){
+          window.location.href = "admin.html";
+        } else {
+          window.location.href = "dashboard.html";
+        }
+      }, 600);
+    } else {
+      error.textContent = err.message || "Incorrect OTP. Please enter 123456.";
+      error.classList.add("show");
+      btn.disabled = false;
+      btn.textContent = "Verify & Proceed";
+    }
+  }
+});
+
+
+/* =====================================================
+   OTP RESEND & BACK ACTIONS
+===================================================== */
+
+document.getElementById("resendOTP").addEventListener("click", async function(){
+  const targetEmail = document.getElementById("otpTargetDisplay").textContent.trim();
+  try {
+    await api.post('/auth/resend-otp/', { email_or_phone: targetEmail });
+    fireToast("New demo OTP sent: 123456");
+  } catch (e) {
+    fireToast("New demo OTP sent: 123456");
+  }
+  clearOtpInputs();
+});
+
+document.getElementById("backToAuth").addEventListener("click", function(){
+  showView(viewAuth);
+});
+
+
+/* =====================================================
+   FORGOT PASSWORD FLOW
+===================================================== */
+
+document.getElementById("goForgot").addEventListener("click", function(){
+  showView(viewForgot);
+});
+
+document.getElementById("backToLogin").addEventListener("click", function(){
+  showView(viewAuth);
+});
+
+document.getElementById("doneBackToLogin").addEventListener("click", function(){
+  showView(viewAuth);
+});
+
+const formForgot = document.getElementById("formForgot");
+formForgot.addEventListener("submit", async function(e){
+  e.preventDefault();
+  const email = document.getElementById("forgotEmail");
+  const error = document.getElementById("forgotEmailErr");
+
+  if(!isValidEmailOrPhone(email.value)){
+    setError(email, error, true);
+    return;
+  }
+  setError(email, error, false);
+
+  try {
+    await api.post('/auth/forgot-password/', { email: email.value.trim() });
+  } catch(err) {}
+
+  document.getElementById("sentToEmail").textContent = email.value.trim();
+  showView(viewSent);
+});
+
+document.getElementById("resendBtn").addEventListener("click", function(){
+  fireToast("Reset link sent again");
+});
+
+document.getElementById("ssoBtn").addEventListener("click", function(){
+  fireToast("DigiLocker SSO — connect your provider here");
+});
+
+</script>
+
+</body>
+</html>

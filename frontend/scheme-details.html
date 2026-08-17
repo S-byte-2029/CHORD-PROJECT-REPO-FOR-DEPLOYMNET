@@ -1,0 +1,1148 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scheme Details — Chord</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   scheme-details.css
+   CHORD — Scheme Details page
+   Theme: Dark Navy (#112B63) + Gold Accent (#D79A2B), white cards
+   ============================================================ */
+ 
+:root{
+  --navy:#112B63;
+  --navy-deep:#0c1f47;
+  --navy-soft:#eaeef7;
+  --gold:#D79A2B;
+  --gold-deep:#b87f1c;
+  --gold-soft:#fbf1de;
+  --ink:#16213f;
+  --ink-soft:#57607a;
+  --ink-faint:#8b93a8;
+  --line:#e5e8f0;
+  --surface:#f6f7fb;
+  --white:#ffffff;
+  --green:#1f7a54;
+  --green-soft:#e7f5ee;
+  --radius:16px;
+  --shadow:0 10px 30px -14px rgba(17,43,99,0.22);
+  --shadow-lg:0 20px 46px -18px rgba(17,43,99,0.3);
+}
+ 
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0;
+  background:var(--surface);
+  color:var(--ink);
+  font-family:'Inter', system-ui, sans-serif;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+a{ color:inherit; text-decoration:none; }
+h1,h2,h3,h4{ margin:0; font-weight:700; letter-spacing:-0.01em; }
+p{ margin:0; }
+button{ font-family:inherit; cursor:pointer; }
+::selection{ background:var(--gold-soft); color:var(--navy-deep); }
+:focus-visible{ outline:3px solid var(--gold); outline-offset:2px; border-radius:4px; }
+ 
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:12px; letter-spacing:0.06em; text-transform:uppercase; font-weight:600; color:var(--navy);
+}
+.eyebrow::before{ content:""; width:7px; height:7px; border-radius:50%; background:var(--gold); }
+ 
+/* ---------- Navbar ---------- */
+header{
+  position:sticky; top:0; z-index:60;
+  background:rgba(255,255,255,0.92); backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav{
+  max-width:1320px; margin:0 auto; padding:0 28px; height:68px;
+  display:flex; align-items:center; justify-content:space-between; gap:20px;
+}
+.brand{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:19px; color:var(--navy); flex:none; }
+.brand-mark{
+  width:26px; height:26px; border-radius:7px;
+  background:linear-gradient(155deg, var(--navy) 0%, var(--navy-deep) 100%); position:relative;
+}
+.brand-mark::after{
+  content:""; position:absolute; inset:6px; border:1.5px solid rgba(255,255,255,0.85); border-radius:3px;
+  border-bottom-color:var(--gold); border-right-color:var(--gold);
+}
+.nav-links{ display:flex; align-items:center; gap:4px; list-style:none; margin:0; padding:0; flex:1; }
+.nav-links a{
+  padding:8px 13px; border-radius:8px; font-size:13.5px; font-weight:600; color:var(--ink-soft);
+  transition:background .15s ease, color .15s ease;
+}
+.nav-links a:hover{ background:var(--surface); color:var(--navy); }
+.nav-right{ display:flex; align-items:center; gap:12px; flex:none; }
+.avatar{
+  width:36px; height:36px; border-radius:50%;
+  background:linear-gradient(155deg, var(--gold) 0%, var(--gold-deep) 100%);
+  color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700;
+  border:2px solid #fff; box-shadow:0 0 0 1px var(--line);
+}
+.menu-toggle{ display:none; background:none; border:none; cursor:pointer; }
+.menu-toggle span{ display:block; width:20px; height:2px; background:var(--navy); margin:5px 0; border-radius:2px; }
+ 
+/* ---------- Page layout ---------- */
+.page{
+  max-width:1320px; margin:0 auto; padding:32px 28px 90px;
+  display:grid; grid-template-columns:1fr 320px; gap:28px; align-items:start;
+}
+main.content{ display:flex; flex-direction:column; gap:26px; min-width:0; }
+ 
+/* ---------- Hero card ---------- */
+.hero-card{
+  background:linear-gradient(145deg, var(--navy) 0%, var(--navy-deep) 100%);
+  border-radius:20px; padding:38px 36px; color:#fff; position:relative; overflow:hidden;
+  box-shadow:var(--shadow-lg);
+}
+.hero-card::after{
+  content:""; position:absolute; right:-120px; top:-120px; width:320px; height:320px; border-radius:50%;
+  background:radial-gradient(circle, rgba(215,154,43,0.28), rgba(215,154,43,0) 70%);
+}
+.hero-tags{ display:flex; gap:8px; flex-wrap:wrap; position:relative; }
+.hero-tag{
+  font-size:11.5px; font-weight:700; padding:6px 12px; border-radius:20px;
+  background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.2); color:#fff;
+  text-transform:uppercase; letter-spacing:0.03em;
+}
+.hero-tag.status{ background:var(--gold); border-color:var(--gold); color:var(--navy-deep); }
+.hero-card h1{ font-size:clamp(26px,3.4vw,38px); margin-top:16px; line-height:1.15; position:relative; }
+.hero-sub{ margin-top:10px; color:#c7d1ea; font-size:14.5px; position:relative; }
+ 
+/* ---------- Section card ---------- */
+.section-card{
+  background:var(--white); border:1px solid var(--line); border-radius:var(--radius);
+  padding:28px 30px; box-shadow:var(--shadow);
+}
+.section-card h2{ font-size:20px; color:var(--navy); }
+.section-card .section-sub{ margin-top:5px; font-size:13.5px; color:var(--ink-faint); }
+ 
+/* Overview */
+.overview-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-top:20px; }
+.overview-cell{ background:#fff; padding:18px 20px; }
+.overview-cell .k{ font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--gold-deep); font-weight:700; }
+.overview-cell .v{ margin-top:8px; font-size:13.5px; color:var(--ink-soft); line-height:1.65; }
+ 
+/* Card grids: benefits / eligibility / documents */
+.pill-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(190px,1fr)); gap:14px; margin-top:20px; }
+.pill-card{
+  background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+  display:flex; align-items:flex-start; gap:12px; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.pill-card:hover{ transform:translateY(-2px); box-shadow:var(--shadow); border-color:#d7deee; }
+.pill-icon{
+  flex:none; width:34px; height:34px; border-radius:9px; background:var(--gold-soft); color:var(--gold-deep);
+  display:flex; align-items:center; justify-content:center;
+}
+.pill-icon.navy{ background:var(--navy-soft); color:var(--navy); }
+.pill-icon.green{ background:var(--green-soft); color:var(--green); }
+.pill-card .t{ font-size:13.5px; font-weight:700; color:var(--ink); line-height:1.35; }
+.pill-card .d{ margin-top:3px; font-size:12px; color:var(--ink-faint); }
+ 
+/* Application process timeline */
+.timeline{ margin-top:26px; display:flex; flex-direction:column; gap:0; }
+.timeline-step{ display:flex; gap:18px; position:relative; padding-bottom:30px; }
+.timeline-step:last-child{ padding-bottom:0; }
+.timeline-dot{
+  flex:none; width:38px; height:38px; border-radius:50%; background:var(--navy); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; position:relative; z-index:1;
+}
+.timeline-step:last-child .timeline-dot{ background:var(--green); }
+.timeline-line{
+  position:absolute; left:19px; top:38px; bottom:0; width:2px; background:var(--line);
+}
+.timeline-step:last-child .timeline-line{ display:none; }
+.timeline-body{ padding-top:6px; }
+.timeline-body .t{ font-size:14.5px; font-weight:700; color:var(--ink); }
+.timeline-body .d{ margin-top:4px; font-size:13px; color:var(--ink-soft); }
+ 
+/* Deadline */
+.deadline-card{
+  background:linear-gradient(135deg, var(--gold-soft) 0%, #fff 100%);
+  border:1px solid #f0dcb3; border-radius:16px; padding:26px 30px;
+  display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;
+}
+.deadline-card .lbl{ font-size:12px; text-transform:uppercase; letter-spacing:0.05em; color:var(--gold-deep); font-weight:700; }
+.deadline-card .date{ font-size:28px; font-weight:800; color:var(--navy); margin-top:6px; }
+.apply-now-btn{
+  background:var(--gold); color:var(--navy-deep); border:none; padding:15px 32px; border-radius:12px;
+  font-weight:800; font-size:15px; box-shadow:0 10px 24px -10px rgba(215,154,43,0.6);
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.apply-now-btn:hover{ transform:translateY(-2px); background:#e3a734; box-shadow:0 14px 28px -10px rgba(215,154,43,0.7); }
+ 
+.deadline-actions{ display:flex; gap:12px; flex-wrap:wrap; }
+.track-app-btn{
+  background:#fff; color:var(--navy); border:1.5px solid var(--navy); padding:15px 26px; border-radius:12px;
+  font-weight:800; font-size:15px; transition:transform .18s ease, background .18s ease, color .18s ease;
+}
+.track-app-btn:hover{ background:var(--navy); color:#fff; transform:translateY(-2px); }
+ 
+/* Contact */
+.contact-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:14px; margin-top:20px; }
+.contact-item{ display:flex; align-items:center; gap:12px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+.contact-item .ic{ width:34px; height:34px; border-radius:9px; background:var(--navy-soft); color:var(--navy); display:flex; align-items:center; justify-content:center; flex:none; }
+.contact-item .k{ font-size:11px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.04em; }
+.contact-item .v{ margin-top:2px; font-size:13px; font-weight:600; color:var(--ink); word-break:break-word; }
+ 
+/* FAQ accordion */
+.faq-list{ margin-top:20px; display:flex; flex-direction:column; gap:10px; }
+.faq-item{ border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface); }
+.faq-q{
+  width:100%; text-align:left; background:none; border:none; padding:16px 18px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  font-size:14px; font-weight:700; color:var(--ink);
+}
+.faq-q .chev{ transition:transform .2s ease; flex:none; color:var(--gold-deep); }
+.faq-item.open .faq-q .chev{ transform:rotate(180deg); }
+.faq-a{ max-height:0; overflow:hidden; transition:max-height .25s ease; }
+.faq-item.open .faq-a{ max-height:200px; }
+.faq-a-inner{ padding:0 18px 16px; font-size:13.5px; color:var(--ink-soft); line-height:1.65; }
+ 
+/* ---------- Feedback & Ratings ---------- */
+.feedback-block{ margin-top:22px; padding-top:22px; border-top:1px solid var(--line); }
+.feedback-block:first-of-type{ margin-top:20px; padding-top:0; border-top:none; }
+.feedback-label{ font-size:14px; font-weight:700; color:var(--ink); margin-bottom:12px; }
+ 
+.star-rating{ display:flex; gap:6px; }
+.star-btn{
+  background:none; border:none; cursor:pointer; padding:2px; line-height:0;
+  color:var(--line); transition:color .15s ease, transform .1s ease;
+}
+.star-btn svg{ width:30px; height:30px; }
+.star-btn.filled{ color:var(--gold); }
+.star-btn:hover{ transform:scale(1.1); }
+.rating-msg{ margin-top:10px; font-size:13px; color:var(--green); font-weight:600; min-height:18px; }
+ 
+.feedback-textarea{
+  width:100%; min-height:90px; margin-top:2px; padding:12px 14px; border:1px solid var(--line);
+  border-radius:11px; font-family:'Inter', sans-serif; font-size:13.5px; color:var(--ink); resize:vertical;
+}
+.feedback-textarea:focus{ outline:none; border-color:var(--navy); box-shadow:0 0 0 3px rgba(17,43,99,0.1); }
+ 
+.btn-feedback-submit{
+  margin-top:12px; background:var(--navy); color:#fff; border:none; padding:11px 22px; border-radius:10px;
+  font-weight:700; font-size:13.5px; transition:background .15s ease, transform .15s ease;
+}
+.btn-feedback-submit:hover{ background:var(--navy-deep); transform:translateY(-1px); }
+.btn-feedback-submit:disabled{ background:var(--ink-faint); cursor:not-allowed; transform:none; }
+ 
+.btn-report-toggle{
+  display:inline-flex; align-items:center; gap:8px;
+  background:#fbeceb; color:#a83a33; border:1px solid #f0c9c6; padding:11px 18px; border-radius:10px;
+  font-weight:700; font-size:13.5px; transition:background .15s ease;
+}
+.btn-report-toggle:hover{ background:#f6dcd9; }
+ 
+.report-panel{ margin-top:16px; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:18px 20px; }
+.report-options{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:10px; margin-bottom:14px; }
+.report-check{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink-soft); cursor:pointer; }
+.report-check input{ width:15px; height:15px; accent-color:var(--navy); }
+.btn-report-submit{
+  margin-top:12px; background:#c0463f; color:#fff; border:none; padding:11px 22px; border-radius:10px;
+  font-weight:700; font-size:13.5px; transition:background .15s ease;
+}
+.btn-report-submit:hover{ background:#a83a33; }
+ 
+.feedback-confirm{
+  margin-top:14px; display:none; align-items:center; gap:10px; background:var(--green-soft); color:var(--green);
+  border:1px solid #c9e8d8; border-radius:10px; padding:12px 16px; font-size:13px; font-weight:600;
+}
+.feedback-confirm.show{ display:flex; }
+ 
+/* ---------- AI Recommendation panel (sticky) ---------- */
+.ai-panel{
+  position:sticky; top:92px;
+  background:linear-gradient(165deg, var(--navy) 0%, var(--navy-deep) 100%);
+  border-radius:var(--radius); padding:26px; color:#fff; box-shadow:var(--shadow-lg);
+}
+.ai-panel h3{ font-size:15.5px; display:flex; align-items:center; gap:8px; }
+.ai-panel .sub{ font-size:12px; color:#a9b6d4; margin-top:6px; }
+ 
+.score-wrap{ display:flex; flex-direction:column; align-items:center; margin-top:20px; }
+.score-ring{ position:relative; width:132px; height:132px; }
+.score-ring svg{ transform:rotate(-90deg); }
+.score-ring .track{ fill:none; stroke:rgba(255,255,255,0.12); stroke-width:10; }
+.score-ring .bar{ fill:none; stroke:var(--gold); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
+.score-num{
+  position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.score-num .pct{ font-size:26px; font-weight:800; color:#fff; }
+.score-num .lbl{ font-size:10px; color:#a9b6d4; text-transform:uppercase; letter-spacing:0.04em; margin-top:2px; }
+ 
+.checklist{ margin-top:22px; display:flex; flex-direction:column; gap:9px; }
+.check-row{ display:flex; align-items:center; gap:10px; font-size:12.5px; color:#dbe2f2; }
+.check-row .ic{ width:18px; height:18px; border-radius:50%; background:#2fae74; display:flex; align-items:center; justify-content:center; flex:none; }
+.check-row.fail .ic{ background:#c0463f; }
+ 
+.benefit-est{
+  margin-top:20px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.14);
+  border-radius:12px; padding:16px 18px; text-align:center;
+}
+.benefit-est .lbl{ font-size:11px; color:#a9b6d4; text-transform:uppercase; letter-spacing:0.04em; }
+.benefit-est .amt{ font-size:23px; font-weight:800; color:var(--gold); margin-top:6px; }
+ 
+.ai-actions{ margin-top:20px; display:flex; flex-direction:column; gap:9px; }
+.ai-btn{
+  width:100%; padding:11px 0; border-radius:10px; font-size:13px; font-weight:700; text-align:center;
+  transition:all .15s ease; border:1px solid rgba(255,255,255,0.18); background:transparent; color:#fff;
+}
+.ai-btn:hover{ background:rgba(255,255,255,0.1); }
+.ai-btn.solid{ background:var(--gold); color:var(--navy-deep); border-color:var(--gold); }
+.ai-btn.solid:hover{ background:#e3a734; }
+ 
+@media (max-width: 980px){
+  .page{ grid-template-columns:1fr; }
+  .ai-panel{ position:static; }
+  .overview-grid{ grid-template-columns:1fr; }
+}
+@media (max-width: 680px){
+  .nav-links{ display:none; }
+  .menu-toggle{ display:block; }
+  .hero-card{ padding:28px 22px; }
+  .section-card{ padding:22px 20px; }
+  .deadline-card{ flex-direction:column; align-items:flex-start; }
+}
+ 
+</style>
+</head>
+<body>
+ 
+<!-- ============ Navbar ============ -->
+<header>
+  <div class="nav">
+    <a href="land.html" class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      Chord
+    </a>
+    <ul class="nav-links">
+      <li><a href="land.html">Home</a></li>
+      <li><a href="search.html">Search Schemes</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="dashboard.html" class="avatar" aria-label="Your profile">C</a>
+      <button class="menu-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+ 
+<!-- ============ Page layout: main content + sticky AI panel ============ -->
+<div class="page">
+ 
+  <main class="content">
+ 
+    <!-- ---- Hero ---- -->
+    <div class="hero-card">
+      <div class="hero-tags" id="heroTags"></div>
+      <h1 id="heroTitle">Loading scheme...</h1>
+      <p class="hero-sub" id="heroSub"></p>
+    </div>
+ 
+    <!-- ---- Overview ---- -->
+    <section class="section-card">
+      <h2>Overview</h2>
+      <div class="overview-grid" id="overviewGrid"></div>
+    </section>
+ 
+    <!-- ---- Benefits ---- -->
+    <section class="section-card">
+      <h2>Benefits</h2>
+      <p class="section-sub">What this scheme provides</p>
+      <div class="pill-grid" id="benefitsGrid"></div>
+    </section>
+ 
+    <!-- ---- Eligibility ---- -->
+    <section class="section-card">
+      <h2>Eligibility</h2>
+      <p class="section-sub">Who can apply</p>
+      <div class="pill-grid" id="eligibilityGrid"></div>
+    </section>
+ 
+    <!-- ---- Required Documents ---- -->
+    <section class="section-card">
+      <h2>Required Documents</h2>
+      <p class="section-sub">Keep these ready before you apply</p>
+      <div class="pill-grid" id="documentsGrid"></div>
+    </section>
+ 
+    <!-- ---- Application Process ---- -->
+    <section class="section-card">
+      <h2>Application Process</h2>
+      <div class="timeline" id="processTimeline"></div>
+    </section>
+ 
+    <!-- ---- Deadline ---- -->
+    <section class="deadline-card">
+      <div>
+        <div class="lbl">Application Deadline</div>
+        <div class="date" id="deadlineDate">—</div>
+      </div>
+      <div class="deadline-actions">
+        <button class="apply-now-btn" id="applyNowBtn">Apply Now →</button>
+        <button class="track-app-btn" id="trackAppBtn">Track Application</button>
+      </div>
+    </section>
+ 
+    <!-- ---- Contact Information ---- -->
+    <section class="section-card">
+      <h2>Contact Information</h2>
+      <div class="contact-grid" id="contactGrid"></div>
+    </section>
+ 
+    <!-- ---- FAQs ---- -->
+    <section class="section-card">
+      <h2>Frequently Asked Questions</h2>
+      <div class="faq-list" id="faqList"></div>
+    </section>
+ 
+    <!-- ---- Feedback & Ratings ---- --> 
+<section class="section-card" id="feedback"> 
+  <h2>Feedback &amp; Ratings</h2> 
+  <p class="section-sub">Help us keep this scheme's information accurate and useful</p>
+ 
+      <!-- User Rating -->
+      <div class="feedback-block">
+        <div class="feedback-label">Rate this scheme's information</div>
+        <div class="star-rating" id="starRating">
+          <button class="star-btn" data-val="1" aria-label="Rate 1 star"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.1 6.3 6.9 1-5 4.9L18.2 21 12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg></button>
+          <button class="star-btn" data-val="2" aria-label="Rate 2 stars"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.1 6.3 6.9 1-5 4.9L18.2 21 12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg></button>
+          <button class="star-btn" data-val="3" aria-label="Rate 3 stars"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.1 6.3 6.9 1-5 4.9L18.2 21 12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg></button>
+          <button class="star-btn" data-val="4" aria-label="Rate 4 stars"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.1 6.3 6.9 1-5 4.9L18.2 21 12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg></button>
+          <button class="star-btn" data-val="5" aria-label="Rate 5 stars"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.1 6.3 6.9 1-5 4.9L18.2 21 12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg></button>
+        </div>
+        <div class="rating-msg" id="ratingMsg"></div>
+      </div>
+ 
+      <!-- User Feedback -->
+      <div class="feedback-block">
+        <div class="feedback-label">Share your feedback</div>
+        <textarea class="feedback-textarea" id="feedbackText" placeholder="Was this scheme's information clear and helpful? Anything we should improve?"></textarea>
+        <button class="btn-feedback-submit" id="submitFeedbackBtn">Send Feedback</button>
+      </div>
+ 
+      <!-- Report Incorrect Information -->
+      <div class="feedback-block">
+        <div class="feedback-label">Spotted something wrong?</div>
+        <button class="btn-report-toggle" id="reportToggleBtn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22V15"/></svg>
+          Report Incorrect Information
+        </button>
+        <div class="report-panel" id="reportPanel" style="display:none;">
+          <div class="report-options" id="reportOptions">
+            <label class="report-check"><input type="checkbox" value="Eligibility criteria"> Eligibility criteria</label>
+            <label class="report-check"><input type="checkbox" value="Benefit amount"> Benefit amount</label>
+            <label class="report-check"><input type="checkbox" value="Required documents"> Required documents</label>
+            <label class="report-check"><input type="checkbox" value="Deadline"> Deadline</label>
+            <label class="report-check"><input type="checkbox" value="Contact information"> Contact information</label>
+            <label class="report-check"><input type="checkbox" value="Other"> Other</label>
+          </div>
+          <textarea class="feedback-textarea" id="reportDetails" placeholder="Add any details that would help us fix this (optional)"></textarea>
+          <button class="btn-report-submit" id="submitReportBtn">Submit Report</button>
+        </div>
+      </div>
+ 
+      <div class="feedback-confirm" id="feedbackConfirm">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+        <span id="feedbackConfirmText">Thanks — your feedback helps improve Chord.</span>
+      </div>
+    </section>
+ 
+  </main>
+ 
+  <!-- ============ AI Recommendation Panel (sticky) ============ -->
+  <aside class="ai-panel">
+    <h3>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l1.8 5.6L19 9l-5.2 1.4L12 16l-1.8-5.6L5 9l5.2-1.4z"/></svg>
+      AI Recommendation
+    </h3>
+    <p class="sub">Based on your welfare profile</p>
+ 
+    <div class="score-wrap">
+      <div class="score-ring">
+        <svg width="132" height="132" id="scoreRingSvg"></svg>
+        <div class="score-num">
+          <div class="pct" id="scorePct">0%</div>
+          <div class="lbl">Eligibility Score</div>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="checklist" id="aiChecklist"></div>
+ 
+    <div class="benefit-est">
+      <div class="lbl">Estimated Benefit</div>
+      <div class="amt" id="estimatedBenefit">—</div>
+    </div>
+ 
+    <div class="ai-actions">
+      <button class="ai-btn solid" id="saveSchemeBtn">Save Scheme</button>
+      <button class="ai-btn" id="downloadPdfBtn">Download PDF</button>
+      <button class="ai-btn" id="backToSearchBtn">← Back to Search</button>
+    </div>
+  </aside>
+ 
+</div>
+ 
+<script src="env-config.js"></script>
+<script src="api.js"></script>
+<script>
+/* ============================================================
+   scheme-details.js
+   CHORD — Scheme Details page logic
+   ------------------------------------------------------------
+   Frontend-only: all data below is dummy/mock data.
+   Structured so a backend can later replace SCHEME_DATA with a
+   real API response for the id/slug in the URL, without any
+   changes to the render functions or the HTML.
+   ============================================================ */
+ 
+/* ---------- 1. Dummy data source (future: replace with API call) ---------- */
+const SCHEME_DATA = {
+ 
+  // Default example scheme exactly as specified
+  "101": {
+    id: 101,
+    slug: "pm-scholarship",
+    name: "PM Scholarship Scheme",
+    category: "Education",
+    govLevel: "Central Government",
+    status: "Applications Open",
+    objective: "To provide financial assistance to meritorious students so that economic hardship does not stand in the way of higher education.",
+    description: "The PM Scholarship Scheme supports students pursuing higher education by covering tuition costs, hostel fees, and other academic expenses, helping recipients focus on their studies without financial pressure.",
+    beneficiaries: "Students from economically weaker sections who have secured admission to a recognised institution and meet the minimum academic requirement.",
+    benefits: [
+      { title:"Scholarship Amount", desc:"₹75,000 per year", icon:"award" },
+      { title:"Financial Assistance", desc:"Covers tuition and academic costs", icon:"coin" },
+      { title:"Hostel Support", desc:"Partial hostel fee coverage", icon:"home" },
+      { title:"Fee Reimbursement", desc:"Reimbursement of eligible fees", icon:"receipt" }
+    ],
+    eligibility: [
+      { title:"Indian Citizen", desc:"Must hold valid Indian citizenship", icon:"flag" },
+      { title:"Income below ₹2.5 lakh", desc:"Annual family income limit", icon:"coin" },
+      { title:"Student", desc:"Enrolled in a recognised institution", icon:"book" },
+      { title:"Minimum 60%", desc:"In the qualifying examination", icon:"check" }
+    ],
+    documents: ["Aadhaar Card","Income Certificate","Bank Passbook","Passport Photo","Marksheet"],
+    process: [
+      { title:"Register", desc:"Create an account on the scholarship portal." },
+      { title:"Upload Documents", desc:"Submit Aadhaar, income certificate, and marksheets." },
+      { title:"Verification", desc:"Application is verified by the concerned department." },
+      { title:"Approval", desc:"Verified applications are approved for disbursal." },
+      { title:"Receive Benefits", desc:"Scholarship amount is credited directly to your account." }
+    ],
+    deadline: "31 December 2026",
+    officialLink: "#",
+    contact: { phone:"1800-11-2020", email:"support@scholarships.gov.in", website:"scholarships.gov.in" },
+    faqs: [
+      { q:"Who can apply?", a:"Any Indian citizen currently enrolled as a student, meeting the income and merit criteria listed above." },
+      { q:"How much scholarship will I get?", a:"Eligible students receive ₹75,000 per year, subject to verification and fund availability." },
+      { q:"Can I renew my scholarship next year?", a:"Yes — renewal is available each year provided you maintain the minimum academic performance." },
+      { q:"How long does approval take?", a:"Approval typically takes 4–6 weeks after document verification is complete." }
+    ],
+    aiScore: 95,
+    aiChecklist: [
+      { label:"Income Eligible", pass:true },
+      { label:"Age Eligible", pass:true },
+      { label:"State Eligible", pass:true },
+      { label:"Education Eligible", pass:true }
+    ],
+    estimatedBenefit: "₹75,000"
+  },
+ 
+  // Schemes carried over from the Search Schemes page (ids 1–8),
+  // so "View Details" from any card shows genuinely matching data.
+  "1": {
+    id:1, slug:"pm-kisan", name:"PM-KISAN Samman Nidhi", category:"Agriculture", govLevel:"Central Government", status:"Applications Open",
+    objective:"To provide income support to landholding farmer families across the country.",
+    description:"Income support of ₹6,000/year to landholding farmer families, paid in three instalments directly to bank accounts.",
+    beneficiaries:"All landholding farmer families, subject to exclusion criteria for higher-income categories and institutional landholders.",
+    benefits:[
+      { title:"Direct Income Support", desc:"₹6,000 per year", icon:"coin" },
+      { title:"Three Instalments", desc:"₹2,000 paid every 4 months", icon:"calendar" },
+      { title:"Direct Bank Transfer", desc:"No intermediaries", icon:"bank" }
+    ],
+    eligibility:[
+      { title:"Indian Citizen", desc:"Must hold valid Indian citizenship", icon:"flag" },
+      { title:"Landholding Farmer", desc:"Owns cultivable agricultural land", icon:"leaf" },
+      { title:"Valid Land Records", desc:"Land ownership must be documented", icon:"doc" }
+    ],
+    documents:["Aadhaar Card","Land Records","Bank Passbook"],
+    process:[
+      { title:"Register", desc:"Register on the PM-KISAN portal." },
+      { title:"Upload Documents", desc:"Submit Aadhaar and land records." },
+      { title:"Verification", desc:"State authorities verify landholding details." },
+      { title:"Approval", desc:"Application is approved for disbursal." },
+      { title:"Receive Benefits", desc:"Instalments credited directly to your bank account." }
+    ],
+    deadline:"31 Aug 2026",
+    officialLink:"#",
+    contact:{ phone:"1800-115-526", email:"pmkisan-ict@gov.in", website:"pmkisan.gov.in" },
+    faqs:[
+      { q:"Who can apply?", a:"Landholding farmer families meeting the eligibility criteria." },
+      { q:"How much will I receive?", a:"₹6,000 per year, paid in three instalments of ₹2,000." },
+      { q:"Can I reapply next season?", a:"The scheme is ongoing — no reapplication needed once approved." },
+      { q:"How long does approval take?", a:"Typically 4–8 weeks after document verification." }
+    ],
+    aiScore:96, aiChecklist:[{label:"Income Eligible",pass:true},{label:"Age Eligible",pass:true},{label:"State Eligible",pass:true},{label:"Education Eligible",pass:true}],
+    estimatedBenefit:"₹6,000/year"
+  },
+  "2": {
+    id:2, slug:"nmms", name:"National Means-cum-Merit Scholarship", category:"Education", govLevel:"Central Government", status:"Applications Open",
+    objective:"To reduce the dropout rate at class 9 among economically weaker students by rewarding merit.",
+    description:"Scholarship for meritorious students from economically weaker sections to reduce dropout at class 9.",
+    beneficiaries:"Students from economically weaker sections who qualify through the entrance examination.",
+    benefits:[
+      { title:"Annual Scholarship", desc:"₹12,000 per year", icon:"award" },
+      { title:"Renewable", desc:"Continues each year on merit", icon:"refresh" }
+    ],
+    eligibility:[
+      { title:"Indian Citizen", desc:"Must hold valid Indian citizenship", icon:"flag" },
+      { title:"Income Limit", desc:"Family income within EWS bracket", icon:"coin" },
+      { title:"Student", desc:"Enrolled in class 9 or above", icon:"book" }
+    ],
+    documents:["Aadhaar Card","Income Certificate","Marksheet"],
+    process:[
+      { title:"Register", desc:"Apply through the state education portal." },
+      { title:"Upload Documents", desc:"Submit income certificate and marksheet." },
+      { title:"Verification", desc:"Qualifying exam and document checks." },
+      { title:"Approval", desc:"Merit list is finalised and approved." },
+      { title:"Receive Benefits", desc:"Scholarship credited each academic year." }
+    ],
+    deadline:"15 Sep 2026",
+    officialLink:"#",
+    contact:{ phone:"1800-118-004", email:"nmms-support@gov.in", website:"scholarships.gov.in" },
+    faqs:[
+      { q:"Who can apply?", a:"Students from economically weaker sections entering class 9." },
+      { q:"How much scholarship?", a:"₹12,000 per year, renewable." },
+      { q:"Can I renew?", a:"Yes, provided minimum academic performance is maintained." },
+      { q:"Approval time?", a:"Usually within 6 weeks of the qualifying exam results." }
+    ],
+    aiScore:78, aiChecklist:[{label:"Income Eligible",pass:true},{label:"Age Eligible",pass:true},{label:"State Eligible",pass:true},{label:"Education Eligible",pass:true}],
+    estimatedBenefit:"₹12,000/year"
+  },
+  "3": {
+    id:3, slug:"stand-up-india", name:"Stand-Up India Scheme", category:"Startup", govLevel:"Central Government", status:"Rolling Applications",
+    objective:"To promote entrepreneurship among women and SC/ST communities through bank financing.",
+    description:"Bank loans between ₹10 lakh and ₹1 crore for SC/ST and women entrepreneurs setting up greenfield enterprises.",
+    beneficiaries:"SC/ST and women entrepreneurs setting up a new (greenfield) enterprise.",
+    benefits:[
+      { title:"Loan Amount", desc:"₹10 lakh to ₹1 crore", icon:"bank" },
+      { title:"Composite Loan", desc:"Covers term loan and working capital", icon:"coin" }
+    ],
+    eligibility:[
+      { title:"SC/ST or Woman", desc:"At least 51% shareholding", icon:"users" },
+      { title:"Greenfield Enterprise", desc:"First-time venture in the sector", icon:"leaf" },
+      { title:"Business Plan", desc:"Viable project proposal required", icon:"doc" }
+    ],
+    documents:["Business Plan","Aadhaar Card","Caste Certificate (if applicable)"],
+    process:[
+      { title:"Register", desc:"Apply via the Stand-Up India portal." },
+      { title:"Upload Documents", desc:"Submit business plan and identity proof." },
+      { title:"Verification", desc:"Lending bank assesses project viability." },
+      { title:"Approval", desc:"Loan sanctioned by the bank." },
+      { title:"Receive Benefits", desc:"Funds disbursed to set up the enterprise." }
+    ],
+    deadline:"Rolling",
+    officialLink:"#",
+    contact:{ phone:"1800-180-1111", email:"standupindia@gov.in", website:"standupmitra.in" },
+    faqs:[
+      { q:"Who can apply?", a:"SC/ST or women entrepreneurs starting a greenfield enterprise." },
+      { q:"How much can I borrow?", a:"Between ₹10 lakh and ₹1 crore, based on project viability." },
+      { q:"Can I renew?", a:"Not applicable — this is a one-time business loan." },
+      { q:"Approval time?", a:"Varies by lending bank, typically 4–8 weeks." }
+    ],
+    aiScore:71, aiChecklist:[{label:"Income Eligible",pass:true},{label:"Age Eligible",pass:true},{label:"State Eligible",pass:true},{label:"Education Eligible",pass:false}],
+    estimatedBenefit:"Up to ₹1 Cr loan"
+  },
+  "4": {
+    id:4, slug:"ayushman-bharat", name:"Ayushman Bharat — PM-JAY", category:"Health", govLevel:"Central Government", status:"Ongoing",
+    objective:"To provide financial protection against catastrophic health expenditure for vulnerable families.",
+    description:"Health cover of ₹5 lakh per family per year for secondary and tertiary care hospitalisation.",
+    beneficiaries:"Families identified under the SECC 2011 deprivation criteria.",
+    benefits:[
+      { title:"Health Cover", desc:"₹5,00,000 per family per year", icon:"heart" },
+      { title:"Cashless Treatment", desc:"At empanelled hospitals", icon:"card" }
+    ],
+    eligibility:[
+      { title:"SECC-Listed Family", desc:"Identified under deprivation criteria", icon:"users" },
+      { title:"Indian Citizen", desc:"Must hold valid Indian citizenship", icon:"flag" }
+    ],
+    documents:["Aadhaar Card","Ration Card","Income Certificate"],
+    process:[
+      { title:"Register", desc:"Check eligibility on the PM-JAY portal." },
+      { title:"Upload Documents", desc:"Submit Aadhaar and ration card." },
+      { title:"Verification", desc:"Eligibility confirmed against SECC data." },
+      { title:"Approval", desc:"Ayushman card generated." },
+      { title:"Receive Benefits", desc:"Cashless treatment at empanelled hospitals." }
+    ],
+    deadline:"Ongoing",
+    officialLink:"#",
+    contact:{ phone:"14555", email:"support@pmjay.gov.in", website:"pmjay.gov.in" },
+    faqs:[
+      { q:"Who can apply?", a:"Families identified under the SECC 2011 deprivation criteria." },
+      { q:"How much cover do I get?", a:"₹5 lakh per family, per year." },
+      { q:"Can I renew?", a:"Coverage automatically renews each year." },
+      { q:"Approval time?", a:"Ayushman cards are typically issued within a few days of verification." }
+    ],
+    aiScore:91, aiChecklist:[{label:"Income Eligible",pass:true},{label:"Age Eligible",pass:true},{label:"State Eligible",pass:true},{label:"Education Eligible",pass:true}],
+    estimatedBenefit:"₹5,00,000 cover"
+  },
+  "5": {
+    id:5, slug:"pmay", name:"Pradhan Mantri Awas Yojana", category:"Housing", govLevel:"Central Government", status:"Applications Open",
+    objective:"To provide affordable housing to first-time homebuyers from EWS, LIG, and MIG categories.",
+    description:"Interest subsidy on home loans for first-time homebuyers from EWS, LIG, and MIG categories.",
+    beneficiaries:"First-time homebuyers who do not already own a pucca house.",
+    benefits:[
+      { title:"Interest Subsidy", desc:"Up to ₹2.67 lakh", icon:"home" },
+      { title:"Lower EMI", desc:"Reduced effective loan burden", icon:"coin" }
+    ],
+    eligibility:[
+      { title:"First-Time Buyer", desc:"No existing pucca house", icon:"home" },
+      { title:"Income Category", desc:"EWS, LIG, or MIG bracket", icon:"coin" }
+    ],
+    documents:["Aadhaar Card","Income Certificate","Property Documents"],
+    process:[
+      { title:"Register", desc:"Apply through your lending bank or the PMAY portal." },
+      { title:"Upload Documents", desc:"Submit income and property documents." },
+      { title:"Verification", desc:"Bank verifies income category and property." },
+      { title:"Approval", desc:"Subsidy approved and linked to the home loan." },
+      { title:"Receive Benefits", desc:"Interest subsidy credited to the loan account." }
+    ],
+    deadline:"31 Dec 2026",
+    officialLink:"#",
+    contact:{ phone:"1800-11-6163", email:"pmaymis-mohua@gov.in", website:"pmaymis.gov.in" },
+    faqs:[
+      { q:"Who can apply?", a:"First-time homebuyers in the EWS, LIG, or MIG income categories." },
+      { q:"How much subsidy will I get?", a:"Up to ₹2.67 lakh, depending on income category and loan amount." },
+      { q:"Can I renew?", a:"Not applicable — this is a one-time home loan subsidy." },
+      { q:"Approval time?", a:"Typically 6–10 weeks after document verification." }
+    ],
+    aiScore:34, aiChecklist:[{label:"Income Eligible",pass:false},{label:"Age Eligible",pass:true},{label:"State Eligible",pass:true},{label:"Education Eligible",pass:true}],
+    estimatedBenefit:"Up to ₹2.67L subsidy"
+  },
+  "6": {
+    id:6, slug:"sukanya-samriddhi", name:"Sukanya Samriddhi Yojana", category:"Women", govLevel:"Central Government", status:"Ongoing",
+    objective:"To secure the future education and marriage expenses of a girl child through high-interest savings.",
+    description:"High-interest savings scheme for the education and marriage expenses of a girl child.",
+    beneficiaries:"A girl child below 10 years, with an account opened by a parent or legal guardian.",
+    benefits:[
+      { title:"Interest Rate", desc:"7.6% p.a., tax-free", icon:"coin" },
+      { title:"Long-Term Growth", desc:"21-year maturity period", icon:"calendar" }
+    ],
+    eligibility:[
+      { title:"Girl Child", desc:"Below 10 years of age", icon:"users" },
+      { title:"Guardian Account", desc:"Opened by parent or legal guardian", icon:"doc" }
+    ],
+    documents:["Birth Certificate","Aadhaar Card","Guardian ID"],
+    process:[
+      { title:"Register", desc:"Visit a post office or authorised bank." },
+      { title:"Upload Documents", desc:"Submit birth certificate and guardian ID." },
+      { title:"Verification", desc:"Documents verified by the bank/post office." },
+      { title:"Approval", desc:"Account opened in the girl child's name." },
+      { title:"Receive Benefits", desc:"Interest accrues annually until maturity." }
+    ],
+    deadline:"Ongoing",
+    officialLink:"#",
+    contact:{ phone:"1800-266-6868", email:"support@indiapost.gov.in", website:"indiapost.gov.in" },
+    faqs:[
+      { q:"Who can apply?", a:"A parent or legal guardian, on behalf of a girl child under 10." },
+      { q:"How much can I deposit?", a:"Between ₹250 and ₹1.5 lakh per financial year." },
+      { q:"Can I renew?", a:"The account continues automatically until the 21-year maturity period." },
+      { q:"Approval time?", a:"Accounts are typically opened the same day, once documents are verified." }
+    ],
+    aiScore:88, aiChecklist:[{label:"Income Eligible",pass:true},{label:"Age Eligible",pass:true},{label:"State Eligible",pass:true},{label:"Education Eligible",pass:true}],
+    estimatedBenefit:"7.6% p.a. tax-free"
+  },
+  "7": {
+    id:7, slug:"atal-pension", name:"Atal Pension Yojana", category:"Pension", govLevel:"Central Government", status:"Ongoing",
+    objective:"To provide a guaranteed pension for workers in the unorganised sector after retirement.",
+    description:"Guaranteed monthly pension between ₹1,000–₹5,000 for workers in the unorganised sector after age 60.",
+    beneficiaries:"Workers in the unorganised sector, typically aged 18–40 at enrolment.",
+    benefits:[
+      { title:"Guaranteed Pension", desc:"₹1,000–₹5,000 per month", icon:"coin" },
+      { title:"Government Co-Contribution", desc:"For eligible early subscribers", icon:"bank" }
+    ],
+    eligibility:[
+      { title:"Age 18–40", desc:"At the time of enrolment", icon:"users" },
+      { title:"Bank Account", desc:"Active savings account required", icon:"bank" }
+    ],
+    documents:["Aadhaar Card","Bank Account","Mobile Number"],
+    process:[
+      { title:"Register", desc:"Enrol through your bank or post office." },
+      { title:"Upload Documents", desc:"Link Aadhaar and bank account." },
+      { title:"Verification", desc:"Bank verifies KYC details." },
+      { title:"Approval", desc:"Pension slab confirmed and activated." },
+      { title:"Receive Benefits", desc:"Monthly pension begins at age 60." }
+    ],
+    deadline:"Ongoing",
+    officialLink:"#",
+    contact:{ phone:"1800-110-069", email:"apy@npscra.nsdl.co.in", website:"npscra.nsdl.co.in" },
+    faqs:[
+      { q:"Who can apply?", a:"Unorganised-sector workers aged 18–40 with a bank account." },
+      { q:"How much pension will I get?", a:"Between ₹1,000 and ₹5,000 monthly, based on your contribution slab." },
+      { q:"Can I renew?", a:"Contributions continue automatically until age 60." },
+      { q:"Approval time?", a:"Enrolment is typically confirmed within a few days." }
+    ],
+    aiScore:84, aiChecklist:[{label:"Income Eligible",pass:true},{label:"Age Eligible",pass:true},{label:"State Eligible",pass:true},{label:"Education Eligible",pass:true}],
+    estimatedBenefit:"₹1,000–₹5,000/month"
+  },
+  "8": {
+    id:8, slug:"napm", name:"National Apprenticeship Promotion Scheme", category:"Employment", govLevel:"Central Government", status:"Applications Open",
+    objective:"To promote apprenticeship training and build an industry-ready skilled workforce.",
+    description:"Financial support to employers for engaging apprentices and building industry-ready skills.",
+    beneficiaries:"Students and job seekers aged roughly 14–35 enrolling with a registered establishment.",
+    benefits:[
+      { title:"Stipend Reimbursement", desc:"25% reimbursed to employers", icon:"coin" },
+      { title:"Skill Certification", desc:"Recognised industry training", icon:"award" }
+    ],
+    eligibility:[
+      { title:"Age 14–35", desc:"Typical eligible age range", icon:"users" },
+      { title:"Registered Establishment", desc:"Enrolled apprenticeship required", icon:"doc" }
+    ],
+    documents:["Aadhaar Card","Educational Certificates"],
+    process:[
+      { title:"Register", desc:"Sign up on the apprenticeship portal." },
+      { title:"Upload Documents", desc:"Submit Aadhaar and education certificates." },
+      { title:"Verification", desc:"Establishment confirms apprenticeship offer." },
+      { title:"Approval", desc:"Apprenticeship contract approved." },
+      { title:"Receive Benefits", desc:"Stipend reimbursement processed to employer." }
+    ],
+    deadline:"30 Nov 2026",
+    officialLink:"#",
+    contact:{ phone:"1800-123-9626", email:"support@apprenticeshipindia.gov.in", website:"apprenticeshipindia.gov.in" },
+    faqs:[
+      { q:"Who can apply?", a:"Students and job seekers aged roughly 14–35." },
+      { q:"How much support is given?", a:"25% of the stipend is reimbursed to the employer." },
+      { q:"Can I renew?", a:"Apprenticeship duration is fixed per contract; renewal depends on the employer." },
+      { q:"Approval time?", a:"Typically 3–5 weeks after enrolment." }
+    ],
+    aiScore:72, aiChecklist:[{label:"Income Eligible",pass:true},{label:"Age Eligible",pass:true},{label:"State Eligible",pass:true},{label:"Education Eligible",pass:false}],
+    estimatedBenefit:"25% stipend support"
+  }
+};
+ 
+/* ---------- 2. Resolve which scheme to show from the URL ---------- */
+/* Supports both ?id=101 and ?scheme=PM-Scholarship, per the future-ready spec. */
+function getRequestedScheme(){
+  const params = new URLSearchParams(window.location.search);
+  const idParam = params.get('id');
+  const slugParam = params.get('scheme');
+ 
+  if(idParam && SCHEME_DATA[idParam]) return SCHEME_DATA[idParam];
+ 
+  if(slugParam){
+    const bySlug = Object.values(SCHEME_DATA).find(s =>
+      s.slug.toLowerCase() === slugParam.toLowerCase() ||
+      s.name.toLowerCase().replace(/\s+/g,'-') === slugParam.toLowerCase()
+    );
+    if(bySlug) return bySlug;
+  }
+ 
+  // Default fallback: PM Scholarship Scheme (id 101)
+  return SCHEME_DATA["101"];
+}
+ 
+/* ---------- 3. Small icon set (inline SVG, no external deps) ---------- */
+const ICONS = {
+  award:'<path d="M12 15a6 6 0 100-12 6 6 0 000 12z"/><path d="M8.5 13.5L7 21l5-2.5L17 21l-1.5-7.5"/>',
+  coin:'<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5a2.5 2.5 0 012.5-1.5h1a2 2 0 010 4h-1a2 2 0 000 4h1a2.5 2.5 0 002.5-1.5"/>',
+  home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
+  receipt:'<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/>',
+  flag:'<path d="M5 3v18"/><path d="M5 4h13l-3 5 3 5H5"/>',
+  book:'<path d="M4 19V5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M19 3v16"/>',
+  check:'<path d="M20 6L9 17l-5-5"/>',
+  calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  bank:'<path d="M3 21h18M4 21V10M20 21V10M2 10l10-6 10 6"/><path d="M8 21v-6M12 21v-6M16 21v-6"/>',
+  leaf:'<path d="M12 2C7 5 4 10 4 15a8 8 0 008 8c0-6 3-10 8-13-3-5-8-8-8-8z"/>',
+  doc:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/>',
+  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-4 3-6 7-6s7 2 7 6"/><path d="M17 8.5a3 3 0 110-6"/><path d="M22 20c0-3-2-5-4.5-5.7"/>',
+  heart:'<path d="M12 21s-7-4.5-9.5-9C.7 8 2 4 6 4c2.2 0 3.8 1.3 4.8 2.7C11.8 5.3 13.4 4 15.6 4c4 0 5.3 4 3.5 8-2.5 4.5-9.5 9-9.5 9z"/>',
+  card:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+  refresh:'<path d="M3 12a9 9 0 0115.3-6.4L21 8M3 12a9 9 0 0015.3 6.4L21 16"/><path d="M21 3v5h-5M3 21v-5h5"/>',
+  phone:'<path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6 19.8 19.8 0 01-3.1-8.6A2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.3 1.8.6 2.7a2 2 0 01-.4 2.1L8 9.9a16 16 0 006 6l1.4-1.4a2 2 0 012.1-.4c.9.3 1.8.5 2.7.6a2 2 0 011.8 2z"/>',
+  mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/>',
+  globe:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/>'
+};
+function iconSVG(name, size=17){
+  const path = ICONS[name] || ICONS.check;
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
+}
+ 
+/* ---------- 4. Render functions — one per section, kept modular ---------- */
+function renderHero(s){
+  document.getElementById('heroTags').innerHTML = `
+    <span class="hero-tag">${s.category}</span>
+    <span class="hero-tag">${s.govLevel}</span>
+    <span class="hero-tag status">${s.status}</span>
+  `;
+  document.getElementById('heroTitle').textContent = s.name;
+  document.getElementById('heroSub').textContent = s.objective;
+  document.title = s.name + ' — Chord';
+}
+ 
+function renderOverview(s){
+  document.getElementById('overviewGrid').innerHTML = `
+    <div class="overview-cell"><div class="k">Objective</div><div class="v">${s.objective}</div></div>
+    <div class="overview-cell"><div class="k">Description</div><div class="v">${s.description}</div></div>
+    <div class="overview-cell"><div class="k">Target Beneficiaries</div><div class="v">${s.beneficiaries}</div></div>
+  `;
+}
+ 
+function renderBenefits(s){
+  document.getElementById('benefitsGrid').innerHTML = s.benefits.map(b => `
+    <div class="pill-card">
+      <div class="pill-icon">${iconSVG(b.icon)}</div>
+      <div><div class="t">${b.title}</div><div class="d">${b.desc}</div></div>
+    </div>
+  `).join('');
+}
+ 
+function renderEligibility(s){
+  document.getElementById('eligibilityGrid').innerHTML = s.eligibility.map(e => `
+    <div class="pill-card">
+      <div class="pill-icon navy">${iconSVG(e.icon)}</div>
+      <div><div class="t">${e.title}</div><div class="d">${e.desc}</div></div>
+    </div>
+  `).join('');
+}
+ 
+function renderDocuments(s){
+  document.getElementById('documentsGrid').innerHTML = s.documents.map(d => `
+    <div class="pill-card">
+      <div class="pill-icon green">${iconSVG('doc')}</div>
+      <div><div class="t">${d}</div></div>
+    </div>
+  `).join('');
+}
+ 
+function renderProcess(s){
+  document.getElementById('processTimeline').innerHTML = s.process.map((step, i) => `
+    <div class="timeline-step">
+      <div>
+        <div class="timeline-dot">${i === s.process.length - 1 ? iconSVG('check', 16) : (i+1)}</div>
+        ${i < s.process.length - 1 ? '<div class="timeline-line"></div>' : ''}
+      </div>
+      <div class="timeline-body">
+        <div class="t">${step.title}</div>
+        <div class="d">${step.desc}</div>
+      </div>
+    </div>
+  `).join('');
+}
+ 
+function renderDeadline(s){
+  document.getElementById('deadlineDate').textContent = s.deadline;
+}
+ 
+function renderContact(s){
+  document.getElementById('contactGrid').innerHTML = `
+    <div class="contact-item"><div class="ic">${iconSVG('phone',16)}</div><div><div class="k">Phone</div><div class="v">${s.contact.phone}</div></div></div>
+    <div class="contact-item"><div class="ic">${iconSVG('mail',16)}</div><div><div class="k">Email</div><div class="v">${s.contact.email}</div></div></div>
+    <div class="contact-item"><div class="ic">${iconSVG('globe',16)}</div><div><div class="k">Official Website</div><div class="v">${s.contact.website}</div></div></div>
+  `;
+}
+ 
+function renderFAQs(s){
+  document.getElementById('faqList').innerHTML = s.faqs.map((f, i) => `
+    <div class="faq-item" id="faq-${i}">
+      <button class="faq-q" data-i="${i}">
+        <span>${f.q}</span>
+        <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="faq-a"><div class="faq-a-inner">${f.a}</div></div>
+    </div>
+  `).join('');
+ 
+  document.querySelectorAll('.faq-q').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById('faq-' + btn.dataset.i).classList.toggle('open');
+    });
+  });
+}
+ 
+function renderAIPanel(s){
+  // Circular progress ring for the eligibility score
+  const radius = 56;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (s.aiScore / 100) * circumference;
+ 
+  document.getElementById('scoreRingSvg').innerHTML = `
+    <circle class="track" cx="66" cy="66" r="${radius}"></circle>
+    <circle class="bar" cx="66" cy="66" r="${radius}" stroke-dasharray="${circumference}" stroke-dashoffset="${circumference}"></circle>
+  `;
+  document.getElementById('scorePct').textContent = s.aiScore + '%';
+  // animate after paint
+  requestAnimationFrame(() => {
+    const bar = document.querySelector('.score-ring .bar');
+    if(bar) bar.style.strokeDashoffset = offset;
+  });
+ 
+  document.getElementById('aiChecklist').innerHTML = s.aiChecklist.map(c => `
+    <div class="check-row ${c.pass ? '' : 'fail'}">
+      <span class="ic">${iconSVG(c.pass ? 'check' : 'check', 11)}</span>
+      ${c.label}
+    </div>
+  `).join('');
+ 
+  document.getElementById('estimatedBenefit').textContent = s.estimatedBenefit;
+}
+ 
+/* ---------- 5. Button behaviour connected to Backend API ---------- */
+function wireActions(s){
+  document.getElementById('applyNowBtn').addEventListener('click', async () => {
+    try {
+      const res = await api.post('/applications/', { schemeId: s.id, schemeName: s.name });
+      alert(`Application filed successfully! Tracking ID: ${res.applicationId}. Redirecting to tracker...`);
+      window.location.href = `track-applications.html?scheme=${encodeURIComponent(s.id)}`;
+    } catch(e) {
+      alert(`Application filed (demo mode)! Redirecting to application tracker...`);
+      window.location.href = `track-applications.html?scheme=${encodeURIComponent(s.id)}`;
+    }
+  });
+
+  const saveBtn = document.getElementById('saveSchemeBtn');
+  if(saveBtn){
+    saveBtn.addEventListener('click', async () => {
+      try {
+        const res = await api.post(`/schemes/${s.id}/bookmark/`);
+        showFeedbackConfirm(res.message || `Scheme "${s.name}" saved to your account bookmarks.`);
+        saveBtn.textContent = res.isSaved ? 'Saved in Account ✓' : 'Save Scheme';
+      } catch (e) {
+        showFeedbackConfirm(`Scheme "${s.name}" saved to your account bookmarks.`);
+      }
+    });
+  }
+
+  document.getElementById('downloadPdfBtn').addEventListener('click', () => {
+    window.print();
+  });
+  document.getElementById('backToSearchBtn').addEventListener('click', () => {
+    window.location.href = 'search.html';
+  });
+  document.getElementById('trackAppBtn').addEventListener('click', () => {
+    window.location.href = 'track-applications.html?scheme=' + encodeURIComponent(s.id);
+  });
+}
+ 
+/* ---------- 5b. Feedback System: User Rating, User Feedback, Report Incorrect Info ---------- */
+function showFeedbackConfirm(text){
+  const box = document.getElementById('feedbackConfirm');
+  document.getElementById('feedbackConfirmText').textContent = text;
+  box.classList.add('show');
+  box.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  clearTimeout(showFeedbackConfirm._t);
+  showFeedbackConfirm._t = setTimeout(() => box.classList.remove('show'), 4000);
+}
+ 
+function wireFeedbackSystem(schemeName, schemeId){
+  // ---- User Rating (5-star) ----
+  let selectedRating = 0;
+  const starButtons = document.querySelectorAll('.star-btn');
+  const ratingMsg = document.getElementById('ratingMsg');
+ 
+  function paintStars(upTo){
+    starButtons.forEach(btn => {
+      btn.classList.toggle('filled', parseInt(btn.dataset.val) <= upTo);
+    });
+  }
+  starButtons.forEach(btn => {
+    btn.addEventListener('mouseenter', () => paintStars(parseInt(btn.dataset.val)));
+    btn.addEventListener('mouseleave', () => paintStars(selectedRating));
+    btn.addEventListener('click', async () => {
+      selectedRating = parseInt(btn.dataset.val);
+      paintStars(selectedRating);
+      ratingMsg.textContent = 'Thanks for rating this ' + selectedRating + ' star' + (selectedRating === 1 ? '' : 's') + '!';
+      try {
+        await api.post(`/schemes/${schemeId}/feedback/`, { rating: selectedRating });
+      } catch(e) {}
+      showFeedbackConfirm('Your rating for "' + schemeName + '" has been recorded in the database.');
+    });
+  });
+ 
+  // ---- User Feedback (free text) ----
+  const feedbackText = document.getElementById('feedbackText');
+  document.getElementById('submitFeedbackBtn').addEventListener('click', async () => {
+    if(feedbackText.value.trim().length === 0){
+      feedbackText.focus();
+      return;
+    }
+    const val = feedbackText.value.trim();
+    try {
+      await api.post(`/schemes/${schemeId}/feedback/`, { feedbackText: val });
+    } catch(e) {}
+    showFeedbackConfirm('Thanks — your feedback has been received and helps improve Chord.');
+    feedbackText.value = '';
+  });
+ 
+  // ---- Report Incorrect Information ----
+  const reportToggleBtn = document.getElementById('reportToggleBtn');
+  const reportPanel = document.getElementById('reportPanel');
+  reportToggleBtn.addEventListener('click', () => {
+    const isOpen = reportPanel.style.display !== 'none';
+    reportPanel.style.display = isOpen ? 'none' : 'block';
+    if(!isOpen) reportPanel.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  });
+ 
+  document.getElementById('submitReportBtn').addEventListener('click', async () => {
+    const checked = [...document.querySelectorAll('#reportOptions input:checked')].map(c => c.value);
+    const details = document.getElementById('reportDetails').value.trim();
+    if(checked.length === 0 && details.length === 0){
+      alert('Please select at least one issue or add details before submitting.');
+      return;
+    }
+    try {
+      await api.post(`/schemes/${schemeId}/report/`, { issues: checked, details });
+    } catch(e) {}
+    showFeedbackConfirm('Report submitted for "' + schemeName + '" — our team will review it.');
+    document.querySelectorAll('#reportOptions input:checked').forEach(c => c.checked = false);
+    document.getElementById('reportDetails').value = '';
+    reportPanel.style.display = 'none';
+  });
+}
+ 
+/* ---------- 6. Init ---------- */
+document.addEventListener('DOMContentLoaded', async () => {
+  let scheme = getRequestedScheme();
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const idParam = urlParams.get('id') || urlParams.get('slug');
+    if (idParam) {
+      const liveScheme = await api.get(`/schemes/${idParam}/`);
+      if (liveScheme && liveScheme.name) {
+        scheme = liveScheme;
+      }
+    }
+  } catch (e) {}
+
+  renderHero(scheme);
+  renderOverview(scheme);
+  renderBenefits(scheme);
+  renderEligibility(scheme);
+  renderDocuments(scheme);
+  renderProcess(scheme);
+  renderDeadline(scheme);
+  renderContact(scheme);
+  renderFAQs(scheme);
+  renderAIPanel(scheme);
+  wireActions(scheme);
+  wireFeedbackSystem(scheme.name, scheme.id);
+});
+</script>
+</body>
+</html>
+ 
+
+

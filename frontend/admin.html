@@ -1,0 +1,2491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>CHORD — Admin Panel</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+    --bg:#f5f7fb;
+    --surface:#ffffff;
+    --surface-2:#eef1f7;
+
+    --ink:#10192b;
+    --ink-soft:#4c586c;
+    --ink-faint:#8792a3;
+
+    --line:#e3e7ee;
+
+    --blue:#1b3f8b;
+    --blue-deep:#122c63;
+
+    --amber:#c8791f;
+    --amber-soft:#fdf2e2;
+
+    --green:#1f7a54;
+    --green-soft:#e9f5ef;
+
+    --red:#c0463f;
+    --red-soft:#fbeceb;
+
+    --radius:14px;
+
+    --shadow:
+        0 1px 2px rgba(16,25,43,0.04),
+        0 12px 28px -14px rgba(16,25,43,0.16);
+}
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',system-ui,sans-serif;
+    line-height:1.5;
+}
+
+button,
+input,
+select,
+textarea{
+    font-family:inherit;
+}
+
+button{
+    cursor:pointer;
+}
+
+h1,
+h2,
+h3{
+    font-family:'Fraunces',serif;
+    margin:0;
+}
+
+a{
+    color:inherit;
+    text-decoration:none;
+}
+
+/* =========================================
+   MAIN LAYOUT
+========================================= */
+
+.admin-layout{
+    min-height:100vh;
+    display:flex;
+}
+
+/* =========================================
+   SIDEBAR
+========================================= */
+
+.sidebar{
+    width:250px;
+    background:var(--blue-deep);
+    color:white;
+    position:fixed;
+    top:0;
+    left:0;
+    bottom:0;
+    display:flex;
+    flex-direction:column;
+    z-index:20;
+}
+
+.brand{
+    padding:25px 24px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Fraunces',serif;
+    font-size:22px;
+    font-weight:700;
+    border-bottom:1px solid rgba(255,255,255,.1);
+}
+
+.brand-mark{
+    width:31px;
+    height:31px;
+    border-radius:8px;
+    background:linear-gradient(
+        155deg,
+        var(--blue),
+        #0c2049
+    );
+    border:1px solid rgba(255,255,255,.18);
+    position:relative;
+}
+
+.brand-mark::after{
+    content:"";
+    position:absolute;
+    inset:8px;
+    border:1.6px solid white;
+    border-radius:4px;
+    border-bottom-color:var(--amber);
+    border-right-color:var(--amber);
+}
+
+.admin-label{
+    padding:20px 24px 10px;
+    color:#8fa0c4;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+}
+
+.nav{
+    padding:0 12px;
+}
+
+.nav button{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 14px;
+    border:none;
+    border-radius:9px;
+    background:transparent;
+    color:#c6d2ea;
+    font-size:14px;
+    text-align:left;
+    margin-bottom:5px;
+    transition:.2s;
+}
+
+.nav button:hover{
+    background:rgba(255,255,255,.07);
+    color:white;
+}
+
+.nav button.active{
+    background:white;
+    color:var(--blue-deep);
+    font-weight:600;
+}
+
+.nav-icon{
+    width:20px;
+    text-align:center;
+    font-size:16px;
+}
+
+.sidebar-bottom{
+    margin-top:auto;
+    padding:18px 16px;
+    border-top:1px solid rgba(255,255,255,.1);
+}
+
+.admin-user{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:15px;
+}
+
+.avatar{
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    background:var(--amber);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    font-weight:700;
+}
+
+.admin-user small{
+    display:block;
+    color:#8fa0c4;
+    font-size:11px;
+}
+
+.logout{
+    width:100%;
+    border:1px solid rgba(255,255,255,.15);
+    background:transparent;
+    color:#c6d2ea;
+    border-radius:8px;
+    padding:9px;
+}
+
+.logout:hover{
+    background:rgba(255,255,255,.08);
+    color:white;
+}
+
+/* =========================================
+   CONTENT
+========================================= */
+
+.main{
+    margin-left:250px;
+    width:calc(100% - 250px);
+    min-height:100vh;
+}
+
+/* =========================================
+   TOP BAR
+========================================= */
+
+.topbar{
+    height:72px;
+    background:white;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:0 34px;
+    position:sticky;
+    top:0;
+    z-index:10;
+}
+
+.top-title{
+    font-size:14px;
+    color:var(--ink-soft);
+}
+
+.top-title strong{
+    color:var(--ink);
+}
+
+.view-site{
+    border:1px solid var(--line);
+    background:white;
+    padding:8px 14px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.view-site:hover{
+    border-color:var(--blue);
+    color:var(--blue);
+}
+
+/* =========================================
+   PAGE
+========================================= */
+
+.content{
+    padding:32px;
+}
+
+.page{
+    display:none;
+}
+
+.page.active{
+    display:block;
+    animation:fadeUp .25s ease;
+}
+
+@keyframes fadeUp{
+    from{
+        opacity:0;
+        transform:translateY(5px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+.page-heading{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.page-heading h1{
+    font-size:30px;
+}
+
+.page-heading p{
+    margin-top:5px;
+    color:var(--ink-soft);
+    font-size:14px;
+}
+
+/* =========================================
+   STAT CARDS
+========================================= */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:18px;
+    margin-bottom:28px;
+}
+
+.stat-card{
+    background:white;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:20px;
+    box-shadow:var(--shadow);
+}
+
+.stat-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.stat-label{
+    font-size:13px;
+    color:var(--ink-soft);
+}
+
+.stat-icon{
+    width:36px;
+    height:36px;
+    border-radius:9px;
+    background:var(--surface-2);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.stat-number{
+    font-family:'Fraunces',serif;
+    font-size:29px;
+    margin-top:10px;
+}
+
+.stat-change{
+    margin-top:5px;
+    font-size:12px;
+    color:var(--green);
+}
+
+/* =========================================
+   CARDS
+========================================= */
+
+.card{
+    background:white;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+}
+
+.card-header{
+    padding:18px 20px;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.card-header h3{
+    font-size:19px;
+}
+
+.card-body{
+    padding:20px;
+}
+
+/* =========================================
+   TABLE
+========================================= */
+
+.table-wrap{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:var(--surface);
+    text-align:left;
+    font-size:12px;
+    color:var(--ink-soft);
+    font-weight:600;
+    padding:12px 15px;
+    border-bottom:1px solid var(--line);
+}
+
+td{
+    padding:14px 15px;
+    border-bottom:1px solid var(--line);
+    font-size:13px;
+}
+
+tr:last-child td{
+    border-bottom:none;
+}
+
+.scheme-name{
+    font-weight:600;
+}
+
+.badge{
+    display:inline-flex;
+    align-items:center;
+    padding:4px 9px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:600;
+    text-transform:uppercase;
+    font-family:'IBM Plex Mono',monospace;
+}
+
+.badge.green{
+    background:var(--green-soft);
+    color:var(--green);
+}
+
+.badge.amber{
+    background:var(--amber-soft);
+    color:var(--amber);
+}
+
+.badge.red{
+    background:var(--red-soft);
+    color:var(--red);
+}
+
+.badge.blue{
+    background:#eaf0ff;
+    color:var(--blue);
+}
+
+.badge.missing{
+    background:var(--surface-2);
+    color:var(--ink-faint);
+}
+
+/* =========================================
+   BUTTONS
+========================================= */
+
+.btn{
+    border:none;
+    border-radius:8px;
+    padding:9px 14px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.btn-primary{
+    background:var(--blue-deep);
+    color:white;
+}
+
+.btn-primary:hover{
+    background:var(--blue);
+}
+
+.btn-secondary{
+    background:white;
+    border:1px solid var(--line);
+    color:var(--ink);
+}
+
+.btn-secondary:hover{
+    border-color:var(--ink-faint);
+}
+
+.btn-danger{
+    background:var(--red-soft);
+    color:var(--red);
+}
+
+.btn-success{
+    background:var(--green-soft);
+    color:var(--green);
+}
+
+.action-buttons{
+    display:flex;
+    gap:7px;
+}
+
+/* =========================================
+   DOCUMENT VERIFICATION STYLES
+========================================= */
+
+.v-user-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    margin-bottom:20px;
+}
+
+.v-user-head{
+    padding:16px 20px;
+    background:#fafbfe;
+    border-bottom:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:12px;
+}
+
+.v-user-info{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.v-avatar{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:linear-gradient(135deg, var(--blue), var(--blue-deep));
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:15px;
+}
+
+.v-doc-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(290px, 1fr));
+    gap:14px;
+    padding:20px;
+}
+
+.v-doc-item{
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:14px;
+    background:#fff;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.v-doc-tag{
+    font-size:11px;
+    font-family:'IBM Plex Mono',monospace;
+    color:var(--blue);
+    background:rgba(27,63,139,0.08);
+    padding:3px 6px;
+    border-radius:5px;
+    margin-top:4px;
+    display:inline-block;
+}
+
+.v-actions{
+    display:flex;
+    gap:6px;
+    padding-top:10px;
+    border-top:1px solid var(--line);
+}
+
+.btn-v{
+    flex:1;
+    padding:7px 4px;
+    border-radius:6px;
+    font-size:11.5px;
+    font-weight:600;
+    border:1px solid transparent;
+    cursor:pointer;
+    text-align:center;
+    transition:all .15s ease;
+}
+
+.btn-v.app{
+    background:var(--green-soft);
+    color:var(--green);
+    border-color:rgba(31,122,84,0.2);
+}
+
+.btn-v.app:hover{
+    background:var(--green);
+    color:#fff;
+}
+
+.btn-v.rej{
+    background:var(--red-soft);
+    color:var(--red);
+    border-color:rgba(192,70,63,0.2);
+}
+
+.btn-v.rej:hover{
+    background:var(--red);
+    color:#fff;
+}
+
+.btn-v.reup{
+    background:var(--amber-soft);
+    color:var(--amber);
+    border-color:rgba(200,121,31,0.2);
+}
+
+.btn-v.reup:hover{
+    background:var(--amber);
+    color:#fff;
+}
+
+.btn-v.dis{
+    opacity:0.45;
+    pointer-events:none;
+}
+
+/* =========================================
+   SEARCH & FORMS
+========================================= */
+
+.search-box{
+    display:flex;
+    gap:10px;
+    margin-bottom:18px;
+}
+
+.search-box input{
+    flex:1;
+    padding:11px 13px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:14px;
+}
+
+.search-box input:focus{
+    outline:none;
+    border-color:var(--blue);
+    box-shadow:0 0 0 3px rgba(27,63,139,.1);
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+
+.form-group{
+    margin-bottom:18px;
+}
+
+.form-group.full{
+    grid-column:1/-1;
+}
+
+.form-group label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:7px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea{
+    width:100%;
+    padding:11px 12px;
+    border:1px solid var(--line);
+    border-radius:8px;
+    font-size:14px;
+    background:white;
+}
+
+.form-group textarea{
+    min-height:110px;
+    resize:vertical;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{
+    outline:none;
+    border-color:var(--blue);
+    box-shadow:0 0 0 3px rgba(27,63,139,.1);
+}
+
+.form-actions{
+    display:flex;
+    gap:10px;
+    margin-top:5px;
+}
+
+/* =========================================
+   REPORTS
+========================================= */
+
+.report-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.report-item{
+    padding:17px 0;
+    border-bottom:1px solid var(--line);
+}
+
+.report-item:last-child{
+    border-bottom:none;
+}
+
+.report-item-top{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:7px;
+}
+
+.progress{
+    height:7px;
+    background:var(--surface-2);
+    border-radius:10px;
+    overflow:hidden;
+}
+
+.progress span{
+    display:block;
+    height:100%;
+    background:var(--blue);
+    border-radius:10px;
+}
+
+/* =========================================
+   ACTIVITY
+========================================= */
+
+.activity{
+    display:flex;
+    gap:12px;
+    padding:13px 0;
+    border-bottom:1px solid var(--line);
+}
+
+.activity:last-child{
+    border-bottom:none;
+}
+
+.activity-dot{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:var(--amber);
+    margin-top:6px;
+    flex:none;
+}
+
+.activity p{
+    font-size:13px;
+}
+
+.activity small{
+    color:var(--ink-faint);
+    font-size:11px;
+}
+
+/* =========================================
+   TOAST
+========================================= */
+
+.toast{
+    position:fixed;
+    right:25px;
+    bottom:25px;
+    background:var(--ink);
+    color:white;
+    padding:12px 18px;
+    border-radius:9px;
+    opacity:0;
+    transform:translateY(10px);
+    pointer-events:none;
+    transition:.25s;
+    z-index:100;
+    font-size:13px;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translateY(0);
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media(max-width:1000px){
+    .stats{ grid-template-columns:1fr 1fr; }
+    .report-grid{ grid-template-columns:1fr; }
+}
+
+@media(max-width:750px){
+    .sidebar{ width:65px; }
+    .brand{ justify-content:center; padding:20px 10px; }
+    .brand span:last-child, .admin-label, .nav button span:not(.nav-icon), .admin-user div, .logout{ display:none; }
+    .nav button{ justify-content:center; }
+    .main{ margin-left:65px; width:calc(100% - 65px); }
+    .content{ padding:20px; }
+    .stats{ grid-template-columns:1fr; }
+    .form-grid{ grid-template-columns:1fr; }
+    .form-group.full{ grid-column:auto; }
+    .topbar{ padding:0 18px; }
+    .page-heading{ align-items:flex-start; gap:12px; flex-direction:column; }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="admin-layout">
+
+<!-- =========================================
+     SIDEBAR
+========================================= -->
+
+<aside class="sidebar">
+
+    <div class="brand">
+        <span class="brand-mark"></span>
+        <span>Chord</span>
+    </div>
+
+    <div class="admin-label">
+        Administration
+    </div>
+
+    <nav class="nav">
+
+        <button class="nav-btn active" data-page="dashboard">
+            <span class="nav-icon">⌂</span>
+            <span>Dashboard</span>
+        </button>
+
+        <button class="nav-btn" data-page="schemes">
+            <span class="nav-icon">▣</span>
+            <span>Manage Schemes</span>
+        </button>
+
+        <button class="nav-btn" data-page="addScheme">
+            <span class="nav-icon">＋</span>
+            <span>Add Scheme</span>
+        </button>
+
+        <button class="nav-btn" data-page="users">
+            <span class="nav-icon">♙</span>
+            <span>Manage Users</span>
+        </button>
+
+        <!-- VERIFY DOCUMENTS BUTTON (Below Manage Users) -->
+        <button class="nav-btn" data-page="verifyDocs">
+            <span class="nav-icon">📋</span>
+            <span>Verify Documents</span>
+        </button>
+
+        <button class="nav-btn" data-page="updates">
+            <span class="nav-icon">✓</span>
+            <span>Scheme Updates</span>
+        </button>
+
+        <button class="nav-btn" data-page="reports">
+            <span class="nav-icon">▤</span>
+            <span>Reports</span>
+        </button>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+        <div class="admin-user">
+
+            <div class="avatar">
+                A
+            </div>
+
+            <div>
+                <strong>Administrator</strong>
+                <small>System Admin</small>
+            </div>
+
+        </div>
+
+        <button class="logout" id="logoutBtn">
+            Logout
+        </button>
+
+    </div>
+
+</aside>
+
+
+<!-- =========================================
+     MAIN
+========================================= -->
+
+<main class="main">
+
+    <header class="topbar">
+
+        <div class="top-title">
+            CHORD / <strong>Administration</strong>
+        </div>
+
+        <a href="land.html" class="view-site">
+            View CHORD Website →
+        </a>
+
+    </header>
+
+
+    <div class="content">
+
+
+<!-- =========================================
+     DASHBOARD
+========================================= -->
+
+<section class="page active" id="dashboard">
+
+    <div class="page-heading">
+
+        <div>
+            <h1>Admin Dashboard</h1>
+            <p>Monitor and manage the CHORD welfare platform.</p>
+        </div>
+
+    </div>
+
+
+    <div class="stats">
+
+        <div class="stat-card">
+
+            <div class="stat-top">
+
+                <span class="stat-label">
+                    Total Schemes
+                </span>
+
+                <div class="stat-icon">
+                    ▣
+                </div>
+
+            </div>
+
+            <div class="stat-number" id="schemeCount">
+                128
+            </div>
+
+            <div class="stat-change">
+                ↑ 8 this month
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-top">
+
+                <span class="stat-label">
+                    Registered Users
+                </span>
+
+                <div class="stat-icon">
+                    ♙
+                </div>
+
+            </div>
+
+            <div class="stat-number">
+                4,286
+            </div>
+
+            <div class="stat-change">
+                ↑ 12.4% this month
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-top">
+
+                <span class="stat-label">
+                    Pending Updates
+                </span>
+
+                <div class="stat-icon">
+                    !
+                </div>
+
+            </div>
+
+            <div class="stat-number">
+                14
+            </div>
+
+            <div class="stat-change">
+                Requires review
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <div class="stat-top">
+
+                <span class="stat-label">
+                    Applications Tracked
+                </span>
+
+                <div class="stat-icon">
+                    ✓
+                </div>
+
+            </div>
+
+            <div class="stat-number">
+                7,942
+            </div>
+
+            <div class="stat-change">
+                ↑ 6.8% this month
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="report-grid">
+
+        <div class="card">
+
+            <div class="card-header">
+                <h3>Recent Activity</h3>
+            </div>
+
+            <div class="card-body">
+
+                <div class="activity">
+                    <span class="activity-dot"></span>
+                    <div>
+                        <p>New scheme added — <strong>Skill Development Initiative</strong></p>
+                        <small>Today, 10:32 AM</small>
+                    </div>
+                </div>
+
+                <div class="activity">
+                    <span class="activity-dot"></span>
+                    <div>
+                        <p>Scheme update submitted for review</p>
+                        <small>Today, 09:15 AM</small>
+                    </div>
+                </div>
+
+                <div class="activity">
+                    <span class="activity-dot"></span>
+                    <div>
+                        <p>42 new users registered</p>
+                        <small>Yesterday</small>
+                    </div>
+                </div>
+
+                <div class="activity">
+                    <span class="activity-dot"></span>
+                    <div>
+                        <p>PM Scholarship information updated</p>
+                        <small>Yesterday</small>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-header">
+                <h3>Scheme Categories</h3>
+            </div>
+
+            <div class="card-body">
+
+                <div class="report-item">
+
+                    <div class="report-item-top">
+                        <span>Education</span>
+                        <strong>32%</strong>
+                    </div>
+
+                    <div class="progress">
+                        <span style="width:32%"></span>
+                    </div>
+
+                </div>
+
+
+                <div class="report-item">
+
+                    <div class="report-item-top">
+                        <span>Employment</span>
+                        <strong>24%</strong>
+                    </div>
+
+                    <div class="progress">
+                        <span style="width:24%"></span>
+                    </div>
+
+                </div>
+
+
+                <div class="report-item">
+
+                    <div class="report-item-top">
+                        <span>Agriculture</span>
+                        <strong>18%</strong>
+                    </div>
+
+                    <div class="progress">
+                        <span style="width:18%"></span>
+                    </div>
+
+                </div>
+
+
+                <div class="report-item">
+
+                    <div class="report-item-top">
+                        <span>Healthcare</span>
+                        <strong>15%</strong>
+                    </div>
+
+                    <div class="progress">
+                        <span style="width:15%"></span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     MANAGE SCHEMES
+========================================= -->
+
+<section class="page" id="schemes">
+
+    <div class="page-heading">
+
+        <div>
+            <h1>Manage Schemes</h1>
+            <p>Add, edit or remove government welfare schemes.</p>
+        </div>
+
+        <button class="btn btn-primary" onclick="openPage('addScheme')">
+            + Add Scheme
+        </button>
+
+    </div>
+
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="schemeSearch"
+            placeholder="Search schemes by name or category..."
+        >
+
+        <button class="btn btn-secondary" onclick="searchSchemes()">
+            Search
+        </button>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Scheme</th>
+                        <th>Category</th>
+                        <th>State</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="schemeTable">
+
+                    <tr>
+
+                        <td class="scheme-name">
+                            PM Scholarship Scheme
+                        </td>
+
+                        <td>Education</td>
+
+                        <td>All India</td>
+
+                        <td>
+                            <span class="badge green">
+                                Active
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <div class="action-buttons">
+
+                                <button
+                                    class="btn btn-secondary"
+                                    onclick="editScheme(this)"
+                                >
+                                    Edit
+                                </button>
+
+                                <button
+                                    class="btn btn-danger"
+                                    onclick="deleteScheme(this)"
+                                >
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td class="scheme-name">
+                            Skill India Mission
+                        </td>
+
+                        <td>Employment</td>
+
+                        <td>All India</td>
+
+                        <td>
+                            <span class="badge green">
+                                Active
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <div class="action-buttons">
+
+                                <button
+                                    class="btn btn-secondary"
+                                    onclick="editScheme(this)"
+                                >
+                                    Edit
+                                </button>
+
+                                <button
+                                    class="btn btn-danger"
+                                    onclick="deleteScheme(this)"
+                                >
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td class="scheme-name">
+                            Kisan Support Scheme
+                        </td>
+
+                        <td>Agriculture</td>
+
+                        <td>All India</td>
+
+                        <td>
+                            <span class="badge amber">
+                                Review
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <div class="action-buttons">
+
+                                <button
+                                    class="btn btn-secondary"
+                                    onclick="editScheme(this)"
+                                >
+                                    Edit
+                                </button>
+
+                                <button
+                                    class="btn btn-danger"
+                                    onclick="deleteScheme(this)"
+                                >
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     ADD SCHEME
+========================================= -->
+
+<section class="page" id="addScheme">
+
+    <div class="page-heading">
+
+        <div>
+            <h1>Add New Scheme</h1>
+            <p>Add a government scheme to the CHORD database.</p>
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <form id="schemeForm">
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label>
+                            Scheme Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="schemeName"
+                            placeholder="Enter scheme name"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Category
+                        </label>
+
+                        <select id="schemeCategory">
+
+                            <option>Education</option>
+                            <option>Employment</option>
+                            <option>Agriculture</option>
+                            <option>Healthcare</option>
+                            <option>Housing</option>
+                            <option>Women & Child</option>
+                            <option>Social Welfare</option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            State / Coverage
+                        </label>
+
+                        <input
+                            type="text"
+                            id="schemeState"
+                            placeholder="e.g. All India"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Benefit
+                        </label>
+
+                        <input
+                            type="text"
+                            id="schemeBenefit"
+                            placeholder="e.g. ₹50,000 scholarship"
+                            required
+                        >
+
+                    </div>
+
+
+                    <div class="form-group full">
+
+                        <label>
+                            Eligibility
+                        </label>
+
+                        <textarea
+                            id="schemeEligibility"
+                            placeholder="Describe eligibility requirements..."
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="form-group full">
+
+                        <label>
+                            Documents Required
+                        </label>
+
+                        <textarea
+                            id="schemeDocuments"
+                            placeholder="List required documents..."
+                        ></textarea>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Application Link
+                        </label>
+
+                        <input
+                            type="text"
+                            id="schemeLink"
+                            placeholder="Official application URL"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label>
+                            Deadline
+                        </label>
+
+                        <input
+                            type="date"
+                            id="schemeDeadline"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-actions">
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Add Scheme
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        onclick="openPage('schemes')"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     MANAGE USERS
+========================================= -->
+
+<section class="page" id="users">
+
+    <div class="page-heading">
+
+        <div>
+            <h1>Manage Users</h1>
+            <p>View registered CHORD users and their account status.</p>
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Joined</th>
+                        <th>Schemes Saved</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td class="scheme-name">
+                            Rahul Sharma
+                        </td>
+
+                        <td>
+                            rahul@example.com
+                        </td>
+
+                        <td>
+                            12 Aug 2026
+                        </td>
+
+                        <td>
+                            6
+                        </td>
+
+                        <td>
+                            <span class="badge green">
+                                Active
+                            </span>
+                        </td>
+
+                        <td>
+                            <button
+                                class="btn btn-secondary"
+                                onclick="fireToast('User details opened')"
+                            >
+                                View
+                            </button>
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td class="scheme-name">
+                            Priya Singh
+                        </td>
+
+                        <td>
+                            priya@example.com
+                        </td>
+
+                        <td>
+                            10 Aug 2026
+                        </td>
+
+                        <td>
+                            4
+                        </td>
+
+                        <td>
+                            <span class="badge green">
+                                Active
+                            </span>
+                        </td>
+
+                        <td>
+                            <button
+                                class="btn btn-secondary"
+                                onclick="fireToast('User details opened')"
+                            >
+                                View
+                            </button>
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td class="scheme-name">
+                            Amit Verma
+                        </td>
+
+                        <td>
+                            amit@example.com
+                        </td>
+
+                        <td>
+                            08 Aug 2026
+                        </td>
+
+                        <td>
+                            2
+                        </td>
+
+                        <td>
+                            <span class="badge red">
+                                Suspended
+                            </span>
+                        </td>
+
+                        <td>
+                            <button
+                                class="btn btn-secondary"
+                                onclick="fireToast('User details opened')"
+                            >
+                                View
+                            </button>
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     VERIFY DOCUMENTS SECTION
+========================================= -->
+
+<section class="page" id="verifyDocs">
+
+    <div class="page-heading">
+        <div>
+            <h1>User Document Verification</h1>
+            <p>Review and verify citizen entitlement proofs uploaded from the dashboard.</p>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px;">
+        <div class="stat-card">
+            <span class="stat-label">Total Users</span>
+            <div class="stat-number" id="vTotalUsers">0</div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Pending Review</span>
+            <div class="stat-number" id="vPendingDocs" style="color:var(--amber);">0</div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Approved</span>
+            <div class="stat-number" id="vApprovedDocs" style="color:var(--green);">0</div>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">Flagged / Reupload</span>
+            <div class="stat-number" id="vFlaggedDocs" style="color:var(--red);">0</div>
+        </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <div class="card" style="margin-bottom: 24px;">
+        <div class="card-body" style="display:flex; gap:14px; flex-wrap:wrap; padding:16px;">
+            <input type="text" id="vSearchInput" placeholder="Search by citizen name, email, or district..." style="flex:1; min-width:240px; padding:10px 14px; border:1px solid var(--line); border-radius:8px; font-size:14px;">
+            <select id="vStatusFilter" style="padding:10px 14px; border:1px solid var(--line); border-radius:8px; font-size:14px; background:#fff;">
+                <option value="all">All Verification Statuses</option>
+                <option value="pending">Pending Review</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+                <option value="reupload">Reupload Requested</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Verification Cards Container -->
+    <div id="vUserList" style="display:flex; flex-direction:column; gap:20px;"></div>
+
+</section>
+
+
+<!-- =========================================
+     SCHEME UPDATES
+========================================= -->
+
+<section class="page" id="updates">
+
+    <div class="page-heading">
+
+        <div>
+            <h1>Scheme Updates</h1>
+            <p>Review changes before publishing them to users.</p>
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Scheme</th>
+                        <th>Update</th>
+                        <th>Submitted By</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="updateTable">
+
+                    <tr>
+
+                        <td class="scheme-name">
+                            PM Scholarship
+                        </td>
+
+                        <td>
+                            Eligibility criteria updated
+                        </td>
+
+                        <td>
+                            Admin Team
+                        </td>
+
+                        <td>
+                            14 Aug 2026
+                        </td>
+
+                        <td>
+                            <span class="badge amber">
+                                Pending
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <div class="action-buttons">
+
+                                <button
+                                    class="btn btn-success"
+                                    onclick="approveUpdate(this)"
+                                >
+                                    Approve
+                                </button>
+
+                                <button
+                                    class="btn btn-danger"
+                                    onclick="rejectUpdate(this)"
+                                >
+                                    Reject
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td class="scheme-name">
+                            Skill India
+                        </td>
+
+                        <td>
+                            Application deadline changed
+                        </td>
+
+                        <td>
+                            Scheme Officer
+                        </td>
+
+                        <td>
+                            13 Aug 2026
+                        </td>
+
+                        <td>
+                            <span class="badge amber">
+                                Pending
+                            </span>
+                        </td>
+
+                        <td>
+
+                            <div class="action-buttons">
+
+                                <button
+                                    class="btn btn-success"
+                                    onclick="approveUpdate(this)"
+                                >
+                                    Approve
+                                </button>
+
+                                <button
+                                    class="btn btn-danger"
+                                    onclick="rejectUpdate(this)"
+                                >
+                                    Reject
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     REPORTS
+========================================= -->
+
+<section class="page" id="reports">
+
+    <div class="page-heading">
+
+        <div>
+            <h1>Reports</h1>
+            <p>Overview of CHORD platform activity.</p>
+        </div>
+
+        <button
+            class="btn btn-primary"
+            onclick="fireToast('Report generated successfully')"
+        >
+            Generate Report
+        </button>
+
+    </div>
+
+
+    <div class="stats">
+
+        <div class="stat-card">
+
+            <span class="stat-label">
+                Most Viewed Category
+            </span>
+
+            <div class="stat-number">
+                Education
+            </div>
+
+            <div class="stat-change">
+                32% of views
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span class="stat-label">
+                Most Saved Scheme
+            </span>
+
+            <div class="stat-number">
+                PMSS
+            </div>
+
+            <div class="stat-change">
+                1,284 saves
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span class="stat-label">
+                Applications Tracked
+            </span>
+
+            <div class="stat-number">
+                7,942
+            </div>
+
+            <div class="stat-change">
+                ↑ 6.8%
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <span class="stat-label">
+                Users Helped
+            </span>
+
+            <div class="stat-number">
+                3,821
+            </div>
+
+            <div class="stat-change">
+                This month
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-header">
+
+            <h3>Platform Insights</h3>
+
+        </div>
+
+        <div class="card-body">
+
+            <div class="report-item">
+
+                <div class="report-item-top">
+                    <span>Education schemes</span>
+                    <strong>32%</strong>
+                </div>
+
+                <div class="progress">
+                    <span style="width:32%"></span>
+                </div>
+
+            </div>
+
+
+            <div class="report-item">
+
+                <div class="report-item-top">
+                    <span>Employment schemes</span>
+                    <strong>24%</strong>
+                </div>
+
+                <div class="progress">
+                    <span style="width:24%"></span>
+                </div>
+
+            </div>
+
+
+            <div class="report-item">
+
+                <div class="report-item-top">
+                    <span>Agriculture schemes</span>
+                    <strong>18%</strong>
+                </div>
+
+                <div class="progress">
+                    <span style="width:18%"></span>
+                </div>
+
+            </div>
+
+
+            <div class="report-item">
+
+                <div class="report-item-top">
+                    <span>Healthcare schemes</span>
+                    <strong>15%</strong>
+                </div>
+
+                <div class="progress">
+                    <span style="width:15%"></span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+    </div>
+
+</main>
+
+</div>
+
+
+<!-- TOAST -->
+
+<div class="toast" id="toast">Action completed successfully</div>
+<script src="env-config.js"></script>
+<script src="api.js"></script>
+<script>
+
+/* =========================================
+   PAGE NAVIGATION
+========================================= */
+
+const navButtons = document.querySelectorAll('.nav-btn');
+const pages = document.querySelectorAll('.page');
+
+function openPage(pageId){
+    pages.forEach(page => {
+        page.classList.remove('active');
+    });
+
+    const selectedPage = document.getElementById(pageId);
+    if(selectedPage){
+        selectedPage.classList.add('active');
+    }
+
+    navButtons.forEach(button => {
+        button.classList.remove('active');
+        if(button.dataset.page === pageId){
+            button.classList.add('active');
+        }
+    });
+
+    window.scrollTo({
+        top:0,
+        behavior:'smooth'
+    });
+}
+
+navButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        openPage(button.dataset.page);
+    });
+});
+
+
+/* =========================================
+   TOAST
+========================================= */
+
+const toast = document.getElementById('toast');
+
+function fireToast(message){
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 2500);
+}
+
+
+/* =========================================
+   DOCUMENT VERIFICATION LOGIC
+========================================= */
+
+const DOC_FIELDS = [
+    { key: 'aadhaar', label: 'Identity Proof / ID Card' },
+    { key: 'income', label: 'Income Certificate' },
+    { key: 'caste', label: 'Caste Certificate' },
+    { key: 'domicile', label: 'Domicile Certificate' },
+    { key: 'disability', label: 'Disability Certificate' },
+    { key: 'education', label: 'Education Certificate' },
+    { key: 'bank', label: 'Bank Passbook' },
+    { key: 'other', label: 'Other Supporting Proof' }
+];
+
+let verificationUsers = [
+    {
+        id: 'USR-101',
+        rawId: 1,
+        name: 'Chetan Rawat',
+        email: 'chetan.rawat@example.com',
+        location: 'Dehradun, Uttarakhand',
+        documents: {
+            aadhaar: { uploaded: true, fileName: 'Voter_ID_Card_Front_Back.pdf', sizeText: '1.45 MB', status: 'approved' },
+            income: { uploaded: true, fileName: 'Income_Certificate_Tehsildar_2026.pdf', sizeText: '1.20 MB', status: 'approved' },
+            caste: { uploaded: false, fileName: null, status: 'missing' },
+            domicile: { uploaded: true, fileName: 'Domicile_Certificate_Uttarakhand.png', sizeText: '890 KB', status: 'approved' },
+            disability: { uploaded: false, fileName: null, status: 'missing' },
+            education: { uploaded: true, fileName: 'Senior_Secondary_Marksheet_12th.pdf', sizeText: '2.10 MB', status: 'approved' },
+            bank: { uploaded: false, fileName: null, status: 'missing' },
+            other: { uploaded: true, fileName: 'Land_Holding_Khasra_Records.pdf', sizeText: '3.40 MB', status: 'pending' }
+        }
+    },
+    {
+        id: 'USR-102',
+        rawId: 2,
+        name: 'Rahul Sharma',
+        email: 'rahul@example.com',
+        location: 'Purnia, Bihar',
+        documents: {
+            aadhaar: { uploaded: true, fileName: 'id_front_back.pdf', sizeText: '980 KB', status: 'approved' },
+            income: { uploaded: true, fileName: 'income_declaration.pdf', sizeText: '1.1 MB', status: 'pending' },
+            caste: { uploaded: false, fileName: null, status: 'missing' },
+            domicile: { uploaded: true, fileName: 'domicile_cert.pdf', sizeText: '740 KB', status: 'pending' },
+            disability: { uploaded: false, fileName: null, status: 'missing' },
+            education: { uploaded: true, fileName: 'marksheet.pdf', sizeText: '1.8 MB', status: 'reupload' },
+            bank: { uploaded: true, fileName: 'passbook.png', sizeText: '620 KB', status: 'approved' },
+            other: { uploaded: false, fileName: null, status: 'missing' }
+        }
+    },
+    {
+        id: 'USR-103',
+        rawId: 3,
+        name: 'Priya Singh',
+        email: 'priya@example.com',
+        location: 'Jaipur, Rajasthan',
+        documents: {
+            aadhaar: { uploaded: true, fileName: 'identity_doc.jpg', sizeText: '1.5 MB', status: 'pending' },
+            income: { uploaded: true, fileName: 'it_returns.pdf', sizeText: '1.2 MB', status: 'rejected' },
+            caste: { uploaded: true, fileName: 'caste_cert.pdf', sizeText: '890 KB', status: 'approved' },
+            domicile: { uploaded: false, fileName: null, status: 'missing' },
+            disability: { uploaded: false, fileName: null, status: 'missing' },
+            education: { uploaded: true, fileName: 'diploma_doc.pdf', sizeText: '950 KB', status: 'approved' },
+            bank: { uploaded: false, fileName: null, status: 'missing' },
+            other: { uploaded: false, fileName: null, status: 'missing' }
+        }
+    }
+];
+
+async function loadVerificationUsers() {
+    try {
+        const data = await api.get('/admin/verifications/');
+        if (data && data.length > 0) {
+            verificationUsers = data;
+        }
+    } catch (e) {}
+    renderVerificationUI();
+}
+
+function renderVerificationUI() {
+    const list = document.getElementById('vUserList');
+    if (!list) return;
+
+    const search = document.getElementById('vSearchInput').value.toLowerCase().trim();
+    const filter = document.getElementById('vStatusFilter').value;
+
+    let pending = 0, approved = 0, flagged = 0;
+
+    verificationUsers.forEach(u => {
+        Object.values(u.documents).forEach(d => {
+            if (d.status === 'pending' || d.status === 'under review') pending++;
+            if (d.status === 'approved' || d.status === 'verified') approved++;
+            if (d.status === 'rejected' || d.status === 'reupload') flagged++;
+        });
+    });
+
+    document.getElementById('vTotalUsers').textContent = verificationUsers.length;
+    document.getElementById('vPendingDocs').textContent = pending;
+    document.getElementById('vApprovedDocs').textContent = approved;
+    document.getElementById('vFlaggedDocs').textContent = flagged;
+
+    const filtered = verificationUsers.filter(u => {
+        const matchesSearch = u.name.toLowerCase().includes(search) || u.email.toLowerCase().includes(search) || u.location.toLowerCase().includes(search);
+        if (!matchesSearch) return false;
+        if (filter !== 'all') return Object.values(u.documents).some(d => d.status === filter);
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding:32px; background:#fff; border:1px solid var(--line); border-radius:var(--radius); color:var(--ink-soft);">No user records match the selected filter criteria.</div>`;
+        return;
+    }
+
+    list.innerHTML = filtered.map(u => {
+        const docsHTML = DOC_FIELDS.map(f => {
+            const doc = u.documents[f.key] || { uploaded: false, status: 'missing' };
+            const isUp = doc.uploaded;
+            const badgeClass = doc.status === 'approved' || doc.status === 'verified' ? 'green' : (doc.status === 'rejected' ? 'red' : (doc.status === 'reupload' ? 'blue' : (doc.status === 'missing' ? 'missing' : 'amber')));
+
+            return `
+                <div class="v-doc-item">
+                    <div>
+                        <div style="display:flex; justify-content:space-between; align-items:start; gap:8px;">
+                            <strong style="font-size:13px;">${f.label}</strong>
+                            <span class="badge ${badgeClass}">${doc.status}</span>
+                        </div>
+                        ${isUp ? `<span class="v-doc-tag">📄 ${doc.fileName} (${doc.sizeText || 'Verified'})</span>` : `<span style="font-size:11.5px; color:var(--ink-faint);">Not uploaded</span>`}
+                    </div>
+                    <div class="v-actions">
+                        <button class="btn-v app ${!isUp ? 'dis' : ''}" onclick="setDocVerdict('${u.id}', '${f.key}', 'approved')">Approve</button>
+                        <button class="btn-v rej ${!isUp ? 'dis' : ''}" onclick="setDocVerdict('${u.id}', '${f.key}', 'rejected')">Reject</button>
+                        <button class="btn-v reup ${!isUp ? 'dis' : ''}" onclick="setDocVerdict('${u.id}', '${f.key}', 'reupload')">Reupload</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        return `
+            <div class="v-user-card">
+                <div class="v-user-head">
+                    <div class="v-user-info">
+                        <div class="v-avatar">${u.name.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <strong style="font-size:15px;">${u.name}</strong> <small style="color:var(--ink-faint);">(${u.id})</small>
+                            <div style="font-size:12px; color:var(--ink-soft);">${u.email} · ${u.location}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="v-doc-grid">${docsHTML}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+async function setDocVerdict(userId, docKey, verdict) {
+    const user = verificationUsers.find(u => u.id === userId);
+    if (!user || !user.documents[docKey]) return;
+
+    user.documents[docKey].status = verdict;
+
+    try {
+        await api.post(`/admin/verifications/${userId}/${docKey}/verdict/`, { verdict: verdict });
+    } catch (e) {
+        console.warn('Verdict saved in local view state');
+    }
+
+    renderVerificationUI();
+    fireToast(`Document set to ${verdict.toUpperCase()}`);
+}
+
+/* =========================================
+   ADD SCHEME VIA BACKEND
+========================================= */
+
+const schemeForm = document.getElementById('schemeForm');
+
+schemeForm.addEventListener('submit', async function(e){
+    e.preventDefault();
+
+    const name = document.getElementById('schemeName').value.trim();
+    const category = document.getElementById('schemeCategory').value;
+    const state = document.getElementById('schemeState').value.trim();
+    const benefit = document.getElementById('schemeBenefit').value.trim();
+    const eligibility = document.getElementById('schemeEligibility').value.trim();
+
+    if(name === '' || state === ''){
+        fireToast('Please fill the required fields.');
+        return;
+    }
+
+    try {
+        await api.post('/admin/schemes/', {
+            schemeName: name,
+            schemeCategory: category,
+            schemeState: state,
+            schemeBenefit: benefit,
+            schemeEligibility: eligibility
+        });
+    } catch(err) {}
+
+    const table = document.getElementById('schemeTable');
+    const row = document.createElement('tr');
+
+    row.innerHTML = `
+        <td class="scheme-name">${name}</td>
+        <td>${category}</td>
+        <td>${state}</td>
+        <td><span class="badge green">Active</span></td>
+        <td>
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="editScheme(this)">Edit</button>
+                <button class="btn btn-danger" onclick="deleteScheme(this)">Delete</button>
+            </div>
+        </td>
+    `;
+
+    table.prepend(row);
+    schemeForm.reset();
+    fireToast('Scheme added successfully to CHORD registry.');
+
+    setTimeout(() => {
+        openPage('schemes');
+    }, 500);
+});
+
+/* =========================================
+   DELETE SCHEME
+========================================= */
+
+async function deleteScheme(button, schemeId){
+    const row = button.closest('tr');
+    const schemeName = row.querySelector('.scheme-name').textContent.trim();
+
+    const confirmDelete = confirm('Are you sure you want to delete "' + schemeName + '"?');
+    if(confirmDelete){
+        if(schemeId){
+            try { await api.delete(`/admin/schemes/${schemeId}/`); } catch(e){}
+        }
+        row.remove();
+        fireToast('Scheme deleted successfully.');
+    }
+}
+
+/* =========================================
+   EDIT SCHEME
+========================================= */
+
+function editScheme(button){
+    const row = button.closest('tr');
+    const name = row.querySelector('.scheme-name').textContent.trim();
+
+    document.getElementById('schemeName').value = name;
+    document.getElementById('schemeCategory').value = row.children[1].textContent.trim();
+    document.getElementById('schemeState').value = row.children[2].textContent.trim();
+
+    openPage('addScheme');
+    fireToast('Scheme loaded for editing.');
+}
+
+/* =========================================
+   SEARCH SCHEMES
+========================================= */
+
+function searchSchemes(){
+    const search = document.getElementById('schemeSearch').value.toLowerCase().trim();
+    const rows = document.querySelectorAll('#schemeTable tr');
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(search) ? '' : 'none';
+    });
+}
+
+/* =========================================
+   APPROVE / REJECT UPDATE VIA BACKEND
+========================================= */
+
+async function approveUpdate(button, updateId){
+    const row = button.closest('tr');
+    const status = row.querySelector('.badge');
+    status.textContent = 'Approved';
+    status.className = 'badge green';
+
+    const buttons = row.querySelector('.action-buttons');
+    buttons.innerHTML = '<span class="badge green">Approved</span>';
+
+    if (updateId) {
+        try { await api.post(`/admin/updates/${updateId}/approve/`); } catch(e) {}
+    }
+
+    fireToast('Scheme update approved.');
+}
+
+async function rejectUpdate(button, updateId){
+    const row = button.closest('tr');
+    const status = row.querySelector('.badge');
+    status.textContent = 'Rejected';
+    status.className = 'badge red';
+
+    const buttons = row.querySelector('.action-buttons');
+    buttons.innerHTML = '<span class="badge red">Rejected</span>';
+
+    if (updateId) {
+        try { await api.post(`/admin/updates/${updateId}/reject/`); } catch(e) {}
+    }
+
+    fireToast('Scheme update rejected.');
+}
+
+/* =========================================
+   LOGOUT & INIT LISTENERS
+========================================= */
+
+document.getElementById('logoutBtn').addEventListener('click', function(){
+    const confirmLogout = confirm('Do you want to logout from the admin panel?');
+    if(confirmLogout){
+        api.logout();
+    }
+});
+
+async function loadAdminDashboardData(){
+    try {
+        const stats = await api.get('/admin/stats/');
+        // Update stats if elements exist
+    } catch(e) {}
+    loadVerificationUsers();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const sInput = document.getElementById('vSearchInput');
+    const sFilter = document.getElementById('vStatusFilter');
+    if(sInput) sInput.addEventListener('input', renderVerificationUI);
+    if(sFilter) sFilter.addEventListener('change', renderVerificationUI);
+    loadAdminDashboardData();
+});
+
+</script>
+
+</body>
+</html>

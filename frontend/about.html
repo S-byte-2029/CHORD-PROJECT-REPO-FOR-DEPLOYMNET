@@ -1,0 +1,1400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Chord — About Us</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+  --bg:#ffffff;
+  --surface:#f5f7fb;
+  --surface-2:#eef1f7;
+  --ink:#10192b;
+  --ink-soft:#4c586c;
+  --ink-faint:#8792a3;
+  --line:#e3e7ee;
+
+  --blue:#1b3f8b;
+  --blue-deep:#122c63;
+
+  --amber:#c8791f;
+  --amber-soft:#fdf2e2;
+
+  --green:#1f7a54;
+  --green-soft:#e9f5ef;
+
+  --radius:14px;
+
+  --shadow:
+    0 1px 2px rgba(16,25,43,0.04),
+    0 12px 28px -14px rgba(16,25,43,0.16);
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'IBM Plex Sans',system-ui,sans-serif;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+
+a{
+  color:inherit;
+}
+
+::selection{
+  background:var(--amber-soft);
+  color:var(--blue-deep);
+}
+
+h1,h2,h3{
+  font-family:'Fraunces',serif;
+  font-weight:600;
+  margin:0;
+  letter-spacing:-0.01em;
+}
+
+p{
+  margin:0;
+}
+
+
+/* =========================
+   NAVBAR
+========================= */
+
+.navbar{
+  height:74px;
+  padding:0 6%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  background:#fff;
+  border-bottom:1px solid var(--line);
+
+  position:sticky;
+  top:0;
+  z-index:50;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  font-family:'Fraunces',serif;
+  font-weight:700;
+  font-size:22px;
+
+  text-decoration:none;
+  color:var(--blue-deep);
+}
+
+.brand-mark{
+  width:32px;
+  height:32px;
+
+  border-radius:8px;
+
+  background:
+    linear-gradient(
+      155deg,
+      var(--blue) 0%,
+      #0c2049 65%
+    );
+
+  position:relative;
+  flex:none;
+
+  border:1px solid rgba(255,255,255,0.18);
+}
+
+.brand-mark::after{
+  content:"";
+
+  position:absolute;
+  inset:8px;
+
+  border:1.6px solid rgba(255,255,255,0.85);
+
+  border-radius:4px;
+
+  border-bottom-color:var(--amber);
+  border-right-color:var(--amber);
+}
+
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:30px;
+}
+
+.nav-links a{
+  text-decoration:none;
+
+  color:var(--ink-soft);
+
+  font-size:14px;
+  font-weight:600;
+
+  transition:
+    color .15s ease;
+}
+
+.nav-links a:hover{
+  color:var(--blue);
+}
+
+.nav-links .active{
+  color:var(--blue);
+}
+
+
+/* =========================
+   BUTTON
+========================= */
+
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:11px 20px;
+
+  border-radius:9px;
+
+  background:var(--blue-deep);
+  color:#fff;
+
+  text-decoration:none;
+
+  font-size:14px;
+  font-weight:600;
+
+  transition:
+    background .15s ease,
+    transform .15s ease,
+    box-shadow .15s ease;
+}
+
+.btn:hover{
+  background:var(--blue);
+  transform:translateY(-1px);
+  box-shadow:0 8px 18px rgba(18,44,99,0.18);
+}
+
+
+/* =========================
+   HERO
+========================= */
+
+.hero{
+  background:var(--blue-deep);
+  color:#fff;
+
+  padding:90px 7% 100px;
+
+  position:relative;
+  overflow:hidden;
+}
+
+.hero::before{
+  content:"";
+
+  position:absolute;
+
+  width:480px;
+  height:480px;
+
+  right:-160px;
+  top:-180px;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(200,121,31,0.28),
+      rgba(200,121,31,0) 70%
+    );
+}
+
+.hero::after{
+  content:"";
+
+  position:absolute;
+
+  width:300px;
+  height:300px;
+
+  left:-150px;
+  bottom:-160px;
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(27,63,139,0.7),
+      rgba(27,63,139,0) 70%
+    );
+}
+
+.hero-content{
+  max-width:900px;
+  margin:auto;
+
+  position:relative;
+  z-index:2;
+
+  text-align:center;
+}
+
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:12px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+
+  color:#a9c1f0;
+}
+
+.eyebrow::before{
+  content:"";
+
+  width:7px;
+  height:7px;
+
+  border-radius:50%;
+
+  background:var(--amber);
+
+  box-shadow:
+    0 0 0 3px rgba(200,121,31,.25);
+}
+
+.hero h1{
+  margin-top:18px;
+
+  font-size:clamp(38px,5vw,62px);
+
+  line-height:1.1;
+
+  color:#fff;
+}
+
+.hero h1 span{
+  color:#e3b267;
+}
+
+.hero p{
+  max-width:700px;
+
+  margin:22px auto 0;
+
+  color:#c6d2ea;
+
+  font-size:17px;
+
+  line-height:1.75;
+}
+
+
+/* =========================
+   COMMON SECTION
+========================= */
+
+.section{
+  padding:85px 7%;
+}
+
+.section-inner{
+  max-width:1100px;
+  margin:auto;
+}
+
+.section-heading{
+  text-align:center;
+
+  max-width:700px;
+
+  margin:0 auto 50px;
+}
+
+.section-heading .eyebrow{
+  color:var(--blue);
+}
+
+.section-heading h2{
+  margin-top:12px;
+
+  font-size:clamp(30px,4vw,42px);
+
+  color:var(--ink);
+}
+
+.section-heading p{
+  margin-top:14px;
+
+  color:var(--ink-soft);
+
+  font-size:15.5px;
+}
+
+
+/* =========================
+   PROBLEM SECTION
+========================= */
+
+.problem{
+  background:#fff;
+}
+
+.problem-grid{
+  display:grid;
+
+  grid-template-columns:1fr 1fr;
+
+  gap:55px;
+
+  align-items:center;
+}
+
+.problem-text h2{
+  font-size:38px;
+  line-height:1.2;
+}
+
+.problem-text p{
+  margin-top:18px;
+
+  color:var(--ink-soft);
+
+  font-size:15.5px;
+
+  line-height:1.75;
+}
+
+.problem-card{
+  background:var(--surface);
+
+  border:1px solid var(--line);
+
+  border-radius:var(--radius);
+
+  padding:28px;
+
+  box-shadow:var(--shadow);
+}
+
+.problem-card-title{
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:12px;
+
+  letter-spacing:.07em;
+
+  text-transform:uppercase;
+
+  color:var(--amber);
+
+  margin-bottom:18px;
+}
+
+.problem-item{
+  display:flex;
+
+  gap:13px;
+
+  padding:15px 0;
+
+  border-bottom:1px solid var(--line);
+
+  color:var(--ink-soft);
+
+  font-size:14px;
+}
+
+.problem-item:last-child{
+  border-bottom:none;
+}
+
+.problem-icon{
+  width:27px;
+  height:27px;
+
+  border-radius:7px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:var(--amber-soft);
+
+  color:var(--amber);
+
+  font-weight:700;
+
+  flex:none;
+}
+
+
+/* =========================
+   WHAT WE DO
+========================= */
+
+.features{
+  background:var(--surface);
+}
+
+.feature-grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap:20px;
+}
+
+.feature-card{
+  background:#fff;
+
+  border:1px solid var(--line);
+
+  border-radius:var(--radius);
+
+  padding:27px;
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    border-color .18s ease;
+}
+
+.feature-card:hover{
+  transform:translateY(-4px);
+
+  border-color:#cfd6e3;
+
+  box-shadow:var(--shadow);
+}
+
+.feature-number{
+  font-family:'IBM Plex Mono',monospace;
+
+  color:var(--amber);
+
+  font-size:12px;
+}
+
+.feature-card h3{
+  margin-top:14px;
+
+  font-size:21px;
+}
+
+.feature-card p{
+  margin-top:9px;
+
+  color:var(--ink-soft);
+
+  font-size:14px;
+
+  line-height:1.65;
+}
+
+
+/* =========================
+   HOW IT WORKS
+========================= */
+
+.steps{
+  background:#fff;
+}
+
+.steps-grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(4,1fr);
+
+  gap:20px;
+
+  position:relative;
+}
+
+.step{
+  text-align:center;
+
+  padding:15px;
+}
+
+.step-number{
+  width:48px;
+  height:48px;
+
+  margin:auto;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:50%;
+
+  background:var(--blue-deep);
+
+  color:#fff;
+
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:14px;
+
+  box-shadow:
+    0 0 0 7px #edf1f8;
+}
+
+.step h3{
+  margin-top:20px;
+
+  font-size:19px;
+}
+
+.step p{
+  margin-top:8px;
+
+  color:var(--ink-soft);
+
+  font-size:13.5px;
+
+  line-height:1.6;
+}
+
+
+/* =========================
+   VISION
+========================= */
+
+.vision{
+  background:var(--blue-deep);
+
+  color:#fff;
+
+  text-align:center;
+
+  padding:90px 7%;
+
+  position:relative;
+
+  overflow:hidden;
+}
+
+.vision-content{
+  max-width:800px;
+
+  margin:auto;
+
+  position:relative;
+
+  z-index:2;
+}
+
+.vision .eyebrow{
+  color:#a9c1f0;
+}
+
+.vision h2{
+  margin-top:16px;
+
+  color:#fff;
+
+  font-size:clamp(32px,4vw,46px);
+}
+
+.vision p{
+  margin-top:18px;
+
+  color:#c6d2ea;
+
+  font-size:16px;
+
+  line-height:1.75;
+}
+
+.quote{
+  margin-top:30px;
+
+  padding:18px 25px;
+
+  border-left:3px solid var(--amber);
+
+  background:rgba(255,255,255,.05);
+
+  border-radius:0 10px 10px 0;
+
+  color:#fff;
+
+  font-family:'Fraunces',serif;
+
+  font-size:20px;
+}
+
+
+/* =========================
+   CTA
+========================= */
+
+.cta{
+  padding:70px 7%;
+
+  background:var(--surface);
+}
+
+.cta-box{
+  max-width:1000px;
+
+  margin:auto;
+
+  padding:45px;
+
+  background:#fff;
+
+  border:1px solid var(--line);
+
+  border-radius:var(--radius);
+
+  box-shadow:var(--shadow);
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:30px;
+}
+
+.cta-box h2{
+  font-size:30px;
+}
+
+.cta-box p{
+  margin-top:8px;
+
+  color:var(--ink-soft);
+
+  font-size:14.5px;
+}
+
+
+/* =========================
+   FOOTER
+========================= */
+
+footer{
+  background:#0c2049;
+
+  color:#a9b6d4;
+
+  padding:30px 7%;
+}
+
+.footer-inner{
+  max-width:1100px;
+
+  margin:auto;
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  gap:20px;
+}
+
+.footer-brand{
+  color:#fff;
+
+  font-family:'Fraunces',serif;
+
+  font-weight:700;
+
+  font-size:18px;
+}
+
+.footer-text{
+  font-family:'IBM Plex Mono',monospace;
+
+  font-size:11px;
+}
+
+.footer-links{
+  display:flex;
+
+  gap:20px;
+}
+
+.footer-links a{
+  color:#c6d2ea;
+
+  text-decoration:none;
+
+  font-size:12px;
+}
+
+.footer-links a:hover{
+  color:#fff;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:900px){
+
+  .navbar{
+    padding:0 25px;
+  }
+
+  .nav-links{
+    gap:15px;
+  }
+
+  .nav-links a:not(.nav-login){
+    display:none;
+  }
+
+  .hero{
+    padding:70px 25px 80px;
+  }
+
+  .section{
+    padding:65px 25px;
+  }
+
+  .problem-grid{
+    grid-template-columns:1fr;
+
+    gap:35px;
+  }
+
+  .feature-grid{
+    grid-template-columns:
+      repeat(2,1fr);
+  }
+
+  .steps-grid{
+    grid-template-columns:
+      repeat(2,1fr);
+
+    gap:35px;
+  }
+
+  .cta-box{
+    flex-direction:column;
+
+    align-items:flex-start;
+
+    padding:32px;
+  }
+
+  footer{
+    padding:30px 25px;
+  }
+
+  .footer-inner{
+    flex-direction:column;
+
+    align-items:flex-start;
+  }
+}
+
+@media(max-width:600px){
+
+  .navbar{
+    height:65px;
+  }
+
+  .brand{
+    font-size:20px;
+  }
+
+  .nav-login{
+    padding:9px 14px;
+  }
+
+  .hero h1{
+    font-size:40px;
+  }
+
+  .hero p{
+    font-size:15px;
+  }
+
+  .feature-grid{
+    grid-template-columns:1fr;
+  }
+
+  .steps-grid{
+    grid-template-columns:1fr;
+  }
+
+  .problem-text h2{
+    font-size:31px;
+  }
+
+  .cta-box h2{
+    font-size:26px;
+  }
+
+  .footer-links{
+    flex-wrap:wrap;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+
+<!-- =========================
+     NAVBAR
+========================= -->
+
+<nav class="navbar">
+
+  <a href="land.html" class="brand">
+
+    <span class="brand-mark"></span>
+
+    Chord
+
+  </a>
+
+
+  <div class="nav-links">
+
+    <a href="land.html">Home</a>
+
+    <a href="about.html" class="active">About Us</a>
+
+    <a href="contact.html">Contact Us</a>
+
+    <a href="login.html" class="btn nav-login">
+      Log in
+    </a>
+
+  </div>
+
+</nav>
+
+
+
+<!-- =========================
+     HERO
+========================= -->
+
+<section class="hero">
+
+  <div class="hero-content">
+
+    <span class="eyebrow">
+      About CHORD
+    </span>
+
+    <h1>
+      Connecting citizens to the
+      <span>benefits they deserve.</span>
+    </h1>
+
+    <p>
+      CHORD is designed to make government schemes easier
+      to discover, understand and access — all from one place.
+    </p>
+
+  </div>
+
+</section>
+
+
+
+<!-- =========================
+     PROBLEM
+========================= -->
+
+<section class="section problem">
+
+  <div class="section-inner">
+
+    <div class="problem-grid">
+
+      <div class="problem-text">
+
+        <span class="eyebrow">
+          The problem
+        </span>
+
+        <h2>
+          Finding the right scheme shouldn't be difficult.
+        </h2>
+
+        <p>
+          Government welfare schemes can provide valuable support,
+          but people may not know which schemes are available to them
+          or whether they are eligible.
+        </p>
+
+        <p>
+          Information can also be spread across different portals,
+          making it difficult to understand eligibility requirements,
+          required documents and application processes.
+        </p>
+
+      </div>
+
+
+      <div class="problem-card">
+
+        <div class="problem-card-title">
+          Common challenges
+        </div>
+
+
+        <div class="problem-item">
+
+          <div class="problem-icon">?</div>
+
+          <div>
+            Not knowing which government schemes are available.
+          </div>
+
+        </div>
+
+
+        <div class="problem-item">
+
+          <div class="problem-icon">!</div>
+
+          <div>
+            Difficulty understanding eligibility requirements.
+          </div>
+
+        </div>
+
+
+        <div class="problem-item">
+
+          <div class="problem-icon">↗</div>
+
+          <div>
+            Searching across multiple portals for information.
+          </div>
+
+        </div>
+
+
+        <div class="problem-item">
+
+          <div class="problem-icon">✓</div>
+
+          <div>
+            Missing benefits simply because people didn't know about them.
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- =========================
+     WHAT CHORD DOES
+========================= -->
+
+<section class="section features">
+
+  <div class="section-inner">
+
+    <div class="section-heading">
+
+      <span class="eyebrow">
+        What CHORD does
+      </span>
+
+      <h2>
+        One simpler way to discover schemes.
+      </h2>
+
+      <p>
+        CHORD brings important scheme information together
+        and presents it in a simpler and more user-friendly way.
+      </p>
+
+    </div>
+
+
+    <div class="feature-grid">
+
+
+      <div class="feature-card">
+
+        <div class="feature-number">
+          01 / DISCOVER
+        </div>
+
+        <h3>
+          Find relevant schemes
+        </h3>
+
+        <p>
+          Explore government schemes and discover opportunities
+          that may be relevant to your situation.
+        </p>
+
+      </div>
+
+
+      <div class="feature-card">
+
+        <div class="feature-number">
+          02 / ELIGIBILITY
+        </div>
+
+        <h3>
+          Understand eligibility
+        </h3>
+
+        <p>
+          View eligibility requirements in a clear and
+          easy-to-understand format.
+        </p>
+
+      </div>
+
+
+      <div class="feature-card">
+
+        <div class="feature-number">
+          03 / DOCUMENTS
+        </div>
+
+        <h3>
+          Know what you need
+        </h3>
+
+        <p>
+          Understand the documents and information generally
+          required before applying.
+        </p>
+
+      </div>
+
+
+      <div class="feature-card">
+
+        <div class="feature-number">
+          04 / BENEFITS
+        </div>
+
+        <h3>
+          Explore benefits
+        </h3>
+
+        <p>
+          Learn about the benefits and assistance associated
+          with different schemes.
+        </p>
+
+      </div>
+
+
+      <div class="feature-card">
+
+        <div class="feature-number">
+          05 / APPLICATION
+        </div>
+
+        <h3>
+          Find application links
+        </h3>
+
+        <p>
+          Get directed toward the relevant official application
+          portal for a scheme.
+        </p>
+
+      </div>
+
+
+      <div class="feature-card">
+
+        <div class="feature-number">
+          06 / PERSONALIZE
+        </div>
+
+        <h3>
+          Personalized discovery
+        </h3>
+
+        <p>
+          CHORD can use user-provided information to help identify
+          schemes that may be relevant to their profile.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- =========================
+     HOW IT WORKS
+========================= -->
+
+<section class="section steps">
+
+  <div class="section-inner">
+
+    <div class="section-heading">
+
+      <span class="eyebrow">
+        How it works
+      </span>
+
+      <h2>
+        From information to opportunity.
+      </h2>
+
+      <p>
+        CHORD aims to make the journey from discovering a scheme
+        to understanding how to apply much simpler.
+      </p>
+
+    </div>
+
+
+    <div class="steps-grid">
+
+
+      <div class="step">
+
+        <div class="step-number">
+          01
+        </div>
+
+        <h3>
+          Create your profile
+        </h3>
+
+        <p>
+          Provide relevant information about yourself.
+        </p>
+
+      </div>
+
+
+      <div class="step">
+
+        <div class="step-number">
+          02
+        </div>
+
+        <h3>
+          Discover schemes
+        </h3>
+
+        <p>
+          Explore schemes that may match your profile.
+        </p>
+
+      </div>
+
+
+      <div class="step">
+
+        <div class="step-number">
+          03
+        </div>
+
+        <h3>
+          Understand
+        </h3>
+
+        <p>
+          Review benefits, eligibility and required documents.
+        </p>
+
+      </div>
+
+
+      <div class="step">
+
+        <div class="step-number">
+          04
+        </div>
+
+        <h3>
+          Take action
+        </h3>
+
+        <p>
+          Follow the official application process when eligible.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- =========================
+     VISION
+========================= -->
+
+<section class="vision">
+
+  <div class="vision-content">
+
+    <span class="eyebrow">
+      Our vision
+    </span>
+
+    <h2>
+      A future where people don't miss benefits
+      simply because they didn't know about them.
+    </h2>
+
+    <p>
+      We believe access to welfare information should be simpler,
+      clearer and easier to navigate. CHORD aims to bridge the gap
+      between citizens and the government schemes created to support them.
+    </p>
+
+    <div class="quote">
+      "Know your benefits. Discover your opportunities.
+      Connect with the right schemes."
+    </div>
+
+  </div>
+
+</section>
+
+
+
+<!-- =========================
+     CTA
+========================= -->
+
+<section class="cta">
+
+  <div class="cta-box">
+
+    <div>
+
+      <h2>
+        Ready to discover what's available to you?
+      </h2>
+
+      <p>
+        Explore CHORD and start discovering relevant schemes.
+      </p>
+
+    </div>
+
+    <a href="login.html" class="btn">
+      Get started →
+    </a>
+
+  </div>
+
+</section>
+
+
+
+<!-- =========================
+     FOOTER
+========================= -->
+
+<footer>
+
+  <div class="footer-inner">
+
+    <div>
+
+      <div class="footer-brand">
+        Chord
+      </div>
+
+      <div class="footer-text">
+        Connecting citizens to opportunities.
+      </div>
+
+    </div>
+
+
+    <div class="footer-links">
+
+      <a href="land.html">
+        Home
+      </a>
+
+      <a href="about.html">
+        About Us
+      </a>
+
+      <a href="contact.html">
+        Contact Us
+      </a>
+
+      <a href="login.html">
+        Log in
+      </a>
+
+    </div>
+
+  </div>
+
+</footer>
+
+
+</body>
+</html>

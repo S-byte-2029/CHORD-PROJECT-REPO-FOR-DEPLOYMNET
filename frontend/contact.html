@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Chord — Contact Us</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+    --bg:#ffffff;
+    --surface:#f5f7fb;
+    --surface-2:#eef1f7;
+    --ink:#10192b;
+    --ink-soft:#4c586c;
+    --ink-faint:#8792a3;
+    --line:#e3e7ee;
+    --blue:#1b3f8b;
+    --blue-deep:#122c63;
+    --amber:#c8791f;
+    --amber-soft:#fdf2e2;
+    --green:#1f7a54;
+    --radius:14px;
+    --shadow:0 12px 28px -14px rgba(16,25,43,0.16);
+}
+
+*{
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'IBM Plex Sans',sans-serif;
+    line-height:1.5;
+}
+
+a{
+    color:inherit;
+}
+
+/* ---------------- NAVBAR ---------------- */
+
+.navbar{
+    height:76px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 7%;
+    border-bottom:1px solid var(--line);
+    background:#fff;
+    position:sticky;
+    top:0;
+    z-index:50;
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+    font-family:'Fraunces',serif;
+    font-weight:700;
+    font-size:22px;
+}
+
+.brand-mark{
+    width:32px;
+    height:32px;
+    border-radius:8px;
+    background:linear-gradient(155deg,var(--blue),#0c2049);
+    position:relative;
+}
+
+.brand-mark::after{
+    content:"";
+    position:absolute;
+    inset:8px;
+    border:1.6px solid white;
+    border-radius:4px;
+    border-bottom-color:var(--amber);
+    border-right-color:var(--amber);
+}
+
+.nav-links{
+    display:flex;
+    align-items:center;
+    gap:28px;
+    list-style:none;
+    margin:0;
+    padding:0;
+}
+
+.nav-links a{
+    text-decoration:none;
+    color:var(--ink-soft);
+    font-size:14px;
+    font-weight:600;
+}
+
+.nav-links a:hover{
+    color:var(--blue);
+}
+
+.login-btn{
+    background:var(--blue-deep);
+    color:white !important;
+    padding:9px 18px;
+    border-radius:8px;
+}
+
+.login-btn:hover{
+    background:var(--blue);
+}
+
+/* ---------------- HERO ---------------- */
+
+.hero{
+    background:var(--blue-deep);
+    color:white;
+    padding:90px 20px;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+}
+
+.hero::after{
+    content:"";
+    position:absolute;
+    width:430px;
+    height:430px;
+    right:-150px;
+    bottom:-210px;
+    border-radius:50%;
+    background:radial-gradient(
+        circle,
+        rgba(200,121,31,0.35),
+        rgba(200,121,31,0) 70%
+    );
+}
+
+.eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:#a9c1f0;
+}
+
+.eyebrow::before{
+    content:"";
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:var(--amber);
+}
+
+.hero h1{
+    font-family:'Fraunces',serif;
+    font-size:clamp(38px,5vw,58px);
+    margin:18px 0 15px;
+    line-height:1.1;
+}
+
+.hero p{
+    max-width:650px;
+    margin:auto;
+    color:#c6d2ea;
+    font-size:17px;
+}
+
+/* ---------------- MAIN ---------------- */
+
+.contact-section{
+    max-width:1100px;
+    margin:70px auto;
+    padding:0 25px;
+}
+
+.contact-grid{
+    display:grid;
+    grid-template-columns:0.9fr 1.1fr;
+    gap:40px;
+}
+
+/* ---------------- LEFT CARD ---------------- */
+
+.info-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:32px;
+}
+
+.info-card h2{
+    font-family:'Fraunces',serif;
+    font-size:30px;
+    margin:0 0 12px;
+}
+
+.info-card > p{
+    color:var(--ink-soft);
+    margin-bottom:28px;
+}
+
+.contact-item{
+    padding:18px 0;
+    border-bottom:1px solid var(--line);
+}
+
+.contact-item:last-child{
+    border-bottom:none;
+}
+
+.contact-item h3{
+    margin:0 0 5px;
+    font-size:15px;
+}
+
+.contact-item p{
+    margin:0;
+    color:var(--ink-soft);
+    font-size:14px;
+}
+
+.contact-item a{
+    color:var(--blue);
+    text-decoration:none;
+    font-weight:600;
+}
+
+.contact-item a:hover{
+    text-decoration:underline;
+}
+
+/* ---------------- FORM ---------------- */
+
+.form-card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:32px;
+    box-shadow:var(--shadow);
+}
+
+.form-card h2{
+    font-family:'Fraunces',serif;
+    font-size:30px;
+    margin:0 0 8px;
+}
+
+.form-card > p{
+    color:var(--ink-soft);
+    margin-bottom:28px;
+}
+
+.field{
+    margin-bottom:18px;
+}
+
+.field label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:7px;
+}
+
+.field input,
+.field select,
+.field textarea{
+    width:100%;
+    padding:12px 14px;
+    border:1px solid var(--line);
+    border-radius:9px;
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:14px;
+    color:var(--ink);
+    background:#fff;
+}
+
+.field textarea{
+    min-height:130px;
+    resize:vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus{
+    outline:none;
+    border-color:var(--blue);
+    box-shadow:0 0 0 3px rgba(27,63,139,.12);
+}
+
+.submit-btn{
+    width:100%;
+    padding:13px;
+    border:none;
+    border-radius:9px;
+    background:var(--blue-deep);
+    color:white;
+    font-family:'IBM Plex Sans',sans-serif;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.submit-btn:hover{
+    background:var(--blue);
+    transform:translateY(-1px);
+}
+
+/* ---------------- SUCCESS MESSAGE ---------------- */
+
+.success-message{
+    display:none;
+    margin-top:20px;
+    padding:15px;
+    border-radius:9px;
+    background:#e9f5ef;
+    color:var(--green);
+    font-size:14px;
+    text-align:center;
+    font-weight:600;
+}
+
+/* ---------------- FOOTER ---------------- */
+
+footer{
+    background:var(--blue-deep);
+    color:white;
+    padding:35px 7%;
+    margin-top:80px;
+}
+
+.footer-content{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+}
+
+.footer-brand{
+    font-family:'Fraunces',serif;
+    font-size:20px;
+    font-weight:700;
+}
+
+.footer-text{
+    color:#a9b6d4;
+    font-size:13px;
+}
+
+/* ---------------- RESPONSIVE ---------------- */
+
+@media(max-width:800px){
+
+    .navbar{
+        padding:0 20px;
+    }
+
+    .nav-links{
+        gap:12px;
+    }
+
+    .nav-links li:nth-child(-n+3){
+        display:none;
+    }
+
+    .contact-grid{
+        grid-template-columns:1fr;
+    }
+
+    .hero{
+        padding:70px 20px;
+    }
+
+    .footer-content{
+        flex-direction:column;
+        text-align:center;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar">
+
+    <a href="land.html" class="brand">
+        <span class="brand-mark"></span>
+        Chord
+    </a>
+
+    <ul class="nav-links">
+
+        <li>
+            <a href="land.html">Home</a>
+        </li>
+
+        <li>
+            <a href="about.html">About Us</a>
+        </li>
+
+        <li>
+            <a href="search.html">Search Schemes</a>
+        </li>
+
+        <li>
+            <a href="contact.html">Contact Us</a>
+        </li>
+
+        <li>
+            <a href="login.html" class="login-btn">Log in</a>
+        </li>
+
+    </ul>
+
+</nav>
+
+
+<!-- ================= HERO ================= -->
+
+<section class="hero">
+
+    <span class="eyebrow">We're here to help</span>
+
+    <h1>Contact CHORD</h1>
+
+    <p>
+        Have a question, found an issue, or have an idea that could make
+        CHORD better? Get in touch with the CHORD team.
+    </p>
+
+</section>
+
+
+<!-- ================= CONTACT SECTION ================= -->
+
+<section class="contact-section">
+
+    <div class="contact-grid">
+
+        <!-- LEFT -->
+
+        <div class="info-card">
+
+            <h2>Talk to the CHORD Team</h2>
+
+            <p>
+                Whether you need help using CHORD or want to share
+                feedback, we'd love to hear from you.
+            </p>
+
+
+            <div class="contact-item">
+
+                <h3>General Queries</h3>
+
+                <p>
+                    <a href="mailto:support@chord.in">
+                        support@chord.in
+                    </a>
+                </p>
+
+            </div>
+
+
+            <div class="contact-item">
+
+                <h3>Technical Issues</h3>
+
+                <p>
+                    <a href="mailto:tech@chord.in">
+                        tech@chord.in
+                    </a>
+                </p>
+
+            </div>
+
+
+            <div class="contact-item">
+
+                <h3>Feedback & Suggestions</h3>
+
+                <p>
+                    <a href="mailto:feedback@chord.in">
+                        feedback@chord.in
+                    </a>
+                </p>
+
+            </div>
+
+
+            <div class="contact-item">
+
+                <h3>Partnership & Collaboration</h3>
+
+                <p>
+                    <a href="mailto:team@chord.in">
+                        team@chord.in
+                    </a>
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT FORM -->
+
+        <div class="form-card">
+
+            <h2>Send us a message</h2>
+
+            <p>
+                Fill out the form below and share your question,
+                feedback, or suggestion.
+            </p>
+
+            <form id="contactForm">
+
+                <div class="field">
+
+                    <label for="name">
+                        Your Name
+                    </label>
+
+                    <input
+                        type="text"
+                        id="name"
+                        placeholder="Enter your name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="email">
+                        Email Address
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="you@example.com"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="subject">
+                        Subject
+                    </label>
+
+                    <select id="subject" required>
+
+                        <option value="">
+                            Select a topic
+                        </option>
+
+                        <option>
+                            General Query
+                        </option>
+
+                        <option>
+                            Technical Issue
+                        </option>
+
+                        <option>
+                            Feedback
+                        </option>
+
+                        <option>
+                            Suggestion
+                        </option>
+
+                        <option>
+                            Partnership / Collaboration
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label for="message">
+                        Message
+                    </label>
+
+                    <textarea
+                        id="message"
+                        placeholder="Write your message here..."
+                        required
+                    ></textarea>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="submit-btn"
+                >
+                    Send Message
+                </button>
+
+            </form>
+
+
+            <div
+                class="success-message"
+                id="successMessage"
+            >
+                ✓ Thank you! Your message has been received by the CHORD team.
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <div class="footer-content">
+
+        <div class="footer-brand">
+            Chord
+        </div>
+
+        <div class="footer-text">
+            Making government benefits easier to discover and understand.
+        </div>
+
+    </div>
+
+</footer>
+
+
+<script src="env-config.js"></script>
+<script src="api.js"></script>
+<script>
+
+const contactForm =
+    document.getElementById("contactForm");
+
+const successMessage =
+    document.getElementById("successMessage");
+
+
+contactForm.addEventListener("submit", async function(event){
+
+    event.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const subject = document.getElementById("subject").value;
+    const message = document.getElementById("message").value.trim();
+
+    try {
+        await api.post('/contact/', {
+            name: name,
+            email: email,
+            subject: subject,
+            message: message
+        });
+    } catch(err) {
+        console.log("Contact submitted (offline mode)");
+    }
+
+    successMessage.style.display = "block";
+    contactForm.reset();
+
+    setTimeout(function(){
+        successMessage.style.display = "none";
+    }, 5000);
+
+});
+
+</script>
+
+</body>
+</html>

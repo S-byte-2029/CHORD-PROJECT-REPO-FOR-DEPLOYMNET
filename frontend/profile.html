@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile Hub — Chord</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #112B63;
+  --navy-deep: #0c1f47;
+  --navy-soft: #eaeef7;
+  --gold: #D79A2B;
+  --gold-deep: #b87f1c;
+  --gold-soft: #fbf1de;
+  --ink: #16213f;
+  --ink-soft: #57607a;
+  --ink-faint: #8b93a8;
+  --line: #e3e7ee;
+  --surface: #f6f8fb;
+  --white: #ffffff;
+  --green: #1f7a54;
+  --green-soft: #e7f5ee;
+  --red: #c0463f;
+  --red-soft: #fbeceb;
+  --radius: 14px;
+  --shadow: 0 4px 20px -8px rgba(17, 43, 99, 0.12);
+  --shadow-lg: 0 14px 34px -14px rgba(17, 43, 99, 0.22);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+
+/* Top Navbar */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.top-nav {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 28px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--navy);
+}
+.brand-mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(155deg, var(--navy) 0%, var(--navy-deep) 100%);
+  position: relative;
+  flex: none;
+}
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border: 1.5px solid rgba(255,255,255,0.85);
+  border-radius: 3px;
+  border-bottom-color: var(--gold);
+  border-right-color: var(--gold);
+}
+.top-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.avatar-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(155deg, var(--gold) 0%, var(--gold-deep) 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px var(--line);
+}
+.logout-link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--red);
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--red-soft);
+}
+.logout-link:hover { background: #f7d5d3; }
+
+/* Main Layout */
+.layout-frame {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: calc(100vh - 68px);
+}
+
+/* Sidebar Menu */
+.sidebar {
+  background: #ffffff;
+  border-right: 1px solid var(--line);
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar-title {
+  font-family: 'Fraunces', serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 24px;
+  padding-left: 12px;
+}
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.nav-item-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 16px;
+  border-radius: 10px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: all .15s ease;
+}
+.nav-item-btn:hover { background: var(--surface); color: var(--navy); }
+.nav-item-btn.active { background: var(--navy-soft); color: var(--navy); font-weight: 700; }
+.nav-item-btn svg { width: 18px; height: 18px; flex: none; }
+.nav-item-btn.active svg { color: var(--gold-deep); }
+
+/* Content Panels */
+.content-area {
+  padding: 36px 40px 80px;
+  background: var(--surface);
+}
+.content-panel {
+  display: none;
+  animation: fadeIn .25s ease;
+}
+.content-panel.active { display: block; }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-header { margin-bottom: 26px; }
+.panel-header h1 { font-size: 28px; font-weight: 800; color: var(--navy); margin: 0 0 6px; }
+.panel-header p { color: var(--ink-soft); font-size: 14.5px; margin: 0; }
+
+.card {
+  background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 26px 28px; box-shadow: var(--shadow); margin-bottom: 24px;
+}
+.card-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 14px;
+}
+.card-head h2 { font-size: 18px; color: var(--navy); margin: 0; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 22px; border-radius: 9px; font-weight: 700; font-size: 13.5px;
+  border: none; cursor: pointer; transition: all .15s ease;
+}
+.btn-primary { background: var(--navy); color: #fff; }
+.btn-primary:hover { background: var(--navy-deep); }
+.btn-gold { background: var(--gold); color: var(--navy-deep); }
+.btn-gold:hover { background: var(--gold-deep); color: #fff; }
+.btn-outline { background: #fff; border: 1px solid var(--line); color: var(--ink-soft); }
+.btn-outline:hover { border-color: var(--navy); color: var(--navy); }
+.btn-sm { padding: 7px 14px; font-size: 12.5px; }
+
+.badge {
+  display: inline-block; padding: 4px 10px; border-radius: 12px;
+  font-size: 11px; font-weight: 800; text-transform: uppercase; font-family: 'IBM Plex Mono', monospace;
+}
+.badge-green { background: var(--green-soft); color: var(--green); }
+.badge-amber { background: var(--amber-soft); color: var(--amber); }
+
+.doc-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 18px; background: var(--surface); border: 1px solid var(--line);
+  border-radius: 10px; margin-top: 10px;
+}
+
+@media (max-width: 900px) {
+  .layout-frame { grid-template-columns: 1fr; }
+  .sidebar { border-right: none; border-bottom: 1px solid var(--line); padding: 20px; }
+  .content-area { padding: 24px 20px 60px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top-nav">
+    <a href="land.html" class="brand">
+      <span class="brand-mark"></span>
+      Chord
+    </a>
+    <div class="top-nav-right">
+      <a href="dashboard.html" class="btn btn-outline btn-sm">Citizen Dashboard</a>
+      <a href="search.html" class="btn btn-outline btn-sm">Search Schemes</a>
+      <div class="avatar-badge">C</div>
+      <a href="login.html" class="logout-link">Log out</a>
+    </div>
+  </div>
+</header>
+
+<div class="layout-frame">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-title">Profile</div>
+    <ul class="nav-menu">
+      <li>
+        <a href="view-uploaded-info.html" class="nav-item-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          View User Details
+        </a>
+      </li>
+      <li>
+        <button class="nav-item-btn active" onclick="switchTab('tab-saved', this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg>
+          Schemes Saved
+        </button>
+      </li>
+      <li>
+        <button class="nav-item-btn" onclick="switchTab('tab-track', this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+          Track Your Scheme
+        </button>
+      </li>
+      <li>
+        <a href="document-upload.html" class="nav-item-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+          Documents
+        </a>
+      </li>
+      <li>
+        <a href="edit-profile.html" class="nav-item-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit your profile
+        </a>
+      </li>
+      <li>
+        <button class="nav-item-btn" onclick="switchTab('tab-settings', this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Settings
+        </button>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="content-area">
+
+    <!-- 1. SCHEMES SAVED -->
+    <div id="tab-saved" class="content-panel active">
+      <div class="panel-header">
+        <h1>Saved Schemes</h1>
+        <p>Bookmarked schemes for quick access, review, and application filing.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Bookmarked Entitlements</h2>
+          <div style="display:flex; gap:8px;">
+            <a href="view-uploaded-info.html" class="btn btn-primary btn-sm">View User Details &rarr;</a>
+            <a href="search.html" class="btn btn-outline btn-sm">+ Find More</a>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 0; border-bottom:1px solid var(--line);">
+          <div>
+            <h3 style="margin:0; font-size:16px; color:var(--navy);">PM-KISAN Samman Nidhi</h3>
+            <p style="margin:4px 0 0; font-size:13px; color:var(--ink-soft);">₹6,000 / year direct transfer &middot; Ministry of Agriculture</p>
+          </div>
+          <a href="scheme-details.html?id=1" class="btn btn-primary btn-sm">View Details &rarr;</a>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 0;">
+          <div>
+            <h3 style="margin:0; font-size:16px; color:var(--navy);">Ayushman Bharat &mdash; PM-JAY</h3>
+            <p style="margin:4px 0 0; font-size:13px; color:var(--ink-soft);">₹5,00,000 health cover &middot; Ministry of Health</p>
+          </div>
+          <a href="scheme-details.html?id=4" class="btn btn-primary btn-sm">View Details &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. TRACK YOUR SCHEME -->
+    <div id="tab-track" class="content-panel">
+      <div class="panel-header">
+        <h1>Track Your Scheme Applications</h1>
+        <p>Real-time lifecycle monitoring of all submitted welfare applications.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Submitted Applications</h2>
+          <a href="track-applications.html" class="btn btn-outline btn-sm">Open Full Tracker &rarr;</a>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid var(--line);">
+          <div>
+            <b>PM-KISAN Samman Nidhi</b>
+            <div style="font-size:12px; color:var(--ink-faint); font-family:'IBM Plex Mono', monospace;">ID: PMK-2026-00451</div>
+          </div>
+          <span class="badge badge-green">Approved</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 0;">
+          <div>
+            <b>National Means-cum-Merit Scholarship</b>
+            <div style="font-size:12px; color:var(--ink-faint); font-family:'IBM Plex Mono', monospace;">ID: NMMS-2026-00877</div>
+          </div>
+          <span class="badge badge-amber">Under Review</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. SETTINGS -->
+    <div id="tab-settings" class="content-panel">
+      <div class="panel-header">
+        <h1>Account Settings</h1>
+        <p>Configure notification preferences and privacy configurations.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h2>Alert Preferences</h2></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--line);">
+          <div>
+            <b>Email Alerts for New Schemes</b>
+            <div style="font-size:12px; color:var(--ink-faint);">Receive alerts whenever a newly matched scheme opens.</div>
+          </div>
+          <input type="checkbox" checked style="accent-color:var(--navy); width:18px; height:18px;">
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0;">
+          <div>
+            <b>SMS Application Status Updates</b>
+            <div style="font-size:12px; color:var(--ink-faint);">Receive text notifications when your application progresses.</div>
+          </div>
+          <input type="checkbox" checked style="accent-color:var(--navy); width:18px; height:18px;">
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="env-config.js"></script>
+<script src="api.js"></script>
+<script>
+function switchTab(panelId, btnElement) {
+  document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item-btn').forEach(b => b.classList.remove('active'));
+
+  const targetPanel = document.getElementById(panelId);
+  if (targetPanel) targetPanel.classList.add('active');
+  if (btnElement) btnElement.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function loadProfileHubData() {
+  // 1. Bookmarks
+  try {
+    const bookmarks = await api.get('/bookmarks/');
+    const savedCard = document.querySelector('#tab-saved .card');
+    if (savedCard && bookmarks && bookmarks.length > 0) {
+      const headerHTML = `
+        <div class="card-head">
+          <h2>Bookmarked Entitlements (${bookmarks.length})</h2>
+          <div style="display:flex; gap:8px;">
+            <a href="view-uploaded-info.html" class="btn btn-primary btn-sm">View User Details &rarr;</a>
+            <a href="search.html" class="btn btn-outline btn-sm">+ Find More</a>
+          </div>
+        </div>
+      `;
+      const rowsHTML = bookmarks.map((b, idx) => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 0; ${idx < bookmarks.length - 1 ? 'border-bottom:1px solid var(--line);' : ''}">
+          <div>
+            <h3 style="margin:0; font-size:16px; color:var(--navy);">${b.name}</h3>
+            <p style="margin:4px 0 0; font-size:13px; color:var(--ink-soft);">${b.benefit} &middot; ${b.ministry}</p>
+          </div>
+          <a href="scheme-details.html?id=${b.id}" class="btn btn-primary btn-sm">View Details &rarr;</a>
+        </div>
+      `).join('');
+      savedCard.innerHTML = headerHTML + rowsHTML;
+    }
+  } catch (e) {
+    console.log('Using default bookmarks markup');
+  }
+
+  // 2. Applications
+  try {
+    const res = await api.get('/applications/');
+    const apps = res.applications || [];
+    const appCard = document.querySelector('#tab-track .card');
+    if (appCard && apps.length > 0) {
+      const headerHTML = `
+        <div class="card-head">
+          <h2>Submitted Applications (${apps.length})</h2>
+          <a href="track-applications.html" class="btn btn-outline btn-sm">Open Full Tracker &rarr;</a>
+        </div>
+      `;
+      const rowsHTML = apps.slice(0, 3).map((a, idx) => {
+        const badgeClass = a.status === 'approved' ? 'badge-green' : (a.status === 'rejected' ? 'badge-red' : 'badge-amber');
+        const badgeLabel = a.status === 'approved' ? 'Approved' : (a.status === 'rejected' ? 'Rejected' : 'Under Review');
+        return `
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 0; ${idx < Math.min(apps.length, 3) - 1 ? 'border-bottom:1px solid var(--line);' : ''}">
+            <div>
+              <b>${a.schemeName}</b>
+              <div style="font-size:12px; color:var(--ink-faint); font-family:'IBM Plex Mono', monospace;">ID: ${a.applicationId}</div>
+            </div>
+            <span class="badge ${badgeClass}">${badgeLabel}</span>
+          </div>
+        `;
+      }).join('');
+      appCard.innerHTML = headerHTML + rowsHTML;
+    }
+  } catch (e) {
+    console.log('Using default applications markup');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadProfileHubData);
+</script>
+</body>
+</html>

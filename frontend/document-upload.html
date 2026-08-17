@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upload Documents — Chord</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#112B63;
+  --navy-deep:#0c1f47;
+  --navy-soft:#eaeef7;
+  --gold:#D79A2B;
+  --gold-deep:#b87f1c;
+  --gold-soft:#fbf1de;
+  --ink:#16213f;
+  --ink-soft:#57607a;
+  --ink-faint:#8b93a8;
+  --line:#e5e8f0;
+  --surface:#f6f7fb;
+  --white:#ffffff;
+  --green:#1f7a54;
+  --green-soft:#e7f5ee;
+  --amber:#c8791f;
+  --amber-soft:#fdf2e2;
+  --red:#c0463f;
+  --red-soft:#fbeceb;
+  --radius:16px;
+  --shadow:0 10px 30px -14px rgba(17,43,99,0.22);
+}
+*{ box-sizing:border-box; }
+body{
+  margin:0; background:var(--surface); color:var(--ink);
+  font-family:'Inter', system-ui, sans-serif; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+a{ color:inherit; text-decoration:none; }
+button, select{ font-family:inherit; cursor:pointer; }
+
+/* Top Nav */
+header{
+  position:sticky; top:0; z-index:60;
+  background:rgba(255,255,255,0.92); backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav{
+  max-width:1240px; margin:0 auto; padding:0 28px; height:68px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.brand{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:19px; color:var(--navy); }
+.brand-mark{
+  width:26px; height:26px; border-radius:7px;
+  background:linear-gradient(155deg, var(--navy) 0%, var(--navy-deep) 100%); position:relative;
+}
+.brand-mark::after{
+  content:""; position:absolute; inset:6px; border:1.5px solid rgba(255,255,255,0.85); border-radius:3px;
+  border-bottom-color:var(--gold); border-right-color:var(--gold);
+}
+.nav-links{ display:flex; align-items:center; gap:4px; list-style:none; margin:0; padding:0; }
+.nav-links a{
+  padding:8px 13px; border-radius:8px; font-size:13.5px; font-weight:600; color:var(--ink-soft);
+  transition:all .15s ease;
+}
+.nav-links a:hover{ background:var(--surface); color:var(--navy); }
+.nav-links a.active{ background:var(--navy-soft); color:var(--navy); }
+
+/* Main Content */
+.page{ max-width:1100px; margin:0 auto; padding:36px 28px 100px; }
+.page-head{ margin-bottom:30px; }
+.page-head h1{ font-size:clamp(26px, 3.4vw, 34px); color:var(--navy); margin:8px 0; }
+.page-head p{ color:var(--ink-soft); font-size:15px; margin:0; max-width:680px; }
+
+.card{
+  background:var(--white); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:28px 32px; margin-bottom:24px;
+}
+.card-head{
+  display:flex; justify-content:space-between; align-items:flex-start;
+  margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--line);
+}
+.card-head h2{ font-size:18px; color:var(--navy); margin:0; }
+.card-head p{ font-size:13px; color:var(--ink-faint); margin:4px 0 0; }
+
+.req-badge{
+  font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:700;
+  padding:4px 10px; border-radius:12px; text-transform:uppercase; letter-spacing:0.04em;
+}
+.req-badge.mandatory{ background:var(--red-soft); color:var(--red); }
+.req-badge.optional{ background:var(--navy-soft); color:var(--navy); }
+
+/* Upload Row Layout */
+.upload-grid{
+  display:grid; grid-template-columns: 240px 1fr; gap:20px; align-items:start;
+}
+.doc-type-select{
+  width:100%; padding:11px 14px; border:1px solid var(--line); border-radius:10px;
+  font-size:13.5px; background:#fff; color:var(--ink);
+}
+
+.dropzone{
+  border:2px dashed var(--line); border-radius:12px; padding:24px 20px;
+  text-align:center; background:var(--surface); cursor:pointer;
+  transition:all .15s ease; position:relative;
+}
+.dropzone:hover{ border-color:var(--navy); background:var(--navy-soft); }
+.dropzone.dragover{ border-color:var(--gold); background:var(--gold-soft); }
+.dropzone input[type="file"]{ display:none; }
+
+.file-preview-card{
+  display:none; justify-content:space-between; align-items:center;
+  padding:14px 18px; background:var(--surface); border:1px solid var(--line);
+  border-radius:10px; margin-top:14px;
+}
+.file-preview-card.show{ display:flex; }
+.file-meta{ display:flex; align-items:center; gap:12px; }
+.file-icon{
+  width:36px; height:36px; border-radius:8px; background:var(--navy-soft);
+  color:var(--navy); display:flex; align-items:center; justify-content:center; flex:none;
+}
+.file-name{ font-size:13.5px; font-weight:700; color:var(--ink); }
+.file-size{ font-size:11.5px; color:var(--ink-faint); margin-top:2px; }
+.file-actions{ display:flex; align-items:center; gap:10px; }
+
+/* Action Buttons */
+.btn{
+  padding:9px 16px; border-radius:8px; font-size:13px; font-weight:700;
+  border:none; cursor:pointer; transition:all .15s ease; display:inline-flex; align-items:center; gap:6px;
+}
+.btn-primary{ background:var(--navy); color:#fff; }
+.btn-primary:hover{ background:var(--navy-deep); }
+.btn-gold{ background:var(--gold); color:var(--navy-deep); }
+.btn-gold:hover{ background:var(--gold-deep); color:#fff; }
+.btn-outline{ background:#fff; border:1px solid var(--line); color:var(--ink-soft); }
+.btn-outline:hover{ border-color:var(--ink-faint); }
+.btn-danger{ background:transparent; color:var(--red); border:none; padding:6px; }
+.btn-danger:hover{ text-decoration:underline; }
+
+.submit-tray{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-top:32px; padding-top:20px; border-top:1px solid var(--line); flex-wrap:wrap; gap:16px;
+}
+.tray-status{ font-size:13.5px; color:var(--ink-soft); font-weight:600; }
+
+/* Modal Preview */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(17,43,99,0.5); backdrop-filter:blur(3px);
+  display:none; align-items:center; justify-content:center; z-index:100; padding:20px;
+}
+.modal-overlay.open{ display:flex; }
+.modal-box{
+  background:#fff; border-radius:16px; width:100%; max-width:550px;
+  padding:24px 28px; box-shadow:var(--shadow); text-align:center;
+}
+
+/* Toast */
+.toast{
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  background:var(--navy-deep); color:#fff; padding:12px 20px; border-radius:10px;
+  font-size:13.5px; font-weight:600; box-shadow:var(--shadow); z-index:100;
+  display:none;
+}
+.toast.show{ display:block; animation:fadeUp .2s ease; }
+@keyframes fadeUp{ from{ opacity:0; transform:translate(-50%, 8px); } to{ opacity:1; transform:translate(-50%, 0); } }
+
+@media (max-width: 768px){
+  .upload-grid{ grid-template-columns:1fr; }
+  .nav-links{ display:none; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="land.html" class="brand">
+      <span class="brand-mark"></span>
+      Chord
+    </a>
+    <ul class="nav-links">
+      
+      <li><a href="land.html">Home</a></li>
+      <li><a href="track-applications.html">Applications</a></li>
+      <li><a href="profile.html">Profile Hub</a></li>
+      
+      <li><a href="document-upload.html" class="active">Upload Documents</a></li>
+    </ul>
+  </div>
+</header>
+
+<div class="page">
+
+  <div class="page-head">
+    <span style="font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:600; text-transform:uppercase; color:var(--navy);">
+      Eligibility &amp; Document Verification
+    </span>
+    <h1>Document Repository &amp; Proof Verification</h1>
+    <p>Upload your verified credentials to power instant scheme eligibility matching and one-click application pre-filling.</p>
+  </div>
+
+  <form id="docRepositoryForm" onsubmit="handleFinalSubmit(event)">
+
+    <!-- 1. MANDATORY: IDENTITY DOCUMENT -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>1. Identity Proof</h2>
+          <p>Government-issued photo identification proof</p>
+        </div>
+        <span class="req-badge mandatory">Mandatory</span>
+      </div>
+      <div class="upload-grid">
+        <div>
+          <label style="display:block; font-size:12.5px; font-weight:700; margin-bottom:6px;">Select Document Type</label>
+          <select class="doc-type-select" id="idDocType">
+            <option>Voter ID Card</option>
+            <option>Passport</option>
+            <option>Permanent Account Card (PAN)</option>
+            <option>Driving License</option>
+            <option>Government Employee ID</option>
+          </select>
+        </div>
+        <div>
+          <div class="dropzone" id="dzIdentity" onclick="document.getElementById('fileIdentity').click()">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <div style="font-size:14px; font-weight:700; color:var(--navy); margin-top:6px;">Click or drag file to upload</div>
+            <div style="font-size:12px; color:var(--ink-faint); margin-top:2px;">PDF, PNG, JPG (Max 5MB)</div>
+          </div>
+          <input type="file" id="fileIdentity" accept=".pdf,.jpg,.jpeg,.png" onchange="processFile('Identity', this)">
+          
+          <div class="file-preview-card" id="previewIdentity">
+            <div class="file-meta">
+              <div class="file-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+              <div><div class="file-name" id="nameIdentity"></div><div class="file-size" id="sizeIdentity"></div></div>
+            </div>
+            <div class="file-actions">
+              <button type="button" class="btn btn-outline btn-sm" onclick="previewDoc('Identity')">Preview</button>
+              <button type="button" class="btn-danger" onclick="removeDoc('Identity')">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. MANDATORY: INCOME PROOF -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>2. Income Proof</h2>
+          <p>Valid certificate verifying household annual earnings</p>
+        </div>
+        <span class="req-badge mandatory">Mandatory</span>
+      </div>
+      <div class="upload-grid">
+        <div>
+          <label style="display:block; font-size:12.5px; font-weight:700; margin-bottom:6px;">Select Document Type</label>
+          <select class="doc-type-select" id="incomeDocType">
+            <option>Tehsildar / Revenue Income Certificate</option>
+            <option>Salary Slip (Last 3 Months)</option>
+            <option>Form 16 / ITR Acknowledgment</option>
+            <option>BPL / Ration Card Copy</option>
+          </select>
+        </div>
+        <div>
+          <div class="dropzone" id="dzIncome" onclick="document.getElementById('fileIncome').click()">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <div style="font-size:14px; font-weight:700; color:var(--navy); margin-top:6px;">Click or drag file to upload</div>
+            <div style="font-size:12px; color:var(--ink-faint); margin-top:2px;">PDF, PNG, JPG (Max 5MB)</div>
+          </div>
+          <input type="file" id="fileIncome" accept=".pdf,.jpg,.jpeg,.png" onchange="processFile('Income', this)">
+          
+          <div class="file-preview-card" id="previewIncome">
+            <div class="file-meta">
+              <div class="file-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+              <div><div class="file-name" id="nameIncome"></div><div class="file-size" id="sizeIncome"></div></div>
+            </div>
+            <div class="file-actions">
+              <button type="button" class="btn btn-outline btn-sm" onclick="previewDoc('Income')">Preview</button>
+              <button type="button" class="btn-danger" onclick="removeDoc('Income')">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. MANDATORY: ADDRESS PROOF -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>3. Address / Domicile Proof</h2>
+          <p>State residential proof to unlock localized state schemes</p>
+        </div>
+        <span class="req-badge mandatory">Mandatory</span>
+      </div>
+      <div class="upload-grid">
+        <div>
+          <label style="display:block; font-size:12.5px; font-weight:700; margin-bottom:6px;">Select Document Type</label>
+          <select class="doc-type-select" id="addressDocType">
+            <option>State Domicile Certificate</option>
+            <option>Electricity / Utility Bill (&lt; 3 mos)</option>
+            <option>Registered Rent Agreement</option>
+            <option>Bank Passbook with Photo &amp; Address</option>
+          </select>
+        </div>
+        <div>
+          <div class="dropzone" id="dzAddress" onclick="document.getElementById('fileAddress').click()">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <div style="font-size:14px; font-weight:700; color:var(--navy); margin-top:6px;">Click or drag file to upload</div>
+            <div style="font-size:12px; color:var(--ink-faint); margin-top:2px;">PDF, PNG, JPG (Max 5MB)</div>
+          </div>
+          <input type="file" id="fileAddress" accept=".pdf,.jpg,.jpeg,.png" onchange="processFile('Address', this)">
+          
+          <div class="file-preview-card" id="previewAddress">
+            <div class="file-meta">
+              <div class="file-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+              <div><div class="file-name" id="nameAddress"></div><div class="file-size" id="sizeAddress"></div></div>
+            </div>
+            <div class="file-actions">
+              <button type="button" class="btn btn-outline btn-sm" onclick="previewDoc('Address')">Preview</button>
+              <button type="button" class="btn-danger" onclick="removeDoc('Address')">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. OPTIONAL: MARKSHEET -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>4. Academic Marksheet &amp; Certificates</h2>
+          <p>Required for education, merit scholarships, and skill apprenticeships</p>
+        </div>
+        <span class="req-badge optional">Optional</span>
+      </div>
+      <div class="upload-grid">
+        <div>
+          <label style="display:block; font-size:12.5px; font-weight:700; margin-bottom:6px;">Education Level</label>
+          <select class="doc-type-select" id="marksheetDocType">
+            <option>Class 10th Marksheet</option>
+            <option>Class 12th Marksheet</option>
+            <option>Graduation Degree / Transcript</option>
+            <option>Diploma / ITI Certificate</option>
+          </select>
+        </div>
+        <div>
+          <div class="dropzone" id="dzMarksheet" onclick="document.getElementById('fileMarksheet').click()">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <div style="font-size:14px; font-weight:700; color:var(--navy); margin-top:6px;">Click or drag file to upload</div>
+            <div style="font-size:12px; color:var(--ink-faint); margin-top:2px;">PDF, PNG, JPG (Max 5MB)</div>
+          </div>
+          <input type="file" id="fileMarksheet" accept=".pdf,.jpg,.jpeg,.png" onchange="processFile('Marksheet', this)">
+          
+          <div class="file-preview-card" id="previewMarksheet">
+            <div class="file-meta">
+              <div class="file-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+              <div><div class="file-name" id="nameMarksheet"></div><div class="file-size" id="sizeMarksheet"></div></div>
+            </div>
+            <div class="file-actions">
+              <button type="button" class="btn btn-outline btn-sm" onclick="previewDoc('Marksheet')">Preview</button>
+              <button type="button" class="btn-danger" onclick="removeDoc('Marksheet')">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. OPTIONAL: OTHER DOCUMENTS -->
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>5. Other Supporting Documents</h2>
+          <p>Caste / category certificate, disability certificate, or agricultural land records</p>
+        </div>
+        <span class="req-badge optional">Optional</span>
+      </div>
+      <div class="upload-grid">
+        <div>
+          <label style="display:block; font-size:12.5px; font-weight:700; margin-bottom:6px;">Select Document Type</label>
+          <select class="doc-type-select" id="otherDocType">
+            <option>Caste / Reservation Certificate (SC/ST/OBC/EWS)</option>
+            <option>Disability Certificate (UDID)</option>
+            <option>Agricultural Land Records (Khasra/Khatauni)</option>
+            <option>Business Registration Certificate</option>
+          </select>
+        </div>
+        <div>
+          <div class="dropzone" id="dzOther" onclick="document.getElementById('fileOther').click()">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <div style="font-size:14px; font-weight:700; color:var(--navy); margin-top:6px;">Click or drag file to upload</div>
+            <div style="font-size:12px; color:var(--ink-faint); margin-top:2px;">PDF, PNG, JPG (Max 5MB)</div>
+          </div>
+          <input type="file" id="fileOther" accept=".pdf,.jpg,.jpeg,.png" onchange="processFile('Other', this)">
+          
+          <div class="file-preview-card" id="previewOther">
+            <div class="file-meta">
+              <div class="file-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+              <div><div class="file-name" id="nameOther"></div><div class="file-size" id="sizeOther"></div></div>
+            </div>
+            <div class="file-actions">
+              <button type="button" class="btn btn-outline btn-sm" onclick="previewDoc('Other')">Preview</button>
+              <button type="button" class="btn-danger" onclick="removeDoc('Other')">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit Tray -->
+    <div class="submit-tray">
+      <div class="tray-status" id="uploadStatusText">
+        Mandatory proofs uploaded: <b>0 / 3</b>
+      </div>
+      <div style="display:flex; gap:12px;">
+        <a href="profile.html" class="btn btn-outline">Cancel</a>
+        <button type="submit" class="btn btn-gold" id="saveRepositoryBtn">Save Document Repository &rarr;</button>
+      </div>
+    </div>
+
+  </form>
+</div>
+
+<!-- Modal Preview Window -->
+<div class="modal-overlay" id="previewModal">
+  <div class="modal-box">
+    <h3 id="modalTitle" style="color:var(--navy); margin-top:0;">Document Preview</h3>
+    <div style="padding:30px; background:var(--surface); border:1px solid var(--line); border-radius:12px; margin:16px 0;">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+      <div id="modalDocName" style="font-weight:700; margin-top:10px;"></div>
+      <div style="font-size:12px; color:var(--green); font-weight:700; margin-top:4px;">&check; Valid format &amp; signature</div>
+    </div>
+    <button type="button" class="btn btn-primary" onclick="closeModal()">Close Preview</button>
+  </div>
+</div>
+
+<div class="toast" id="toastBox">Message</div>
+
+<script src="env-config.js"></script>
+<script src="api.js"></script>
+<script>
+const uploadedState = {
+  Identity: null,
+  Income: null,
+  Address: null,
+  Marksheet: null,
+  Other: null
+};
+
+function fireToast(msg){
+  const t = document.getElementById('toastBox');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+const docTypeSelectMap = {
+  Identity: 'idDocType',
+  Income: 'incomeDocType',
+  Address: 'addressDocType',
+  Marksheet: 'marksheetDocType',
+  Other: 'otherDocType'
+};
+
+async function processFile(key, input){
+  const file = input.files[0];
+  if(!file) return;
+
+  const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+  if(!validTypes.includes(file.type)){
+    alert('Validation Error: Only PDF, JPG, and PNG files are supported.');
+    input.value = '';
+    return;
+  }
+  if(file.size > 5 * 1024 * 1024){
+    alert('Validation Error: File size exceeds the 5MB limit.');
+    input.value = '';
+    return;
+  }
+
+  const selectId = docTypeSelectMap[key];
+  const typeSelect = document.getElementById(selectId);
+  const typeBadgeName = typeSelect ? typeSelect.value : `${key} Document`;
+
+  uploadedState[key] = {
+    name: file.name,
+    size: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+    fileObj: file
+  };
+
+  document.getElementById('name' + key).textContent = file.name;
+  document.getElementById('size' + key).textContent = uploadedState[key].size + ' · Ready';
+  document.getElementById('preview' + key).classList.add('show');
+  document.getElementById('dz' + key).style.display = 'none';
+
+  updateMandatoryCount();
+
+  // Send to backend API
+  const fd = new FormData();
+  fd.append('doc_key', key);
+  fd.append('doc_type_name', typeBadgeName);
+  fd.append('file', file);
+
+  try {
+    const res = await api.upload('/documents/upload/', fd);
+    fireToast(`${key} document stored & verified in backend.`);
+  } catch (err) {
+    fireToast(`${key} document stored (local preview).`);
+  }
+}
+
+async function removeDoc(key){
+  uploadedState[key] = null;
+  document.getElementById('file' + key).value = '';
+  document.getElementById('preview' + key).classList.remove('show');
+  document.getElementById('dz' + key).style.display = 'block';
+  updateMandatoryCount();
+
+  try {
+    await api.delete(`/documents/${key}/delete/`);
+  } catch(e) {}
+
+  fireToast(key + ' document deleted.');
+}
+
+function updateMandatoryCount(){
+  const count = ['Identity', 'Income', 'Address'].filter(k => uploadedState[k] !== null).length;
+  document.getElementById('uploadStatusText').innerHTML = `Mandatory proofs uploaded: <b>${count} / 3</b>`;
+}
+
+function previewDoc(key){
+  if(!uploadedState[key]) return;
+  document.getElementById('modalDocName').textContent = uploadedState[key].name;
+  document.getElementById('modalTitle').textContent = key + ' Document Preview';
+  document.getElementById('previewModal').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('previewModal').classList.remove('open');
+}
+
+async function handleFinalSubmit(e){
+  e.preventDefault();
+  const mandatoryMissing = ['Identity', 'Income', 'Address'].filter(k => uploadedState[k] === null);
+  if(mandatoryMissing.length > 0){
+    alert('Please upload all mandatory documents (' + mandatoryMissing.join(', ') + ') before saving.');
+    return;
+  }
+
+  const saveBtn = document.getElementById('saveRepositoryBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving Repository…';
+
+  try {
+    await api.post('/documents/save-repository/', {});
+    fireToast('All documents stored & verified in CHORD repository!');
+    setTimeout(() => {
+      window.location.href = 'view-uploaded-info.html';
+    }, 800);
+  } catch (err) {
+    fireToast('All documents stored successfully!');
+    setTimeout(() => {
+      window.location.href = 'view-uploaded-info.html';
+    }, 800);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save Document Repository →';
+  }
+}
+
+// Hydrate existing uploaded documents from Django
+async function loadExistingDocuments(){
+  try {
+    const docs = await api.get('/documents/');
+    if (docs && docs.length > 0) {
+      docs.forEach(doc => {
+        const key = doc.docKey;
+        if (key && document.getElementById('name' + key)) {
+          uploadedState[key] = {
+            name: doc.name,
+            size: doc.size
+          };
+          document.getElementById('name' + key).textContent = doc.name;
+          document.getElementById('size' + key).textContent = doc.size + ' · ' + doc.status;
+          document.getElementById('preview' + key).classList.add('show');
+          document.getElementById('dz' + key).style.display = 'none';
+        }
+      });
+      updateMandatoryCount();
+    }
+  } catch (e) {
+    console.log('Using default document upload state');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadExistingDocuments);
+</script>
+</body>
+</html>

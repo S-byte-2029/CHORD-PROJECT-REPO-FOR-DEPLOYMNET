@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Your Applications — Chord</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#112B63;
+  --navy-deep:#0c1f47;
+  --navy-soft:#eaeef7;
+  --gold:#D79A2B;
+  --gold-deep:#b87f1c;
+  --gold-soft:#fbf1de;
+  --ink:#16213f;
+  --ink-soft:#57607a;
+  --ink-faint:#8b93a8;
+  --line:#e5e8f0;
+  --surface:#f6f7fb;
+  --white:#ffffff;
+  --green:#1f7a54;
+  --green-soft:#e7f5ee;
+  --amber:#c8791f;
+  --amber-soft:#fdf2e2;
+  --red:#c0463f;
+  --red-soft:#fbeceb;
+  --radius:16px;
+  --shadow:0 10px 30px -14px rgba(17,43,99,0.22);
+  --shadow-lg:0 20px 46px -18px rgba(17,43,99,0.3);
+}
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0; background:var(--surface); color:var(--ink);
+  font-family:'Inter', system-ui, sans-serif; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+a{ color:inherit; text-decoration:none; }
+h1,h2,h3{ margin:0; font-weight:700; letter-spacing:-0.01em; }
+p{ margin:0; }
+button{ font-family:inherit; cursor:pointer; }
+::selection{ background:var(--gold-soft); color:var(--navy-deep); }
+:focus-visible{ outline:3px solid var(--gold); outline-offset:2px; border-radius:4px; }
+
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:12px; letter-spacing:0.06em; text-transform:uppercase; font-weight:600; color:var(--navy);
+}
+.eyebrow::before{ content:""; width:7px; height:7px; border-radius:50%; background:var(--gold); }
+
+/* ---------- Navbar ---------- */
+header{
+  position:sticky; top:0; z-index:60;
+  background:rgba(255,255,255,0.92); backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav{
+  max-width:1200px; margin:0 auto; padding:0 28px; height:68px;
+  display:flex; align-items:center; justify-content:space-between; gap:20px;
+}
+.brand{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:19px; color:var(--navy); flex:none; }
+.brand-mark{
+  width:26px; height:26px; border-radius:7px;
+  background:linear-gradient(155deg, var(--navy) 0%, var(--navy-deep) 100%); position:relative;
+}
+.brand-mark::after{
+  content:""; position:absolute; inset:6px; border:1.5px solid rgba(255,255,255,0.85); border-radius:3px;
+  border-bottom-color:var(--gold); border-right-color:var(--gold);
+}
+.nav-links{ display:flex; align-items:center; gap:4px; list-style:none; margin:0; padding:0; flex:1; }
+.nav-links a{
+  padding:8px 13px; border-radius:8px; font-size:13.5px; font-weight:600; color:var(--ink-soft);
+  transition:background .15s ease, color .15s ease;
+}
+.nav-links a:hover{ background:var(--surface); color:var(--navy); }
+.nav-links a.active{ background:var(--navy-soft); color:var(--navy); }
+.nav-right{ display:flex; align-items:center; gap:12px; flex:none; }
+.avatar{
+  width:36px; height:36px; border-radius:50%;
+  background:linear-gradient(155deg, var(--gold) 0%, var(--gold-deep) 100%);
+  color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700;
+  border:2px solid #fff; box-shadow:0 0 0 1px var(--line);
+}
+.menu-toggle{ display:none; background:none; border:none; cursor:pointer; }
+.menu-toggle span{ display:block; width:20px; height:2px; background:var(--navy); margin:5px 0; border-radius:2px; }
+
+/* ---------- Page ---------- */
+.page{ max-width:1100px; margin:0 auto; padding:36px 28px 90px; }
+.page-head{ margin-bottom:30px; max-width:640px; }
+.page-head h1{ font-size:clamp(26px,3.4vw,36px); margin-top:12px; }
+.page-head p{ margin-top:10px; color:var(--ink-soft); font-size:15px; line-height:1.6; }
+
+/* ---------- Summary cards ---------- */
+.summary-grid{
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:18px; margin-bottom:34px;
+}
+.summary-card{
+  background:var(--white); border:1px solid var(--line); border-radius:15px; padding:22px 22px;
+  box-shadow:var(--shadow); transition:transform .18s ease, box-shadow .18s ease;
+  position:relative; overflow:hidden;
+}
+.summary-card:hover{ transform:translateY(-3px); box-shadow:var(--shadow-lg); }
+.summary-card::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--line);
+}
+.summary-card.total::before{ background:var(--navy); }
+.summary-card.review::before{ background:var(--amber); }
+.summary-card.approved::before{ background:var(--green); }
+.summary-card.rejected::before{ background:var(--red); }
+.summary-card .num{ font-size:32px; font-weight:800; color:var(--navy); line-height:1; }
+.summary-card .lbl{ margin-top:8px; font-size:13px; color:var(--ink-soft); font-weight:600; }
+.summary-card .icon{
+  position:absolute; right:18px; top:18px; width:36px; height:36px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center; opacity:0.9;
+}
+.summary-card.total .icon{ background:var(--navy-soft); color:var(--navy); }
+.summary-card.review .icon{ background:var(--amber-soft); color:var(--amber); }
+.summary-card.approved .icon{ background:var(--green-soft); color:var(--green); }
+.summary-card.rejected .icon{ background:var(--red-soft); color:var(--red); }
+
+/* ---------- Filter bar ---------- */
+.filter-bar{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:26px; }
+.filter-pill{
+  padding:10px 18px; border-radius:20px; border:1.5px solid var(--line); background:#fff;
+  font-size:13.5px; font-weight:700; color:var(--ink-soft); cursor:pointer;
+  transition:all .18s ease;
+}
+.filter-pill:hover{ border-color:var(--navy); color:var(--navy); }
+.filter-pill.active{ background:var(--navy); border-color:var(--navy); color:#fff; }
+.filter-pill .count{
+  margin-left:6px; font-size:11px; opacity:0.75;
+}
+
+/* ---------- Application list ---------- */
+.app-list{ display:flex; flex-direction:column; gap:16px; }
+
+.app-card{
+  background:var(--white); border:1px solid var(--line); border-radius:var(--radius); padding:24px 26px;
+  box-shadow:var(--shadow); transition:transform .2s ease, box-shadow .2s ease, opacity .25s ease;
+  animation: cardIn .35s ease;
+}
+@keyframes cardIn{ from{ opacity:0; transform:translateY(10px);} to{ opacity:1; transform:translateY(0);} }
+.app-card:hover{ transform:translateY(-3px); box-shadow:var(--shadow-lg); border-color:#d7deee; }
+
+.app-card-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; }
+.app-scheme-name{ font-size:17.5px; font-weight:800; color:var(--navy); }
+.app-id{ margin-top:5px; font-size:12.5px; color:var(--ink-faint); }
+.app-id b{ color:var(--ink-soft); font-weight:600; }
+
+.status-badge{
+  flex:none; padding:7px 14px; border-radius:18px; font-size:11.5px; font-weight:800;
+  text-transform:uppercase; letter-spacing:0.03em; display:inline-flex; align-items:center; gap:6px;
+}
+.status-badge::before{ content:""; width:6px; height:6px; border-radius:50%; background:currentColor; }
+.status-badge.submitted{ background:var(--navy-soft); color:var(--navy); }
+.status-badge.review{ background:var(--amber-soft); color:var(--amber); }
+.status-badge.approved{ background:var(--green-soft); color:var(--green); }
+.status-badge.rejected{ background:var(--red-soft); color:var(--red); }
+
+.app-meta-row{
+  display:flex; gap:32px; margin-top:16px; padding-top:16px; border-top:1px solid var(--line); flex-wrap:wrap;
+}
+.app-meta-row .k{ font-size:10.5px; text-transform:uppercase; letter-spacing:0.05em; color:var(--ink-faint); font-weight:700; }
+.app-meta-row .v{ margin-top:4px; font-size:13px; color:var(--ink); font-weight:600; }
+
+/* ---------- Mini progress timeline (per card) ---------- */
+.mini-stepper{ display:flex; align-items:flex-start; margin-top:20px; }
+.mstep{ display:flex; flex-direction:column; align-items:center; flex:1; position:relative; }
+.mstep-dot{
+  width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+  background:var(--line); color:var(--ink-faint); font-weight:800; font-size:11px; z-index:1;
+  transition:background .3s ease, color .3s ease;
+}
+.mstep.done .mstep-dot{ background:var(--green); color:#fff; }
+.mstep.current .mstep-dot{ background:var(--gold); color:var(--navy-deep); box-shadow:0 0 0 4px var(--gold-soft); }
+.mstep.rejected .mstep-dot{ background:var(--red); color:#fff; }
+.mstep-label{ margin-top:7px; font-size:10.5px; font-weight:700; color:var(--ink-faint); text-align:center; line-height:1.3; max-width:76px; }
+.mstep.done .mstep-label, .mstep.current .mstep-label, .mstep.rejected .mstep-label{ color:var(--ink); }
+.mstep-connector{
+  position:absolute; top:13px; left:calc(-50% + 13px); width:calc(100% - 26px); height:2.5px;
+  background:var(--line); z-index:0;
+}
+.mstep:first-child .mstep-connector{ display:none; }
+.mstep.done .mstep-connector{ background:var(--green); }
+.mstep.rejected .mstep-connector{ background:var(--red); }
+
+.rejection-note{
+  margin-top:16px; background:var(--red-soft); border:1px solid #f0c9c6; border-radius:10px;
+  padding:11px 14px; font-size:12.5px; color:#a83a33; line-height:1.6;
+}
+
+.app-card-actions{ margin-top:20px; display:flex; justify-content:flex-end; }
+.view-details-btn{
+  background:var(--navy); color:#fff; border:none; padding:11px 22px; border-radius:10px;
+  font-weight:700; font-size:13.5px; transition:background .15s ease, transform .15s ease;
+}
+.view-details-btn:hover{ background:var(--navy-deep); transform:translateY(-1px); }
+
+.empty-state{ text-align:center; padding:60px 20px; color:var(--ink-soft); }
+.empty-state h3{ font-size:18px; color:var(--navy); }
+.empty-state p{ margin-top:8px; font-size:13.5px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 980px){
+  .summary-grid{ grid-template-columns:repeat(2, 1fr); }
+}
+@media (max-width: 680px){
+  .nav-links{ display:none; }
+  .menu-toggle{ display:block; }
+  .summary-grid{ grid-template-columns:repeat(2, 1fr); gap:12px; }
+  .summary-card{ padding:16px; }
+  .summary-card .num{ font-size:24px; }
+  .app-card{ padding:20px 18px; }
+  .mstep-label{ font-size:9.5px; max-width:56px; }
+  .mstep-dot{ width:22px; height:22px; font-size:10px; }
+  .app-meta-row{ gap:20px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="index.html" class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      Chord
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="search.html">Search Schemes</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="track-applications.html" class="active">Track Applications</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="dashboard.html" class="avatar" aria-label="Your profile">C</a>
+      <button class="menu-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+
+  <div class="page-head">
+    <span class="eyebrow">Application status</span>
+    <h1>Track Your Applications</h1>
+    <p>Every scheme you've applied to, in one place — see exactly where each application stands, from submission to benefit received.</p>
+  </div>
+
+  <!-- ---- Summary cards ---- -->
+  <div class="summary-grid" id="summaryGrid"></div>
+
+  <!-- ---- Filters ---- -->
+  <div class="filter-bar" id="filterBar"></div>
+
+  <!-- ---- Application cards ---- -->
+  <div class="app-list" id="appList"></div>
+
+</div>
+
+<script src="env-config.js"></script>
+<script src="api.js"></script>
+<script>
+/* ============================================================
+   track-applications.html
+   Connected to Django Backend API
+   ============================================================ */
+
+/* 5-stage success pipeline used by the mini progress timeline */
+const PIPELINE = ['Submitted', 'Documents Verified', 'Under Review', 'Approved', 'Benefit Received'];
+
+/* Realistic fallback data */
+let APPLICATIONS_DATA = [
+  {
+    schemeId: 1, schemeName: 'PM-KISAN Samman Nidhi', applicationId: 'PMK-2026-00451',
+    submittedDate: '02 Jan 2026', lastUpdated: '28 Jul 2026',
+    status: 'approved', stage: 4, rejectionReason: null
+  },
+  {
+    schemeId: 2, schemeName: 'National Means-cum-Merit Scholarship', applicationId: 'NMMS-2026-00877',
+    submittedDate: '14 Mar 2026', lastUpdated: '30 Jul 2026',
+    status: 'review', stage: 2, rejectionReason: null
+  },
+  {
+    schemeId: 3, schemeName: 'Stand-Up India Scheme', applicationId: 'SUI-2026-00129',
+    submittedDate: '05 Feb 2026', lastUpdated: '20 Feb 2026',
+    status: 'rejected', stage: 1, rejectionReason: 'Business plan did not meet the minimum project viability threshold. You may reapply with updated financials.'
+  },
+  {
+    schemeId: 4, schemeName: 'Ayushman Bharat — PM-JAY', applicationId: 'ABY-2026-00902',
+    submittedDate: '18 Jan 2026', lastUpdated: '25 Jan 2026',
+    status: 'approved', stage: 4, rejectionReason: null
+  },
+  {
+    schemeId: 5, schemeName: 'Pradhan Mantri Awas Yojana', applicationId: 'PMY-2026-00344',
+    submittedDate: '22 Apr 2026', lastUpdated: '02 Aug 2026',
+    status: 'review', stage: 2, rejectionReason: null
+  },
+  {
+    schemeId: 6, schemeName: 'Sukanya Samriddhi Yojana', applicationId: 'SSY-2026-00560',
+    submittedDate: '10 Feb 2026', lastUpdated: '15 Feb 2026',
+    status: 'approved', stage: 3, rejectionReason: null
+  },
+  {
+    schemeId: 7, schemeName: 'Atal Pension Yojana', applicationId: 'APY-2026-00718',
+    submittedDate: '30 Jul 2026', lastUpdated: '30 Jul 2026',
+    status: 'submitted', stage: 0, rejectionReason: null
+  },
+  {
+    schemeId: 8, schemeName: 'National Apprenticeship Promotion Scheme', applicationId: 'NAPS-2026-00095',
+    submittedDate: '08 Mar 2026', lastUpdated: '22 Mar 2026',
+    status: 'rejected', stage: 2, rejectionReason: 'Establishment withdrew the apprenticeship offer before final approval. You can apply to a different establishment.'
+  }
+];
+
+function getApplications(){
+  return APPLICATIONS_DATA;
+}
+
+const STATUS_META = {
+  submitted: { label: 'Submitted', badgeClass: 'submitted' },
+  review:    { label: 'Under Review', badgeClass: 'review' },
+  approved:  { label: 'Approved', badgeClass: 'approved' },
+  rejected:  { label: 'Rejected', badgeClass: 'rejected' }
+};
+
+let activeFilter = 'all';
+
+/* ---------- Summary cards ---------- */
+function renderSummary(apps){
+  const counts = {
+    total: apps.length,
+    review: apps.filter(a => a.status === 'review').length,
+    approved: apps.filter(a => a.status === 'approved').length,
+    rejected: apps.filter(a => a.status === 'rejected').length
+  };
+
+  const icon = (path) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${path}</svg>`;
+
+  document.getElementById('summaryGrid').innerHTML = `
+    <div class="summary-card total">
+      <div class="icon">${icon('<path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>')}</div>
+      <div class="num">${counts.total}</div>
+      <div class="lbl">Total Applications</div>
+    </div>
+    <div class="summary-card review">
+      <div class="icon">${icon('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>')}</div>
+      <div class="num">${counts.review}</div>
+      <div class="lbl">Under Review</div>
+    </div>
+    <div class="summary-card approved">
+      <div class="icon">${icon('<path d="M20 6L9 17l-5-5"/>')}</div>
+      <div class="num">${counts.approved}</div>
+      <div class="lbl">Approved</div>
+    </div>
+    <div class="summary-card rejected">
+      <div class="icon">${icon('<path d="M18 6L6 18M6 6l12 12"/>')}</div>
+      <div class="num">${counts.rejected}</div>
+      <div class="lbl">Rejected</div>
+    </div>
+  `;
+
+  return counts;
+}
+
+/* ---------- Filter bar ---------- */
+function renderFilters(counts){
+  const filters = [
+    { key:'all', label:'All', count: counts.total },
+    { key:'submitted', label:'Submitted', count: APPLICATIONS_DATA.filter(a=>a.status==='submitted').length },
+    { key:'review', label:'Under Review', count: counts.review },
+    { key:'approved', label:'Approved', count: counts.approved },
+    { key:'rejected', label:'Rejected', count: counts.rejected }
+  ];
+
+  document.getElementById('filterBar').innerHTML = filters.map(f => `
+    <button class="filter-pill ${f.key === activeFilter ? 'active' : ''}" data-key="${f.key}">
+      ${f.label} <span class="count">${f.count}</span>
+    </button>
+  `).join('');
+
+  document.querySelectorAll('.filter-pill').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeFilter = btn.dataset.key;
+      renderAll();
+    });
+  });
+}
+
+/* ---------- Mini progress timeline for one application ---------- */
+function miniStepperHTML(app){
+  return PIPELINE.map((label, i) => {
+    let state = '';
+    if(app.status === 'rejected'){
+      if(i < app.stage) state = 'done';
+      else if(i === app.stage) state = 'rejected';
+      else state = '';
+    } else {
+      if(i < app.stage) state = 'done';
+      else if(i === app.stage) state = 'current';
+      else state = '';
+    }
+    return `
+      <div class="mini-step ${state}">
+        <span class="dot"></span>
+        <span class="lbl">${label}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+/* ---------- Application card list ---------- */
+function renderAppList(apps){
+  const listEl = document.getElementById('appList');
+  const filtered = activeFilter === 'all'
+    ? apps
+    : apps.filter(a => a.status === activeFilter);
+
+  if(filtered.length === 0){
+    listEl.innerHTML = '<div class="empty-state">No applications found in this view.</div>';
+    return;
+  }
+
+  listEl.innerHTML = filtered.map(app => {
+    const meta = STATUS_META[app.status] || { label: 'Submitted', badgeClass: 'submitted' };
+    return `
+      <div class="app-card">
+        <div class="app-card-top">
+          <div>
+            <div class="app-scheme-name">${app.schemeName}</div>
+            <div class="app-id">Application ID: <b>${app.applicationId}</b></div>
+          </div>
+          <span class="status-badge ${meta.badgeClass}">${meta.label}</span>
+        </div>
+
+        <div class="app-meta-row">
+          <div><div class="k">Submission Date</div><div class="v">${app.submittedDate}</div></div>
+          <div><div class="k">Last Updated</div><div class="v">${app.lastUpdated}</div></div>
+        </div>
+
+        <div class="mini-stepper">${miniStepperHTML(app)}</div>
+
+        ${app.rejectionReason ? `<div class="rejection-note">${app.rejectionReason}</div>` : ''}
+
+        <div class="app-card-actions">
+          <button class="view-details-btn" data-scheme-id="${app.schemeId}">View Details</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.querySelectorAll('.view-details-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.location.href = 'scheme-details.html?id=' + btn.dataset.schemeId;
+    });
+  });
+}
+
+/* ---------- Master render ---------- */
+async function renderAll(){
+  try {
+    const res = await api.get('/applications/');
+    if(res.applications && res.applications.length > 0){
+      APPLICATIONS_DATA = res.applications;
+    }
+  } catch(e) {
+    console.log('Using local applications data');
+  }
+
+  const apps = getApplications();
+  const counts = renderSummary(apps);
+  renderFilters(counts);
+  renderAppList(apps);
+}
+
+document.addEventListener('DOMContentLoaded', renderAll);
+</script>
+</body>
+</html>

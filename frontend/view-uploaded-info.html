@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>View Uploaded Information &amp; Documents — Chord</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#112B63;
+  --navy-deep:#0c1f47;
+  --navy-soft:#eaeef7;
+  --gold:#D79A2B;
+  --gold-deep:#b87f1c;
+  --gold-soft:#fbf1de;
+  --ink:#16213f;
+  --ink-soft:#57607a;
+  --ink-faint:#8b93a8;
+  --line:#e5e8f0;
+  --surface:#f6f7fb;
+  --white:#ffffff;
+  --green:#1f7a54;
+  --green-soft:#e7f5ee;
+  --amber:#c8791f;
+  --amber-soft:#fdf2e2;
+  --red:#c0463f;
+  --red-soft:#fbeceb;
+  --radius:16px;
+  --shadow:0 10px 30px -14px rgba(17,43,99,0.22);
+  --shadow-lg:0 20px 46px -18px rgba(17,43,99,0.3);
+}
+*{ box-sizing:border-box; }
+body{
+  margin:0; background:var(--surface); color:var(--ink);
+  font-family:'Inter', system-ui, sans-serif; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+a{ color:inherit; text-decoration:none; }
+button, select, input{ font-family:inherit; }
+
+/* Top Nav */
+header{
+  position:sticky; top:0; z-index:60;
+  background:rgba(255,255,255,0.92); backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav{
+  max-width:1280px; margin:0 auto; padding:0 28px; height:68px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.brand{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:19px; color:var(--navy); }
+.brand-mark{
+  width:26px; height:26px; border-radius:7px;
+  background:linear-gradient(155deg, var(--navy) 0%, var(--navy-deep) 100%); position:relative;
+}
+.brand-mark::after{
+  content:""; position:absolute; inset:6px; border:1.5px solid rgba(255,255,255,0.85); border-radius:3px;
+  border-bottom-color:var(--gold); border-right-color:var(--gold);
+}
+.nav-links{ display:flex; align-items:center; gap:4px; list-style:none; margin:0; padding:0; }
+.nav-links a{
+  padding:8px 13px; border-radius:8px; font-size:13.5px; font-weight:600; color:var(--ink-soft);
+  transition:all .15s ease;
+}
+.nav-links a:hover{ background:var(--surface); color:var(--navy); }
+.nav-links a.active{ background:var(--navy-soft); color:var(--navy); }
+
+/* Page Shell */
+.page{ max-width:1280px; margin:0 auto; padding:36px 28px 100px; }
+.page-head{
+  display:flex; justify-content:space-between; align-items:flex-end;
+  margin-bottom:30px; flex-wrap:wrap; gap:16px;
+}
+.page-head h1{ font-size:clamp(26px, 3.4vw, 34px); color:var(--navy); margin:8px 0 0; }
+.page-head p{ color:var(--ink-soft); font-size:15px; margin:0; }
+
+/* Filter & Summary Bar */
+.filter-summary-strip{
+  background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+  padding:18px 24px; display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:28px; box-shadow:var(--shadow); flex-wrap:wrap; gap:16px;
+}
+.filter-pills{ display:flex; gap:8px; flex-wrap:wrap; }
+.pill-btn{
+  padding:8px 16px; border-radius:20px; font-size:12.5px; font-weight:700;
+  border:1px solid var(--line); background:var(--surface); color:var(--ink-soft);
+  cursor:pointer; transition:all .15s ease;
+}
+.pill-btn.active{ background:var(--navy); border-color:var(--navy); color:#fff; }
+
+.search-box{
+  display:flex; align-items:center; gap:8px; background:var(--surface);
+  border:1px solid var(--line); border-radius:10px; padding:6px 14px;
+}
+.search-box input{
+  border:none; background:transparent; font-size:13.5px; outline:none; color:var(--ink);
+  width:220px;
+}
+
+/* Data Sections */
+.section-title-wrap{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:16px; padding-bottom:8px; border-bottom:2px solid var(--line);
+}
+.section-title-wrap h2{ font-size:18px; color:var(--navy); margin:0; }
+.section-title-wrap span{ font-size:12.5px; color:var(--ink-faint); font-weight:600; }
+
+.card{
+  background:var(--white); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:26px 28px; margin-bottom:28px;
+}
+
+/* Information Grid */
+.info-data-grid{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+  gap:1px; background:var(--line); border:1px solid var(--line);
+  border-radius:12px; overflow:hidden;
+}
+.info-cell{ background:#fff; padding:16px 20px; }
+.info-cell .k{
+  font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase;
+  letter-spacing:0.04em; color:var(--ink-faint); font-weight:600;
+}
+.info-cell .v{ font-size:14.5px; font-weight:700; color:var(--ink); margin-top:4px; }
+.info-cell .v.secure{ font-family:'IBM Plex Mono', monospace; color:var(--navy); }
+
+/* Document Cards Table / Grid */
+.doc-card-grid{
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:20px;
+}
+.doc-box{
+  border:1px solid var(--line); border-radius:14px; padding:20px;
+  background:#fff; box-shadow:var(--shadow); transition:transform .15s ease, box-shadow .15s ease;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+.doc-box:hover{ transform:translateY(-2px); box-shadow:var(--shadow-lg); border-color:#cfd7e6; }
+.doc-box-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+.doc-type-badge{
+  font-family:'IBM Plex Mono', monospace; font-size:10.5px; font-weight:700;
+  padding:4px 8px; border-radius:6px; background:var(--navy-soft); color:var(--navy);
+  text-transform:uppercase;
+}
+.doc-box-body{ margin:14px 0 20px; }
+.doc-title{ font-size:15px; font-weight:700; color:var(--navy); word-break:break-all; }
+.doc-meta-text{ font-size:12px; color:var(--ink-faint); margin-top:4px; }
+
+.status-badge{
+  display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700;
+  padding:3px 8px; border-radius:20px; font-family:'IBM Plex Mono', monospace;
+}
+.status-badge.verified{ background:var(--green-soft); color:var(--green); }
+.status-badge.review{ background:var(--amber-soft); color:var(--amber); }
+
+.doc-actions{
+  display:flex; gap:8px; padding-top:14px; border-top:1px solid var(--line);
+}
+
+/* Buttons */
+.btn{
+  padding:8px 16px; border-radius:8px; font-size:12.5px; font-weight:700;
+  border:none; cursor:pointer; transition:all .15s ease; display:inline-flex; align-items:center; gap:6px;
+}
+.btn-primary{ background:var(--navy); color:#fff; }
+.btn-primary:hover{ background:var(--navy-deep); }
+.btn-outline{ background:#fff; border:1px solid var(--line); color:var(--ink-soft); }
+.btn-outline:hover{ border-color:var(--navy); color:var(--navy); }
+.btn-sm{ padding:6px 12px; font-size:12px; }
+
+/* Modal Preview */
+.modal-overlay{
+  position:fixed; inset:0; background:rgba(17,43,99,0.5); backdrop-filter:blur(3px);
+  display:none; align-items:center; justify-content:center; z-index:100; padding:20px;
+}
+.modal-overlay.open{ display:flex; }
+.modal-box{
+  background:#fff; border-radius:16px; width:100%; max-width:640px;
+  padding:24px 28px; box-shadow:var(--shadow-lg); text-align:center;
+}
+.preview-window{
+  max-height:380px; overflow-y:auto; margin:16px 0; border:1px solid var(--line);
+  border-radius:10px; background:var(--surface); padding:20px;
+  display:flex; align-items:center; justify-content:center;
+}
+.preview-window img{ max-width:100%; max-height:320px; border-radius:6px; }
+
+/* Empty state */
+.empty-box{ text-align:center; padding:48px 20px; color:var(--ink-faint); font-size:14px; }
+
+@media (max-width: 768px){
+  .nav-links{ display:none; }
+  .info-data-grid{ grid-template-columns:1fr; }
+  .doc-card-grid{ grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="land.html" class="brand">
+      <span class="brand-mark"></span>
+      Chord
+    </a>
+    <ul class="nav-links">
+      <li><a href="land.html">Home</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="profile.html">Profile Hub</a></li>
+      <li><a href="document-upload.html">Upload Documents</a></li>
+      <li><a href="view-uploaded-info.html" class="active">View Uploaded Info</a></li>
+    </ul>
+  </div>
+</header>
+
+<div class="page">
+
+  <div class="page-head">
+    <div>
+      <span style="font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:600; text-transform:uppercase; color:var(--navy);">
+        Audit &amp; Record Verification
+      </span>
+      <h1>Uploaded Citizen Records &amp; Proofs</h1>
+      <p>Inspect, preview, and verify all demographic data and uploaded document credentials currently stored in the system.</p>
+    </div>
+    <div>
+      <a href="document-upload.html" class="btn btn-primary">+ Upload New Proof</a>
+      <a href="edit-profile.html" class="btn btn-outline">Edit Profile Info</a>
+    </div>
+  </div>
+
+  <!-- Filter & Search Strip -->
+  <div class="filter-summary-strip">
+    <div class="filter-pills">
+      <button class="pill-btn active" onclick="filterCategory('all', this)">All Uploads</button>
+      <button class="pill-btn" onclick="filterCategory('mandatory', this)">Mandatory Proofs</button>
+      <button class="pill-btn" onclick="filterCategory('academic', this)">Academic Marksheets</button>
+      <button class="pill-btn" onclick="filterCategory('other', this)">Supporting Documents</button>
+    </div>
+    <div class="search-box">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Search record name..." onkeyup="filterSearch()">
+    </div>
+  </div>
+
+  <!-- SECTION 1: CITIZEN PROFILE PARAMETERS -->
+  <div class="section-title-wrap">
+    <h2>1. Uploaded Demographic &amp; Eligibility Parameters</h2>
+    <span>Stored in Welfare Twin Record</span>
+  </div>
+  
+  <div class="card" style="padding:0; overflow:hidden;">
+    <div class="info-data-grid" id="profileParamsGrid">
+      <div class="info-cell"><div class="k">Full Name</div><div class="v" id="viewName">Chetan Rawat</div></div>
+      <div class="info-cell"><div class="k">Date of Birth</div><div class="v" id="viewDob">14 Jun 1998</div></div>
+      <div class="info-cell"><div class="k">Gender</div><div class="v" id="viewGender">Male</div></div>
+      <div class="info-cell"><div class="k">State / UT</div><div class="v" id="viewState">Uttarakhand</div></div>
+      <div class="info-cell"><div class="k">District</div><div class="v" id="viewDistrict">Dehradun</div></div>
+      <div class="info-cell"><div class="k">Primary Occupation</div><div class="v" id="viewOccupation">Farmer</div></div>
+      <div class="info-cell"><div class="k">Annual Income</div><div class="v" id="viewIncome">₹2,85,000 / year</div></div>
+      <div class="info-cell"><div class="k">Category / Caste</div><div class="v" id="viewCategory">OBC</div></div>
+      <div class="info-cell"><div class="k">Highest Education</div><div class="v" id="viewEducation">12th Pass</div></div>
+      <div class="info-cell"><div class="k">Disability Status</div><div class="v" id="viewDisability">No</div></div>
+      <div class="info-cell"><div class="k">Contact Mobile</div><div class="v secure" id="viewPhone">+91 98765 43210</div></div>
+      <div class="info-cell"><div class="k">Registered Email</div><div class="v secure" id="viewEmail">chetan.rawat@example.com</div></div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: UPLOADED DOCUMENTS REPOSITORY -->
+  <div class="section-title-wrap">
+    <h2>2. Uploaded Document Records</h2>
+    <span id="docCountBadge">5 Documents Stored</span>
+  </div>
+
+  <div class="doc-card-grid" id="docCardsContainer">
+    <!-- Populated dynamically from storage and fallback default data -->
+  </div>
+
+</div>
+
+<!-- PREVIEW MODAL -->
+<div class="modal-overlay" id="previewModal">
+  <div class="modal-box">
+    <h3 id="modalTitle" style="color:var(--navy); margin-top:0;">Document Preview</h3>
+    <div class="preview-window" id="modalPreviewContent"></div>
+    <div id="modalMetaText" style="font-size:12.5px; color:var(--ink-soft); font-weight:600; margin-bottom:18px;"></div>
+    <div style="display:flex; justify-content:center; gap:10px;">
+      <button type="button" class="btn btn-outline" onclick="closeModal()">Close</button>
+      <button type="button" class="btn btn-primary" onclick="alert('Downloading authenticated document copy...')">Download Copy</button>
+    </div>
+  </div>
+</div>
+
+<script src="env-config.js"></script>
+<script src="api.js"></script>
+<script>
+// Default document repository records as resilient fallback
+const defaultDocs = [
+  {
+    id: 'Identity',
+    name: 'Voter_ID_Card_Front_Back.pdf',
+    category: 'mandatory',
+    typeBadge: 'Identity Proof',
+    size: '1.45 MB',
+    format: 'PDF Document',
+    uploadedDate: '12 Jan 2026',
+    status: 'Verified'
+  },
+  {
+    id: 'Income',
+    name: 'Income_Certificate_Tehsildar_2026.pdf',
+    category: 'mandatory',
+    typeBadge: 'Income Proof',
+    size: '1.20 MB',
+    format: 'PDF Document',
+    uploadedDate: '15 Jan 2026',
+    status: 'Verified'
+  },
+  {
+    id: 'Address',
+    name: 'Domicile_Certificate_Uttarakhand.png',
+    category: 'mandatory',
+    typeBadge: 'Address / Domicile',
+    size: '890 KB',
+    format: 'Image (PNG)',
+    uploadedDate: '15 Jan 2026',
+    status: 'Verified'
+  },
+  {
+    id: 'Marksheet',
+    name: 'Senior_Secondary_Marksheet_12th.pdf',
+    category: 'academic',
+    typeBadge: 'Academic Marksheet',
+    size: '2.10 MB',
+    format: 'PDF Document',
+    uploadedDate: '20 Jan 2026',
+    status: 'Verified'
+  },
+  {
+    id: 'Other',
+    name: 'Land_Holding_Khasra_Records.pdf',
+    category: 'other',
+    typeBadge: 'Land Records',
+    size: '3.40 MB',
+    format: 'PDF Document',
+    uploadedDate: '28 Jan 2026',
+    status: 'Under Review'
+  }
+];
+
+let activeDocs = [];
+
+async function loadAndHydrateDocuments(){
+  try {
+    const docs = await api.get('/documents/');
+    if (docs && docs.length > 0) {
+      activeDocs = docs.map(d => ({
+        id: d.docKey || d.id,
+        name: d.name,
+        category: d.category,
+        typeBadge: d.typeBadge || `${d.docKey} Proof`,
+        size: d.size,
+        format: d.format,
+        uploadedDate: d.uploadedDate,
+        status: d.status,
+        fileUrl: d.fileUrl
+      }));
+    } else {
+      activeDocs = [...defaultDocs];
+    }
+  } catch (e) {
+    activeDocs = [...defaultDocs];
+  }
+
+  renderDocGrid(activeDocs);
+}
+
+function renderDocGrid(list){
+  const container = document.getElementById('docCardsContainer');
+  document.getElementById('docCountBadge').textContent = `${list.length} Documents Stored`;
+
+  if(list.length === 0){
+    container.innerHTML = '<div class="empty-box" style="grid-column:1/-1;">No uploaded documents match the selected filter.</div>';
+    return;
+  }
+
+  container.innerHTML = list.map(doc => `
+    <div class="doc-box" data-category="${doc.category}">
+      <div class="doc-box-top">
+        <span class="doc-type-badge">${doc.typeBadge}</span>
+        <span class="status-badge ${doc.status === 'Verified' || doc.status === 'Approved' ? 'verified' : 'review'}">
+          ${doc.status === 'Verified' || doc.status === 'Approved' ? '✓ Verified' : '● ' + doc.status}
+        </span>
+      </div>
+      
+      <div class="doc-box-body">
+        <div class="doc-title">${doc.name}</div>
+        <div class="doc-meta-text">${doc.format} · ${doc.size}</div>
+        <div class="doc-meta-text">Uploaded on: <b>${doc.uploadedDate}</b></div>
+      </div>
+
+      <div class="doc-actions">
+        <button type="button" class="btn btn-outline btn-sm" onclick="openPreview('${doc.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Preview
+        </button>
+        <a href="document-upload.html" class="btn btn-outline btn-sm" style="color:var(--navy);">Update / Replace</a>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterCategory(cat, btn){
+  document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  if(cat === 'all'){
+    renderDocGrid(activeDocs);
+  } else {
+    const filtered = activeDocs.filter(d => d.category === cat);
+    renderDocGrid(filtered);
+  }
+}
+
+function filterSearch(){
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = activeDocs.filter(d => 
+    d.name.toLowerCase().includes(query) || 
+    d.typeBadge.toLowerCase().includes(query)
+  );
+  renderDocGrid(filtered);
+}
+
+function openPreview(docId){
+  const doc = activeDocs.find(d => String(d.id) === String(docId));
+  if(!doc) return;
+
+  document.getElementById('modalTitle').textContent = doc.typeBadge + ' Preview';
+  document.getElementById('modalMetaText').textContent = `${doc.name} (${doc.size}) — ${doc.status}`;
+
+  const previewBox = document.getElementById('modalPreviewContent');
+  if(doc.fileUrl && (doc.fileUrl.endsWith('.png') || doc.fileUrl.endsWith('.jpg') || doc.fileUrl.endsWith('.jpeg'))){
+    previewBox.innerHTML = `<img src="${doc.fileUrl}" alt="Document Preview">`;
+  } else {
+    previewBox.innerHTML = `
+      <div style="padding:24px; text-align:center;">
+        <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+        <div style="font-weight:700; color:var(--navy); font-size:15px; margin-top:10px;">${doc.name}</div>
+        <div style="font-size:12px; color:var(--green); font-weight:700; margin-top:6px;">✓ Digitally Authenticated Record in CHORD Repository</div>
+      </div>
+    `;
+  }
+
+  document.getElementById('previewModal').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('previewModal').classList.remove('open');
+}
+
+document.addEventListener('DOMContentLoaded', loadAndHydrateDocuments);
+</script>
+</body>
+</html>

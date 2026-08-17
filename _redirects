@@ -1,0 +1,18 @@
+# Clean URL Redirects for CHORD Multi-Page Web App
+/land                 /land.html                 200
+/login                /login.html                200
+/dashboard            /dashboard.html            200
+/search               /search.html               200
+/scheme-details       /scheme-details.html       200
+/profile              /profile.html              200
+/edit-profile         /edit-profile.html         200
+/document-upload      /document-upload.html      200
+/track-applications   /track-applications.html   200
+/view-uploaded-info   /view-uploaded-info.html   200
+/admin                /admin.html                200
+/about                /about.html                200
+/contact              /contact.html              200
+
+# Root & SPA Fallback
+/                     /index.html                200
+/*                    /index.html                200
