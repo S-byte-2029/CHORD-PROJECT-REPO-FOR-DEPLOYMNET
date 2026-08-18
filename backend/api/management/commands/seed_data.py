@@ -1,3 +1,18 @@
+import os
+import sys
+from pathlib import Path
+
+# Ensure backend root is in sys.path when invoked directly or via Render
+BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chord_backend.settings')
+
+import django
+if not django.apps.apps.ready:
+    django.setup()
+
 from django.core.management.base import BaseCommand
 from api.models import (
     UserAccount, Scheme, UserDocument, Application,
@@ -571,3 +586,7 @@ class Command(BaseCommand):
             )
 
         self.stdout.write(self.style.SUCCESS('Successfully seeded CHORD database.'))
+
+if __name__ == '__main__':
+    from django.core.management import call_command
+    call_command('seed_data')
