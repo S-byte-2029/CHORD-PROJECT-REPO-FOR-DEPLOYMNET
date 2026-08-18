@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "npx -y serve . -l 3000",
     "start": "npx -y serve . -l 3000",
-    "build": "node -e 'const fs=require(\"fs\"); const url=process.env.VITE_API_URL || process.env.CHORD_API_URL || \"http://127.0.0.1:8000/api\"; fs.writeFileSync(\"env-config.js\", `window.__ENV__ = { VITE_API_URL: \"${url}\" };\\n`); console.log(\"Built env-config.js with API URL:\", url);'",
+    "build": "node -e 'const fs=require(\"fs\"); const url=process.env.VITE_API_URL || process.env.CHORD_API_URL || \"https://chord-deployment.onrender.com/api\"; fs.writeFileSync(\"env-config.js\", `window.__ENV__ = { VITE_API_URL: \"${url}\" };\\n`); console.log(\"Built env-config.js with API URL:\", url);'",
     "test": "node -e 'console.log(\"Frontend build check passed.\");'"
   },
   "keywords": [

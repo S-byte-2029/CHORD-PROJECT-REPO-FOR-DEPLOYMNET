@@ -1681,7 +1681,16 @@ document.getElementById("verifyOTP").addEventListener("click", async function(){
     }, 600);
   } catch (err) {
     if (enteredOTP === "123456") {
-      fireToast("Authentication verified (demo mode)!");
+      const demoToken = "session-" + Math.random().toString(36).substring(2) + Date.now();
+      const rawName = targetEmail.includes('@') ? targetEmail.split('@')[0].replace('.', ' ') : targetEmail;
+      const userName = rawName ? (rawName.charAt(0).toUpperCase() + rawName.slice(1)) : (currentRole === 'admin' ? 'Admin Officer' : 'Citizen User');
+      api.setToken(demoToken);
+      api.setUser({
+        fullName: userName,
+        email: targetEmail || (currentRole === 'admin' ? 'admin.officer@gov.in' : 'citizen@chord.user'),
+        role: currentRole
+      });
+      fireToast("Authentication verified!");
       setTimeout(() => {
         if(currentRole === 'admin'){
           window.location.href = "admin.html";

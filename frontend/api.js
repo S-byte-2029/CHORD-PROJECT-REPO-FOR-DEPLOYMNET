@@ -5,8 +5,14 @@
 
 function resolveApiBaseUrl() {
   if (typeof window !== 'undefined') {
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     if (window.__ENV__ && window.__ENV__.VITE_API_URL) {
-      return window.__ENV__.VITE_API_URL.replace(/\/+$/, '');
+      const configured = window.__ENV__.VITE_API_URL.replace(/\/+$/, '');
+      // If deployed on HTTPS, never use localhost HTTP
+      if (!isLocalhost && configured.includes('127.0.0.1')) {
+        return 'https://chord-deployment.onrender.com/api';
+      }
+      return configured;
     }
     if (window.CHORD_API_URL) {
       return window.CHORD_API_URL.replace(/\/+$/, '');
@@ -15,12 +21,15 @@ function resolveApiBaseUrl() {
     if (localOverride) {
       return localOverride.replace(/\/+$/, '');
     }
+    if (!isLocalhost) {
+      return 'https://chord-deployment.onrender.com/api';
+    }
   }
   if (typeof process !== 'undefined' && process.env) {
     const envUrl = process.env.VITE_API_URL || process.env.REACT_APP_API_URL || process.env.CHORD_API_URL;
     if (envUrl) return envUrl.replace(/\/+$/, '');
   }
-  return 'http://127.0.0.1:8000/api';
+  return 'https://chord-deployment.onrender.com/api';
 }
 
 const api = {

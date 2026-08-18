@@ -834,7 +834,14 @@ async function loadProfile(){
       if(appRows[2]) appRows[2].textContent = data.applicationsCount;
     }
   } catch (err) {
-    console.log('Using default prefill profile');
+    const localUser = api.getUser();
+    if(localUser){
+      if(localUser.fullName) fullNameEl.value = localUser.fullName;
+      if(localUser.email) document.getElementById('email').value = localUser.email;
+      if(localUser.phone) document.getElementById('phone').value = localUser.phone;
+      sidebarName.textContent = localUser.fullName || 'Citizen User';
+      avatarPreview.textContent = initials(fullNameEl.value);
+    }
   }
   updateCompleteness();
 }

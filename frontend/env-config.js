@@ -1,1 +1,1 @@
-window.__ENV__ = { VITE_API_URL: "http://127.0.0.1:8000/api" };
+window.__ENV__ = { VITE_API_URL: "https://chord-deployment.onrender.com/api" };

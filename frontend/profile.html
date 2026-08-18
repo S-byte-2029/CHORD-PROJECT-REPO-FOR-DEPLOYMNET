@@ -416,9 +416,10 @@ async function loadProfileHubData() {
       }
     }
   } catch (e) {
-    if (e.message && e.message.includes('401')) {
-      api.logout();
-      return;
+    const localUser = api.getUser();
+    if (localUser && localUser.fullName) {
+      const avatarEl = document.querySelector('.avatar-badge');
+      if (avatarEl) avatarEl.textContent = localUser.fullName.charAt(0).toUpperCase();
     }
   }
   // 1. Bookmarks
