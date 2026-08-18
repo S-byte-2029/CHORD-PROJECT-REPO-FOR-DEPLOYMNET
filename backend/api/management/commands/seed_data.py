@@ -10,7 +10,8 @@ if str(BASE_DIR) not in sys.path:
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chord_backend.settings')
 
 import django
-if not django.apps.apps.ready:
+from django.apps import apps
+if not apps.ready:
     django.setup()
 
 from django.core.management.base import BaseCommand
