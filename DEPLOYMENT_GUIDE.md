@@ -98,7 +98,7 @@ git push -u origin main
    - **Runtime**: `Python 3`
    - **Build Command**:
      ```bash
-     pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate --noinput && python api/management/commands/seed_data.py
+     pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate --noinput && python manage.py seed_data
      ```
    - **Start Command**:
      ```bash
