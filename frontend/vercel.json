@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "buildCommand": "node -e 'const fs=require(\"fs\"); const url=process.env.VITE_API_URL || process.env.CHORD_API_URL || \"http://127.0.0.1:8000/api\"; fs.writeFileSync(\"env-config.js\", `window.__ENV__ = { VITE_API_URL: \"${url}\" };\\n`);'",
+  "outputDirectory": ".",
+  "routes": [
+    { "src": "/land", "dest": "/land.html" },
+    { "src": "/login", "dest": "/login.html" },
+    { "src": "/dashboard", "dest": "/dashboard.html" },
+    { "src": "/search", "dest": "/search.html" },
+    { "src": "/scheme-details", "dest": "/scheme-details.html" },
+    { "src": "/profile", "dest": "/profile.html" },
+    { "src": "/edit-profile", "dest": "/edit-profile.html" },
+    { "src": "/document-upload", "dest": "/document-upload.html" },
+    { "src": "/track-applications", "dest": "/track-applications.html" },
+    { "src": "/view-uploaded-info", "dest": "/view-uploaded-info.html" },
+    { "src": "/admin", "dest": "/admin.html" },
+    { "src": "/about", "dest": "/about.html" },
+    { "src": "/contact", "dest": "/contact.html" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    },
+    {
+      "source": "/(.*)\\.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    }
+  ]
+}

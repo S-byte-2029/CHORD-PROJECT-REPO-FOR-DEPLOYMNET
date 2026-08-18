@@ -1,7 +1,7 @@
 """
 Django settings for CHORD backend.
-Configured for production deployment on Railway with Supabase Managed PostgreSQL
-and Netlify frontend integration.
+Configured for production deployment on Render / Railway with Supabase Managed PostgreSQL
+and Vercel / Netlify frontend integration.
 """
 
 from pathlib import Path
@@ -44,8 +44,10 @@ if raw_allowed_hosts == '*':
     ALLOWED_HOSTS = ['*']
 else:
     ALLOWED_HOSTS = [h.strip() for h in raw_allowed_hosts.split(',') if h.strip()]
-    if '.railway.app' not in ALLOWED_HOSTS:
-        ALLOWED_HOSTS.extend(['.railway.app', '.up.railway.app', 'localhost', '127.0.0.1'])
+    default_hosts = ['.onrender.com', '.railway.app', '.up.railway.app', '.vercel.app', 'localhost', '127.0.0.1']
+    for host in default_hosts:
+        if host not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(host)
 
 # Application definition
 INSTALLED_APPS = [
@@ -147,12 +149,12 @@ CORS_ALLOW_ALL_ORIGINS = os.environ.get('CORS_ALLOW_ALL_ORIGINS', 'True').strip(
 
 raw_cors_origins = os.environ.get(
     'CORS_ALLOWED_ORIGINS',
-    'http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5500,http://localhost:8080'
+    'http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:5500,http://localhost:8080,https://*.vercel.app,https://*.netlify.app'
 )
 CORS_ALLOWED_ORIGINS = [o.strip() for o in raw_cors_origins.split(',') if o.strip()]
 
 raw_csrf_origins = os.environ.get(
     'CSRF_TRUSTED_ORIGINS',
-    'http://localhost:3000,http://127.0.0.1:3000,https://*.netlify.app,https://*.railway.app,https://*.up.railway.app'
+    'http://localhost:3000,http://127.0.0.1:3000,https://*.vercel.app,https://*.onrender.com,https://*.netlify.app,https://*.railway.app,https://*.up.railway.app'
 )
 CSRF_TRUSTED_ORIGINS = [o.strip() for o in raw_csrf_origins.split(',') if o.strip()]

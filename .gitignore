@@ -11,6 +11,10 @@ dist/
 build/
 .npm/
 .parcel-cache/
+.vercel/
+.render/
+*.zip
+*.tar.gz
 
 # Python & Django Artifacts
 __pycache__/

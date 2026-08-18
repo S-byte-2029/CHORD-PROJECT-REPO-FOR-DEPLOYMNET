@@ -5,14 +5,18 @@ from django.conf import settings
 class CorsMiddleware:
     """
     Production-grade CORS middleware that supports:
+    - Wildcard Vercel preview & production deploys (e.g. https://chord-app-shakti.vercel.app)
     - Wildcard Netlify preview deploys (e.g. https://deploy-preview-12--chord.netlify.app)
+    - Render backend origins (e.g. https://chord-backend.onrender.com)
     - Production domains configured via CORS_ALLOWED_ORIGINS
     - Development environments (localhost, 127.0.0.1)
     - Full preflight OPTIONS handling and credential support
     """
     def __init__(self, get_response):
         self.get_response = get_response
+        self.vercel_pattern = re.compile(r'^https://[a-zA-Z0-9_\-]+\.vercel\.app$')
         self.netlify_pattern = re.compile(r'^https://[a-zA-Z0-9_\-]+\.netlify\.app$')
+        self.render_pattern = re.compile(r'^https://[a-zA-Z0-9_\-]+\.onrender\.com$')
         self.railway_pattern = re.compile(r'^https://[a-zA-Z0-9_\-]+\.(?:up\.)?railway\.app$')
 
     def is_origin_allowed(self, origin: str) -> bool:
@@ -28,8 +32,11 @@ class CorsMiddleware:
         if origin in allowed_origins or '*' in allowed_origins:
             return True
         
-        # Regex match for Netlify preview branches and Railway
-        if self.netlify_pattern.match(origin) or self.railway_pattern.match(origin):
+        # Regex match for Vercel, Netlify, Render, Railway preview and production branches
+        if (self.vercel_pattern.match(origin) or 
+            self.netlify_pattern.match(origin) or 
+            self.render_pattern.match(origin) or 
+            self.railway_pattern.match(origin)):
             return True
         
         # Local development origins
