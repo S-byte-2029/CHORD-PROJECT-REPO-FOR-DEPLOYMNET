@@ -988,12 +988,12 @@ tr:last-child td{
 
             </div>
 
-            <div class="stat-number" id="schemeCount">
+            <div class="stat-number" id="statTotalSchemes">
                 128
             </div>
 
             <div class="stat-change">
-                ↑ 8 this month
+                Live catalog
             </div>
 
         </div>
@@ -1013,12 +1013,12 @@ tr:last-child td{
 
             </div>
 
-            <div class="stat-number">
+            <div class="stat-number" id="statRegisteredUsers">
                 4,286
             </div>
 
             <div class="stat-change">
-                ↑ 12.4% this month
+                Verified database
             </div>
 
         </div>
@@ -1038,7 +1038,7 @@ tr:last-child td{
 
             </div>
 
-            <div class="stat-number">
+            <div class="stat-number" id="statPendingUpdates">
                 14
             </div>
 
@@ -1063,12 +1063,12 @@ tr:last-child td{
 
             </div>
 
-            <div class="stat-number">
+            <div class="stat-number" id="statTotalApplications">
                 7,942
             </div>
 
             <div class="stat-change">
-                ↑ 6.8% this month
+                Live tracking
             </div>
 
         </div>
@@ -2470,11 +2470,29 @@ document.getElementById('logoutBtn').addEventListener('click', function(){
 });
 
 async function loadAdminDashboardData(){
+    // Auth check for Admin
+    if (!api.getToken()) {
+        window.location.href = 'login.html';
+        return;
+    }
+
     try {
         const stats = await api.get('/admin/stats/');
-        // Update stats if elements exist
-    } catch(e) {}
-    loadVerificationUsers();
+        if (stats) {
+            const elSchemes = document.getElementById('statTotalSchemes');
+            const elUsers = document.getElementById('statRegisteredUsers');
+            const elUpdates = document.getElementById('statPendingUpdates');
+            const elApps = document.getElementById('statTotalApplications');
+            
+            if (elSchemes && stats.totalSchemes !== undefined) elSchemes.textContent = stats.totalSchemes;
+            if (elUsers && stats.totalCitizens !== undefined) elUsers.textContent = stats.totalCitizens;
+            if (elUpdates && stats.pendingUpdates !== undefined) elUpdates.textContent = stats.pendingUpdates;
+            if (elApps && stats.totalApplications !== undefined) elApps.textContent = stats.totalApplications;
+        }
+    } catch(e) {
+        console.warn('Could not load live admin stats', e);
+    }
+    await loadVerificationUsers();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -390,6 +390,11 @@ header {
 <script src="env-config.js"></script>
 <script src="api.js"></script>
 <script>
+// Auth Guard: Require login to view profile
+if (!api.getToken()) {
+  window.location.href = 'login.html';
+}
+
 function switchTab(panelId, btnElement) {
   document.querySelectorAll('.content-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item-btn').forEach(b => b.classList.remove('active'));
@@ -401,6 +406,21 @@ function switchTab(panelId, btnElement) {
 }
 
 async function loadProfileHubData() {
+  // Load user profile details
+  try {
+    const user = await api.get('/profile/');
+    if (user) {
+      const avatarEl = document.querySelector('.avatar-badge');
+      if (avatarEl && user.fullName) {
+        avatarEl.textContent = user.fullName.charAt(0).toUpperCase();
+      }
+    }
+  } catch (e) {
+    if (e.message && e.message.includes('401')) {
+      api.logout();
+      return;
+    }
+  }
   // 1. Bookmarks
   try {
     const bookmarks = await api.get('/bookmarks/');

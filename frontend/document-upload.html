@@ -439,6 +439,11 @@ header{
 <script src="env-config.js"></script>
 <script src="api.js"></script>
 <script>
+// Auth Guard: Require login to upload documents
+if (!api.getToken()) {
+  window.location.href = 'login.html';
+}
+
 const uploadedState = {
   Identity: null,
   Income: null,

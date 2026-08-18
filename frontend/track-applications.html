@@ -268,52 +268,15 @@ header{
    Connected to Django Backend API
    ============================================================ */
 
+// Auth Guard: Require login to track applications
+if (!api.getToken()) {
+  window.location.href = 'login.html';
+}
+
 /* 5-stage success pipeline used by the mini progress timeline */
 const PIPELINE = ['Submitted', 'Documents Verified', 'Under Review', 'Approved', 'Benefit Received'];
 
-/* Realistic fallback data */
-let APPLICATIONS_DATA = [
-  {
-    schemeId: 1, schemeName: 'PM-KISAN Samman Nidhi', applicationId: 'PMK-2026-00451',
-    submittedDate: '02 Jan 2026', lastUpdated: '28 Jul 2026',
-    status: 'approved', stage: 4, rejectionReason: null
-  },
-  {
-    schemeId: 2, schemeName: 'National Means-cum-Merit Scholarship', applicationId: 'NMMS-2026-00877',
-    submittedDate: '14 Mar 2026', lastUpdated: '30 Jul 2026',
-    status: 'review', stage: 2, rejectionReason: null
-  },
-  {
-    schemeId: 3, schemeName: 'Stand-Up India Scheme', applicationId: 'SUI-2026-00129',
-    submittedDate: '05 Feb 2026', lastUpdated: '20 Feb 2026',
-    status: 'rejected', stage: 1, rejectionReason: 'Business plan did not meet the minimum project viability threshold. You may reapply with updated financials.'
-  },
-  {
-    schemeId: 4, schemeName: 'Ayushman Bharat — PM-JAY', applicationId: 'ABY-2026-00902',
-    submittedDate: '18 Jan 2026', lastUpdated: '25 Jan 2026',
-    status: 'approved', stage: 4, rejectionReason: null
-  },
-  {
-    schemeId: 5, schemeName: 'Pradhan Mantri Awas Yojana', applicationId: 'PMY-2026-00344',
-    submittedDate: '22 Apr 2026', lastUpdated: '02 Aug 2026',
-    status: 'review', stage: 2, rejectionReason: null
-  },
-  {
-    schemeId: 6, schemeName: 'Sukanya Samriddhi Yojana', applicationId: 'SSY-2026-00560',
-    submittedDate: '10 Feb 2026', lastUpdated: '15 Feb 2026',
-    status: 'approved', stage: 3, rejectionReason: null
-  },
-  {
-    schemeId: 7, schemeName: 'Atal Pension Yojana', applicationId: 'APY-2026-00718',
-    submittedDate: '30 Jul 2026', lastUpdated: '30 Jul 2026',
-    status: 'submitted', stage: 0, rejectionReason: null
-  },
-  {
-    schemeId: 8, schemeName: 'National Apprenticeship Promotion Scheme', applicationId: 'NAPS-2026-00095',
-    submittedDate: '08 Mar 2026', lastUpdated: '22 Mar 2026',
-    status: 'rejected', stage: 2, rejectionReason: 'Establishment withdrew the apprenticeship offer before final approval. You can apply to a different establishment.'
-  }
-];
+let APPLICATIONS_DATA = [];
 
 function getApplications(){
   return APPLICATIONS_DATA;
@@ -462,11 +425,13 @@ function renderAppList(apps){
 async function renderAll(){
   try {
     const res = await api.get('/applications/');
-    if(res.applications && res.applications.length > 0){
+    if(res && res.applications){
       APPLICATIONS_DATA = res.applications;
+    } else {
+      APPLICATIONS_DATA = [];
     }
   } catch(e) {
-    console.log('Using local applications data');
+    APPLICATIONS_DATA = [];
   }
 
   const apps = getApplications();

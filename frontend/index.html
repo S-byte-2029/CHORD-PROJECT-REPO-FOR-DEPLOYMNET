@@ -1139,6 +1139,29 @@
         }
       }
     });
+
+    // Update header actions based on auth state
+    const token = api.getToken();
+    const profileNavBtn = document.getElementById('profileNavBtn');
+    const loginNavBtn = document.querySelector('.btn-login');
+
+    if(profileNavBtn){
+      profileNavBtn.addEventListener('click', (e) => {
+        if(!api.getToken()){
+          e.preventDefault();
+          window.location.href = 'login.html';
+        }
+      });
+    }
+
+    if(token && loginNavBtn){
+      loginNavBtn.textContent = 'Sign Out';
+      loginNavBtn.href = '#';
+      loginNavBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        api.logout();
+      });
+    }
   });
 </script>
  

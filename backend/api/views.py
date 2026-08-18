@@ -31,7 +31,7 @@ def parse_body(request):
 def get_auth_user(request):
     """
     Identifies the authenticated user from Authorization header, token parameter,
-    or falls back to the default citizen demo account.
+    or X-User-Email header. Returns None if unauthenticated.
     """
     token = None
     auth_header = request.headers.get('Authorization', '')
@@ -48,12 +48,11 @@ def get_auth_user(request):
     # Check for email passed in headers / params
     user_email = request.headers.get('X-User-Email') or request.GET.get('user_email')
     if user_email:
-        user = UserAccount.objects.filter(email=user_email).first()
+        user = UserAccount.objects.filter(email__iexact=user_email.strip()).first()
         if user:
             return user
 
-    # Fallback to default citizen
-    return UserAccount.objects.filter(role='citizen').first()
+    return None
 
 
 # ==========================================
@@ -160,15 +159,14 @@ def verify_otp_view(request):
         user = UserAccount.objects.filter(Q(email__iexact=target) | Q(phone=target)).first()
 
     if not user:
-        if role == 'admin':
-            user = UserAccount.objects.filter(role='admin').first()
-        else:
-            user = UserAccount.objects.filter(role='citizen').first()
-
-    if not user:
+        if not target:
+            return json_error('Email or phone target is required for verification.', 400)
+        
+        clean_name = 'Admin Officer' if role == 'admin' else (target.split('@')[0].replace('.', ' ').title() if '@' in target else 'Citizen User')
         user = UserAccount.objects.create(
-            full_name='Chetan Rawat',
-            email=target or 'chetan.rawat@example.com',
+            full_name=clean_name,
+            email=target if '@' in target else f"{target}@chord.user",
+            phone=target if '@' not in target else '',
             role=role or 'citizen',
             otp_code='123456'
         )
@@ -247,9 +245,7 @@ def current_user_view(request):
 def profile_detail_view(request):
     user = get_auth_user(request)
     if not user:
-        user = UserAccount.objects.filter(role='citizen').first()
-        if not user:
-            user = UserAccount.objects.create(email='chetan.rawat@example.com', full_name='Chetan Rawat')
+        return json_error('Authentication required. Please log in.', 401)
 
     if request.method == 'GET':
         matched_count = Scheme.objects.filter(is_active=True).count()
@@ -396,7 +392,7 @@ def save_wizard_view(request):
 def document_list_create_view(request):
     user = get_auth_user(request)
     if not user:
-        user = UserAccount.objects.filter(role='citizen').first()
+        return json_error('Authentication required. Please log in.', 401)
 
     if request.method == 'GET':
         docs = UserDocument.objects.filter(user=user).order_by('-uploaded_at')
@@ -799,7 +795,7 @@ def chat_assistant_view(request):
 def application_list_create_view(request):
     user = get_auth_user(request)
     if not user:
-        user = UserAccount.objects.filter(role='citizen').first()
+        return json_error('Authentication required. Please log in.', 401)
 
     if request.method == 'GET':
         apps = Application.objects.filter(user=user).order_by('-submitted_date')
@@ -1005,13 +1001,13 @@ def admin_stats_view(request):
     return json_response({
         'totalSchemes': schemes_count,
         'activeSchemes': active_schemes,
-        'totalCitizens': users_count or 1240,
+        'totalCitizens': users_count,
         'totalApplications': apps_count,
-        'pendingUpdates': pending_updates or 14,
+        'pendingUpdates': pending_updates,
         'pendingDocs': pending_docs,
         'approvedDocs': approved_docs,
         'flaggedDocs': flagged_docs,
-        'openFeedback': open_feedback or 8
+        'openFeedback': open_feedback
     })
 
 

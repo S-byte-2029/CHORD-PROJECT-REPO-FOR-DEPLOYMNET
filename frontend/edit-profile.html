@@ -578,6 +578,11 @@ input[type="range"]{ width:100%; accent-color:var(--navy); margin-top:10px; curs
    Connected to Django Backend via api.js
    ============================================================ */
 
+// Auth Guard: Require login to edit profile
+if (!api.getToken()) {
+  window.location.href = 'login.html';
+}
+
 const state = { gender:'Male', occupation:'Farmer', disability:'No', dirty:false };
 
 // ---------- Pill groups ----------

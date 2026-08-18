@@ -294,66 +294,17 @@ header{
 <script src="env-config.js"></script>
 <script src="api.js"></script>
 <script>
-// Default document repository records as resilient fallback
-const defaultDocs = [
-  {
-    id: 'Identity',
-    name: 'Voter_ID_Card_Front_Back.pdf',
-    category: 'mandatory',
-    typeBadge: 'Identity Proof',
-    size: '1.45 MB',
-    format: 'PDF Document',
-    uploadedDate: '12 Jan 2026',
-    status: 'Verified'
-  },
-  {
-    id: 'Income',
-    name: 'Income_Certificate_Tehsildar_2026.pdf',
-    category: 'mandatory',
-    typeBadge: 'Income Proof',
-    size: '1.20 MB',
-    format: 'PDF Document',
-    uploadedDate: '15 Jan 2026',
-    status: 'Verified'
-  },
-  {
-    id: 'Address',
-    name: 'Domicile_Certificate_Uttarakhand.png',
-    category: 'mandatory',
-    typeBadge: 'Address / Domicile',
-    size: '890 KB',
-    format: 'Image (PNG)',
-    uploadedDate: '15 Jan 2026',
-    status: 'Verified'
-  },
-  {
-    id: 'Marksheet',
-    name: 'Senior_Secondary_Marksheet_12th.pdf',
-    category: 'academic',
-    typeBadge: 'Academic Marksheet',
-    size: '2.10 MB',
-    format: 'PDF Document',
-    uploadedDate: '20 Jan 2026',
-    status: 'Verified'
-  },
-  {
-    id: 'Other',
-    name: 'Land_Holding_Khasra_Records.pdf',
-    category: 'other',
-    typeBadge: 'Land Records',
-    size: '3.40 MB',
-    format: 'PDF Document',
-    uploadedDate: '28 Jan 2026',
-    status: 'Under Review'
-  }
-];
+// Auth Guard: Require login to view documents
+if (!api.getToken()) {
+  window.location.href = 'login.html';
+}
 
 let activeDocs = [];
 
 async function loadAndHydrateDocuments(){
   try {
     const docs = await api.get('/documents/');
-    if (docs && docs.length > 0) {
+    if (docs && Array.isArray(docs)) {
       activeDocs = docs.map(d => ({
         id: d.docKey || d.id,
         name: d.name,
@@ -366,10 +317,10 @@ async function loadAndHydrateDocuments(){
         fileUrl: d.fileUrl
       }));
     } else {
-      activeDocs = [...defaultDocs];
+      activeDocs = [];
     }
   } catch (e) {
-    activeDocs = [...defaultDocs];
+    activeDocs = [];
   }
 
   renderDocGrid(activeDocs);
