@@ -1041,9 +1041,13 @@ def admin_schemes_crud_view(request, scheme_id=None):
         data = parse_body(request)
         name = data.get('name', data.get('schemeName', '')).strip()
         category = data.get('category', data.get('schemeCategory', 'Social Welfare'))
-        state = data.get('state', data.get('schemeState', 'All India')).strip()
+        state = data.get('state', data.get('schemeState', 'All India')).strip() or 'All India'
         benefit = data.get('benefit', data.get('schemeBenefit', '')).strip()
         eligibility_text = data.get('eligibility', data.get('schemeEligibility', '')).strip()
+        ministry = data.get('ministry', data.get('schemeMinistry', f'Ministry of {category}'))
+        target_occs = data.get('target_occupations') or ['All', 'Farmer', 'Student', 'Daily Wage Worker', 'Business Owner', 'Salaried Employee', 'Unemployed', 'General']
+        target_secs = data.get('target_sectors') or [category, 'Social Welfare', 'General']
+        docs = data.get('documents') or ['Aadhaar Card', 'Identity Proof', 'Bank Account Details']
 
         if not name:
             return json_error('Scheme name is required')
@@ -1056,20 +1060,28 @@ def admin_schemes_crud_view(request, scheme_id=None):
             name=name,
             slug=slug,
             category=category,
+            ministry=ministry,
             state_coverage=state,
-            benefits_summary=benefit,
-            objective=eligibility_text,
-            description=eligibility_text,
+            gov_level='Central Government' if state == 'All India' else 'State Government',
+            benefits_summary=benefit or 'Direct Welfare Entitlement',
+            objective=eligibility_text or 'Welfare initiative for eligible citizens.',
+            description=eligibility_text or 'Welfare initiative for eligible citizens.',
             is_active=True,
-            benefits=[{'title': 'Benefit', 'desc': benefit, 'icon': 'award'}]
+            benefits=[{'title': 'Benefit', 'desc': benefit or 'Direct Financial Transfer', 'icon': 'award'}],
+            documents=docs,
+            target_occupations=target_occs,
+            target_sectors=target_secs,
+            deadline=data.get('deadline', 'Ongoing'),
+            ai_score=int(data.get('ai_score', 95))
         )
 
         return json_response({
             'status': 'success',
-            'message': f'Scheme "{name}" added successfully.',
+            'message': f'Scheme "{name}" added successfully to CHORD registry.',
             'id': scheme.id,
             'scheme_code': scheme.scheme_code,
-            'schemeCode': scheme.scheme_code
+            'schemeCode': scheme.scheme_code,
+            'slug': scheme.slug
         }, status=201)
 
     elif request.method in ['PUT', 'PATCH']:

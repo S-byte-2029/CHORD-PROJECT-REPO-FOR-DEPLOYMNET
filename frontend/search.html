@@ -851,18 +851,27 @@
   }
 
   function matchesFilters(s){
-    if(filters.type && s.type !== filters.type) return false;
-    if(filters.quicktype && !s.occupation.includes(filters.quicktype)) return false;
-    if(filters.sectors.length && !filters.sectors.some(sec => s.sector.includes(sec))) return false;
+    const occs = Array.isArray(s.occupation) ? s.occupation : [s.occupation || 'All'];
+    const secs = Array.isArray(s.sector) ? s.sector : [s.category || 'General'];
+    const sType = s.type || 'Central Government';
+    const sState = s.state || 'All India';
+
+    if(filters.type && sType !== filters.type) return false;
+    if(filters.quicktype && !occs.includes(filters.quicktype) && !occs.includes('All') && !occs.includes('General')) return false;
+    if(filters.sectors.length && !filters.sectors.some(sec => secs.includes(sec) || secs.includes('General') || secs.includes('Social Welfare'))) return false;
+    
     const stateSel = document.getElementById('fState').value;
-    if(stateSel && s.state !== stateSel) return false;
+    if(stateSel && sState !== stateSel && sState !== 'All India' && sState !== 'Central') return false;
+    
     const ministrySel = document.getElementById('fMinistry').value;
     if(ministrySel && s.ministry !== ministrySel) return false;
+    
     const occSel = document.getElementById('fOccupation').value;
-    if(occSel && !s.occupation.includes(occSel)) return false;
+    if(occSel && !occs.includes(occSel) && !occs.includes('All') && !occs.includes('General')) return false;
+    
     if(filters.keyword){
       const k = filters.keyword.toLowerCase();
-      const hay = (s.name + ' ' + s.ministry + ' ' + s.desc + ' ' + s.sector.join(' ')).toLowerCase();
+      const hay = ((s.name || '') + ' ' + (s.ministry || '') + ' ' + (s.desc || '') + ' ' + secs.join(' ') + ' ' + (s.scheme_code || '')).toLowerCase();
       if(!hay.includes(k)) return false;
     }
     return true;
@@ -872,7 +881,7 @@
     let list = schemes.filter(matchesFilters);
 
     const sort = document.getElementById('sortSelect').value;
-    if(sort === 'name'){ list = list.slice().sort((a,b) => a.name.localeCompare(b.name)); }
+    if(sort === 'name'){ list = list.slice().sort((a,b) => (a.name || '').localeCompare(b.name || '')); }
 
     resultsCount.textContent = list.length;
     if(list.length === 0){
@@ -916,7 +925,7 @@
           btn.innerHTML = saveIconHTML('Saved');
           try {
             const res = await api.post(`/schemes/${id}/bookmark/`);
-            if (res.message) fireToast(res.message);
+            if (res && res.message) fireToast(res.message);
           } catch(e) {}
         }
         renderSaved();
@@ -926,13 +935,15 @@
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         addRecent(parseInt(btn.dataset.id));
-        fireToast('This would open the official application portal.');
+        fireToast('Opening application form...');
+        goToSchemeDetails(parseInt(btn.dataset.id));
       });
     });
     document.querySelectorAll('.share-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        fireToast('Share link copied (demo).');
+        navigator.clipboard.writeText(window.location.origin + '/scheme-details.html?id=' + btn.dataset.id);
+        fireToast('Share link copied to clipboard!');
       });
     });
   }
@@ -948,13 +959,14 @@
     renderRecent();
   }
   function renderRecent(){
+    if(!recentRow) return;
     if(recentIds.length === 0){
       recentRow.innerHTML = '<div class="saved-empty">Schemes you view will show up here.</div>';
       return;
     }
     recentRow.innerHTML = recentIds.map(id => {
       const s = schemes.find(x => x.id === id);
-      return miniCardHTML(s);
+      return s ? miniCardHTML(s) : '';
     }).join('');
   }
 
@@ -962,39 +974,45 @@
   const savedEmpty = document.getElementById('savedEmpty');
   const savedCount = document.getElementById('savedCount');
   function renderSaved(){
+    if(!savedCount) return;
     savedCount.textContent = savedIds.size + ' saved';
     if(savedIds.size === 0){
-      savedRow.innerHTML = '';
-      savedEmpty.style.display = 'block';
+      if(savedRow) savedRow.innerHTML = '';
+      if(savedEmpty) savedEmpty.style.display = 'block';
       return;
     }
-    savedEmpty.style.display = 'none';
-    savedRow.innerHTML = [...savedIds].map(id => {
-      const s = schemes.find(x => x.id === id);
-      return miniCardHTML(s);
-    }).join('');
+    if(savedEmpty) savedEmpty.style.display = 'none';
+    if(savedRow){
+      savedRow.innerHTML = [...savedIds].map(id => {
+        const s = schemes.find(x => x.id === id);
+        return s ? miniCardHTML(s) : '';
+      }).join('');
+    }
   }
   function miniCardHTML(s){
     return `
     <div class="mini-card" onclick="addRecent(${s.id}); goToSchemeDetails(${s.id});">
-      <div class="mini-ministry">${s.ministry}</div>
+      <div class="mini-ministry">${s.ministry || 'Government of India'}</div>
       <div class="mini-name">${s.name}</div>
       <div class="mini-foot">
-        <span class="mini-badge badge ${s.eligibility}" style="padding:4px 8px;">${badgeLabel[s.eligibility]}</span>
-        <span style="font-size:11px; color:var(--ink-faint); font-family:'IBM Plex Mono',monospace;">${s.lastDate}</span>
+        <span class="mini-badge badge ${s.eligibility || 'eligible'}" style="padding:4px 8px;">${badgeLabel[s.eligibility] || 'Eligible'}</span>
+        <span style="font-size:11px; color:var(--ink-faint); font-family:'IBM Plex Mono',monospace;">${s.lastDate || 'Ongoing'}</span>
       </div>
     </div>`;
   }
 
   const aiCardList = document.getElementById('aiCardList');
   function renderAI(){
-    const picks = [
-      { s: schemes[0], pct:96, why:'Matches your occupation and state profile closely.' },
-      { s: schemes[3], pct:91, why:'Income band and household size align with coverage criteria.' },
-      { s: schemes[6], pct:84, why:'Unorganised-sector workers in your age range qualify.' },
-      { s: schemes[1], pct:78, why:'Education level and income put you in the target group.' },
-      { s: schemes[7], pct:72, why:'Age range fits; apprenticeship slots open in your sector.' }
-    ];
+    if(!aiCardList) return;
+    if(!schemes || schemes.length === 0){
+      aiCardList.innerHTML = '<div style="padding:16px; color:var(--ink-soft); font-size:13px;">Loading AI recommendations...</div>';
+      return;
+    }
+    const picks = schemes.slice(0, 5).map((s, idx) => ({
+      s: s,
+      pct: Math.max(65, 96 - idx * 6),
+      why: s.desc || (s.benefits ? s.benefits.toString() : 'High match with verified citizen parameters.')
+    }));
     aiCardList.innerHTML = picks.map(p => `
       <div class="ai-card" onclick="addRecent(${p.s.id}); goToSchemeDetails(${p.s.id});" style="cursor:pointer;">
         <div class="ai-card-top">

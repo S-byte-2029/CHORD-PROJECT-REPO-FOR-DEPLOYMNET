@@ -2259,7 +2259,11 @@ schemeForm.addEventListener('submit', async function(e){
         return;
     }
 
-    let generatedCode = 'SCH-' + category.substring(0,3).toUpperCase() + '-NEW';
+    const submitBtn = schemeForm.querySelector('button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving to Database...';
+    }
 
     try {
         const res = await api.post('/admin/schemes/', {
@@ -2267,39 +2271,31 @@ schemeForm.addEventListener('submit', async function(e){
             schemeCategory: category,
             schemeState: state,
             schemeBenefit: benefit,
-            schemeEligibility: eligibility
+            schemeEligibility: eligibility,
+            target_occupations: ['All', 'Farmer', 'Student', 'Daily Wage Worker', 'Business Owner', 'Salaried Employee', 'Unemployed', 'General'],
+            target_sectors: [category, 'Social Welfare', 'General']
         });
-        if (res && (res.scheme_code || res.schemeCode)) {
-            generatedCode = res.scheme_code || res.schemeCode;
+        
+        const generatedCode = (res && (res.scheme_code || res.schemeCode)) ? (res.scheme_code || res.schemeCode) : ('SCH-' + category.substring(0,3).toUpperCase() + '-NEW');
+        
+        schemeForm.reset();
+        fireToast('✓ Scheme added successfully to CHORD registry with ID ' + generatedCode);
+        
+        // Reload live schemes from DB
+        await loadAdminSchemes();
+        
+        setTimeout(() => {
+            openPage('schemes');
+        }, 300);
+    } catch(err) {
+        console.error('Error adding scheme:', err);
+        fireToast('Failed to add scheme: ' + (err.message || 'Server error. Please verify backend connection.'));
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '+ Add Scheme to Registry';
         }
-    } catch(err) {}
-
-    const table = document.getElementById('schemeTable');
-    const row = document.createElement('tr');
-
-    row.innerHTML = `
-        <td class="scheme-name">
-            <span style="font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:700; color:var(--blue); background:var(--surface-2); padding:2px 7px; border-radius:4px; margin-right:8px;">${generatedCode}</span>
-            ${name}
-        </td>
-        <td>${category}</td>
-        <td>${state}</td>
-        <td><span class="badge green">Active</span></td>
-        <td>
-            <div class="action-buttons">
-                <button class="btn btn-secondary" onclick="editScheme(this)">Edit</button>
-                <button class="btn btn-danger" onclick="deleteScheme(this)">Delete</button>
-            </div>
-        </td>
-    `;
-
-    table.prepend(row);
-    schemeForm.reset();
-    fireToast('Scheme added successfully to CHORD registry with ID ' + generatedCode);
-
-    setTimeout(() => {
-        openPage('schemes');
-    }, 500);
+    }
 });
 
 /* =========================================
