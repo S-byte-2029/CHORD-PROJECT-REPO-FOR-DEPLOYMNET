@@ -453,11 +453,11 @@
         <span class="notif-dot"></span>
       </button>
       <div class="profile-menu" id="profileMenu">
-        <a href="#" class="avatar" aria-label="Your profile" id="avatarInitial">C</a>
+        <a href="#" class="avatar" aria-label="Your profile" id="avatarInitial">U</a>
         <div class="dropdown" id="profileDropdown">
           <div class="dropdown-head">
-            <div class="name">Chetan Rawat</div>
-            <div class="email">chetan.rawat@example.com</div>
+            <div class="name">Citizen User</div>
+            <div class="email">Signed In</div>
           </div>
           <a href="edit-profile.html">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
@@ -774,56 +774,8 @@
 </script>
 
 <script>
-  let schemes = [
-    { id:1, name:'PM-KISAN Samman Nidhi', ministry:'Ministry of Agriculture', type:'Central',
-      desc:'Income support of ₹6,000/year to landholding farmer families, paid in three instalments.',
-      eligibility:'eligible', benefits:'₹6,000 per year direct transfer',
-      documents:['Aadhaar Card','Land Records','Bank Passbook'], lastDate:'31 Aug 2026',
-      sector:['Agriculture'], occupation:['Farmer'], state:'Bihar',
-      more:'Applicable to all landholding farmer families across the country, subject to certain exclusion criteria for higher-income categories and institutional landholders.' },
-    { id:2, name:'National Means-cum-Merit Scholarship', ministry:'Ministry of Education', type:'Central',
-      desc:'Scholarship for meritorious students from economically weaker sections to reduce dropout at class 9.',
-      eligibility:'eligible', benefits:'₹12,000 per year',
-      documents:['Aadhaar Card','Income Certificate','Marksheet'], lastDate:'15 Sep 2026',
-      sector:['Education'], occupation:['Student'], state:'Uttar Pradesh',
-      more:'Awarded based on a qualifying exam; renewable each year subject to minimum academic performance and continued income eligibility.' },
-    { id:3, name:'Stand-Up India Scheme', ministry:'Ministry of Skill Development', type:'Central',
-      desc:'Bank loans between ₹10 lakh and ₹1 crore for SC/ST and women entrepreneurs setting up greenfield enterprises.',
-      eligibility:'partial', benefits:'Loans from ₹10L to ₹1Cr',
-      documents:['Business Plan','Aadhaar Card','Caste Certificate (if applicable)'], lastDate:'Rolling',
-      sector:['Startup','Employment'], occupation:['Business Owner'], state:'Maharashtra',
-      more:'Partially eligible — loan amount and terms depend on project viability and category-specific reservation criteria assessed by the lending bank.' },
-    { id:4, name:'Ayushman Bharat — PM-JAY', ministry:'Ministry of Health', type:'Central',
-      desc:'Health cover of ₹5 lakh per family per year for secondary and tertiary care hospitalisation.',
-      eligibility:'eligible', benefits:'₹5,00,000 health cover/year',
-      documents:['Aadhaar Card','Ration Card','Income Certificate'], lastDate:'Ongoing',
-      sector:['Health'], occupation:['Farmer','Student','Business Owner','Daily Wage Worker'], state:'Odisha',
-      more:'Coverage is cashless and paperless at empanelled hospitals; eligibility is based on the SECC 2011 deprivation criteria.' },
-    { id:5, name:'Pradhan Mantri Awas Yojana', ministry:'Ministry of Housing & Urban Affairs', type:'Central',
-      desc:'Interest subsidy on home loans for first-time homebuyers from EWS, LIG, and MIG categories.',
-      eligibility:'not', benefits:'Up to ₹2.67 lakh interest subsidy',
-      documents:['Aadhaar Card','Income Certificate','Property Documents'], lastDate:'31 Dec 2026',
-      sector:['Housing'], occupation:['Salaried Employee','Business Owner'], state:'Rajasthan',
-      more:'Not eligible under current income slab entered — try adjusting the annual income filter to see revised eligibility.' },
-    { id:6, name:'Beti Bachao Beti Padhao — Sukanya Samriddhi', ministry:'Ministry of Women & Child Development', type:'Central',
-      desc:'High-interest savings scheme for the education and marriage expenses of a girl child.',
-      eligibility:'eligible', benefits:'7.6% p.a. tax-free interest',
-      documents:['Birth Certificate','Aadhaar Card','Guardian ID'], lastDate:'Ongoing',
-      sector:['Women','Education'], occupation:['Student'], state:'Tamil Nadu',
-      more:'Account can be opened for a girl child below 10 years by a parent or legal guardian, with a 21-year maturity period.' },
-    { id:7, name:'Atal Pension Yojana', ministry:'Ministry of Skill Development', type:'Central',
-      desc:'Guaranteed monthly pension between ₹1,000–₹5,000 for workers in the unorganised sector after age 60.',
-      eligibility:'eligible', benefits:'₹1,000–₹5,000 monthly pension',
-      documents:['Aadhaar Card','Bank Account','Mobile Number'], lastDate:'Ongoing',
-      sector:['Pension','Employment'], occupation:['Farmer','Daily Wage Worker'], state:'West Bengal',
-      more:'Contribution amount varies by age of entry and chosen pension slab; co-contribution available for eligible subscribers.' },
-    { id:8, name:'National Apprenticeship Promotion Scheme', ministry:'Ministry of Skill Development', type:'Central',
-      desc:'Financial support to employers for engaging apprentices and building industry-ready skills.',
-      eligibility:'partial', benefits:'25% stipend reimbursement',
-      documents:['Aadhaar Card','Educational Certificates'], lastDate:'30 Nov 2026',
-      sector:['Employment','Education'], occupation:['Student','Unemployed'], state:'Karnataka',
-      more:'Eligibility depends on age (generally 14–35) and enrolment with a registered establishment offering apprenticeship training.' }
-  ];
+  let schemes = [];
+  let isFetchingSchemes = true;
 
   const badgeLabel = { eligible:'Eligible', partial:'Partially Eligible', not:'Not Eligible' };
 
@@ -835,29 +787,52 @@
   const resultsCount = document.getElementById('resultsCount');
   const noResults = document.getElementById('noResults');
 
+  function renderSkeletons(){
+    if(!cardGrid) return;
+    cardGrid.innerHTML = Array(6).fill(0).map(() => `
+      <div class="scheme-card" style="pointer-events:none; opacity:0.85;">
+        <div class="card-top">
+          <div style="width:100%;">
+            <div class="skeleton" style="width:140px; height:14px; margin-bottom:8px; border-radius:4px;"></div>
+            <div class="skeleton" style="width:260px; height:22px; margin-bottom:10px; border-radius:4px;"></div>
+            <div class="skeleton" style="width:100%; height:36px; border-radius:4px;"></div>
+          </div>
+        </div>
+        <div class="card-meta" style="margin-top:16px;">
+          <div class="skeleton" style="width:120px; height:20px; border-radius:4px;"></div>
+        </div>
+      </div>
+    `).join('');
+  }
+
   function schemeCardHTML(s){
+    const code = s.scheme_code || s.schemeCode || ('SCH-' + (s.category ? s.category.substring(0,3).toUpperCase() : 'GEN') + '-' + s.id);
+    const docs = Array.isArray(s.documents) ? s.documents : [];
     return `
     <div class="scheme-card" data-id="${s.id}" onclick="handleCardClick(event, ${s.id})">
       <div class="card-top">
-        <div>
-          <div class="card-ministry">${s.ministry}</div>
+        <div style="flex:1;">
+          <div class="card-ministry" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+            <span>${s.ministry || 'Government of India'}</span>
+            <span style="font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:700; color:var(--blue); background:var(--blue-soft); padding:2px 8px; border-radius:6px; letter-spacing:0.04em;">${code}</span>
+          </div>
           <h3 class="card-title">${s.name}</h3>
-          <p class="card-desc">${s.desc}</p>
+          <p class="card-desc">${s.desc || s.description || ''}</p>
         </div>
-        <span class="badge ${s.eligibility}">${badgeLabel[s.eligibility]}</span>
+        <span class="badge ${s.eligibility || 'eligible'}">${badgeLabel[s.eligibility] || 'Eligible'}</span>
       </div>
       <div class="card-meta">
         <div class="meta-block">
           <div class="k">Benefits</div>
-          <div class="v">${s.benefits}</div>
+          <div class="v">${s.benefits || 'Direct Benefit Transfer'}</div>
         </div>
         <div class="meta-block">
           <div class="k">Required Documents</div>
-          <div class="doc-list">${s.documents.map(d => '<span class="doc-tag">'+d+'</span>').join('')}</div>
+          <div class="doc-list">${docs.map(d => '<span class="doc-tag">'+d+'</span>').join('')}</div>
         </div>
         <div class="meta-block">
           <div class="k">Last Date</div>
-          <div class="v last-date">${s.lastDate}</div>
+          <div class="v last-date">${s.lastDate || s.deadline || 'Ongoing'}</div>
         </div>
       </div>
       <div class="card-actions">
@@ -1366,21 +1341,35 @@
   });
 
   async function initSearchPage(){
+    renderSkeletons();
     try {
       const liveSchemes = await api.get('/schemes/');
-      if (liveSchemes && liveSchemes.length > 0) {
+      if (liveSchemes && Array.isArray(liveSchemes) && liveSchemes.length > 0) {
         schemes = liveSchemes;
         liveSchemes.forEach(s => {
           if (s.isSaved) savedIds.add(s.id);
         });
       }
-    } catch(e) {}
+    } catch(e) {
+      console.warn('Failed to fetch live schemes:', e);
+    }
 
     renderResults();
     renderAI();
     renderRecent();
     renderSaved();
     loadProfileFromStorage();
+
+    // Hydrate user nav avatar if logged in
+    const user = api.getUser();
+    if (user && avatarInitial) {
+      const initial = (user.fullName || user.email || 'U').charAt(0).toUpperCase();
+      avatarInitial.textContent = initial;
+      const navName = document.querySelector('.dropdown-head .name');
+      const navEmail = document.querySelector('.dropdown-head .email');
+      if (navName) navName.textContent = user.fullName || 'Citizen User';
+      if (navEmail) navEmail.textContent = user.email || '';
+    }
   }
 
   initSearchPage();

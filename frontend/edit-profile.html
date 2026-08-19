@@ -331,11 +331,11 @@ input[type="range"]{ width:100%; accent-color:var(--navy); margin-top:10px; curs
         <div class="grid-2">
           <div class="field">
             <label for="fullName">Full name</label>
-            <input type="text" id="fullName" value="Chetan Rawat" placeholder="As per government ID">
+            <input type="text" id="fullName" value="" placeholder="As per government ID">
           </div>
           <div class="field">
             <label for="dob">Date of birth</label>
-            <input type="date" id="dob" value="1998-06-14">
+            <input type="date" id="dob" value="">
           </div>
         </div>
 
@@ -541,8 +541,8 @@ input[type="range"]{ width:100%; accent-color:var(--navy); margin-top:10px; curs
             <input type="file" id="avatarFile" accept="image/*">
           </label>
         </div>
-        <h3 id="sidebarName">Chetan Rawat</h3>
-        <div class="role">Farmer · Uttarakhand</div>
+        <h3 id="sidebarName">Loading...</h3>
+        <div class="role" id="sidebarRole">Citizen · All India</div>
 
         <div class="completeness">
           <div class="lbl-row"><span>Profile completeness</span><span id="pctLabel">0%</span></div>
@@ -553,9 +553,9 @@ input[type="range"]{ width:100%; accent-color:var(--navy); margin-top:10px; curs
         <div class="sidebar-divider"></div>
 
         <div class="sidebar-list">
-          <div class="row"><span class="k">Member since</span><span class="v">Jan 2026</span></div>
+          <div class="row"><span class="k">Member since</span><span class="v">Active User</span></div>
           <div class="row"><span class="k">Matched schemes</span><span class="v" id="matchCount">—</span></div>
-          <div class="row"><span class="k">Applications submitted</span><span class="v">3</span></div>
+          <div class="row"><span class="k">Applications submitted</span><span class="v" id="sidebarAppsCount">0</span></div>
         </div>
 
         <a href="#" class="danger-link">Deactivate my account</a>
@@ -583,7 +583,7 @@ if (!api.getToken()) {
   window.location.href = 'login.html';
 }
 
-const state = { gender:'Male', occupation:'Farmer', disability:'No', dirty:false };
+const state = { gender:'Male', occupation:'General', disability:'No', dirty:false };
 
 // ---------- Pill groups ----------
 document.querySelectorAll('.pill-group').forEach(group => {
@@ -618,10 +618,10 @@ const navAvatar = document.getElementById('navAvatar');
 const sidebarName = document.getElementById('sidebarName');
 
 function initials(name){
-  return name.trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase() || 'C';
+  return name.trim().split(/\s+/).map(w => w[0]).slice(0,2).join('').toUpperCase() || 'U';
 }
 fullNameEl.addEventListener('input', () => {
-  const val = fullNameEl.value || 'Chetan Rawat';
+  const val = fullNameEl.value || 'Citizen User';
   if(!avatarPreview.style.backgroundImage){
     avatarPreview.textContent = initials(val);
     if(navAvatar) navAvatar.textContent = initials(val);

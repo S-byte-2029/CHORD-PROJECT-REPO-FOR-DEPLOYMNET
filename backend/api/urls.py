@@ -5,10 +5,12 @@ urlpatterns = [
     # Auth
     path('auth/login/', views.login_view, name='login'),
     path('auth/signup/', views.signup_view, name='signup'),
+    path('auth/register/', views.signup_view, name='register'),
     path('auth/verify-otp/', views.verify_otp_view, name='verify_otp'),
     path('auth/resend-otp/', views.resend_otp_view, name='resend_otp'),
     path('auth/forgot-password/', views.forgot_password_view, name='forgot_password'),
     path('auth/me/', views.current_user_view, name='current_user'),
+    path('user/me/', views.current_user_view, name='user_me'),
 
     # Profile & Welfare Twin
     path('profile/', views.profile_detail_view, name='profile_detail'),
@@ -25,6 +27,7 @@ urlpatterns = [
 
     # Schemes
     path('schemes/', views.scheme_list_view, name='scheme_list'),
+    path('schemes/bulk-ingest/', views.bulk_ingest_schemes_view, name='bulk_ingest_schemes'),
     path('schemes/<int:scheme_id>/bookmark/', views.scheme_bookmark_view, name='scheme_bookmark'),
     path('schemes/<int:scheme_id>/feedback/', views.scheme_feedback_view, name='scheme_feedback'),
     path('schemes/<int:scheme_id>/report/', views.scheme_report_view, name='scheme_report'),

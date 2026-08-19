@@ -14,9 +14,9 @@ class UserAccount(models.Model):
         ('admin', 'Admin Officer'),
     )
 
-    full_name = models.CharField(max_length=150, default='Chetan Rawat')
+    full_name = models.CharField(max_length=150, default='Citizen User')
     email = models.CharField(max_length=150, unique=True, db_index=True)
-    phone = models.CharField(max_length=30, blank=True, default='+91 98765 43210')
+    phone = models.CharField(max_length=30, blank=True, default='')
     password_hash = models.CharField(max_length=128)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='citizen')
     token = models.CharField(max_length=64, blank=True, default='')
@@ -26,17 +26,17 @@ class UserAccount(models.Model):
     otp_created_at = models.DateTimeField(default=timezone.now)
 
     # Demographic & Profile Details
-    dob = models.CharField(max_length=30, blank=True, default='1998-06-14')
+    dob = models.CharField(max_length=30, blank=True, default='')
     gender = models.CharField(max_length=20, default='Male')
-    state = models.CharField(max_length=100, default='Uttarakhand')
-    district = models.CharField(max_length=100, default='Dehradun')
-    address = models.TextField(blank=True, default='14, Rajpur Road, Dehradun, Uttarakhand — 248001')
+    state = models.CharField(max_length=100, default='')
+    district = models.CharField(max_length=100, default='')
+    address = models.TextField(blank=True, default='')
 
     # Occupation & Income
-    occupation = models.CharField(max_length=50, default='Farmer')
-    income = models.IntegerField(default=285000)
-    education = models.CharField(max_length=50, default='12th Pass')
-    category = models.CharField(max_length=30, default='OBC')
+    occupation = models.CharField(max_length=50, default='General')
+    income = models.IntegerField(default=0)
+    education = models.CharField(max_length=50, default='General')
+    category = models.CharField(max_length=30, default='General')
 
     # Disability & Preferences
     has_disability = models.BooleanField(default=False)
@@ -77,6 +77,7 @@ class UserAccount(models.Model):
 
 
 class Scheme(models.Model):
+    scheme_code = models.CharField(max_length=50, unique=True, db_index=True, blank=True, null=True)
     slug = models.SlugField(max_length=100, unique=True)
     name = models.CharField(max_length=255)
     category = models.CharField(max_length=100, default='Social Welfare')
@@ -112,8 +113,17 @@ class Scheme(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def save(self, *args, **kwargs):
+        if not self.scheme_code:
+            cat_prefix = (self.category[:3].upper()) if self.category else 'GEN'
+            if len(cat_prefix) < 3:
+                cat_prefix = cat_prefix.ljust(3, 'X')
+            rand_code = uuid.uuid4().hex[:6].upper()
+            self.scheme_code = f"SCH-{cat_prefix}-{rand_code}"
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return f"{self.name} ({self.category})"
+        return f"{self.scheme_code or 'NO-CODE'} - {self.name} ({self.category})"
 
 
 class UserDocument(models.Model):

@@ -2320,10 +2320,40 @@ async function setDocVerdict(userId, docKey, verdict) {
 }
 
 /* =========================================
-   ADD SCHEME VIA BACKEND
+   ADD SCHEME VIA BACKEND & DYNAMIC SCHEMES TABLE
 ========================================= */
 
 const schemeForm = document.getElementById('schemeForm');
+
+async function loadAdminSchemes() {
+    try {
+        const schemes = await api.get('/admin/schemes/');
+        const table = document.getElementById('schemeTable');
+        if (table && Array.isArray(schemes) && schemes.length > 0) {
+            table.innerHTML = schemes.map(s => {
+                const code = s.scheme_code || s.schemeCode || ('SCH-' + (s.category ? s.category.substring(0,3).toUpperCase() : 'GEN') + '-' + s.id);
+                return `
+                <tr data-id="${s.id}">
+                    <td class="scheme-name">
+                        <span style="font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:700; color:var(--blue); background:var(--surface-2); padding:2px 7px; border-radius:4px; margin-right:8px;">${code}</span>
+                        ${s.name}
+                    </td>
+                    <td>${s.category || 'General'}</td>
+                    <td>${s.state || 'All India'}</td>
+                    <td><span class="badge ${s.status === 'Active' ? 'green' : 'amber'}">${s.status || 'Active'}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-secondary" onclick="editScheme(this)">Edit</button>
+                            <button class="btn btn-danger" onclick="deleteScheme(this, ${s.id})">Delete</button>
+                        </div>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+    } catch(e) {
+        console.warn('Could not load live admin schemes:', e);
+    }
+}
 
 schemeForm.addEventListener('submit', async function(e){
     e.preventDefault();
@@ -2339,21 +2369,29 @@ schemeForm.addEventListener('submit', async function(e){
         return;
     }
 
+    let generatedCode = 'SCH-' + category.substring(0,3).toUpperCase() + '-NEW';
+
     try {
-        await api.post('/admin/schemes/', {
+        const res = await api.post('/admin/schemes/', {
             schemeName: name,
             schemeCategory: category,
             schemeState: state,
             schemeBenefit: benefit,
             schemeEligibility: eligibility
         });
+        if (res && (res.scheme_code || res.schemeCode)) {
+            generatedCode = res.scheme_code || res.schemeCode;
+        }
     } catch(err) {}
 
     const table = document.getElementById('schemeTable');
     const row = document.createElement('tr');
 
     row.innerHTML = `
-        <td class="scheme-name">${name}</td>
+        <td class="scheme-name">
+            <span style="font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:700; color:var(--blue); background:var(--surface-2); padding:2px 7px; border-radius:4px; margin-right:8px;">${generatedCode}</span>
+            ${name}
+        </td>
         <td>${category}</td>
         <td>${state}</td>
         <td><span class="badge green">Active</span></td>
@@ -2367,7 +2405,7 @@ schemeForm.addEventListener('submit', async function(e){
 
     table.prepend(row);
     schemeForm.reset();
-    fireToast('Scheme added successfully to CHORD registry.');
+    fireToast('Scheme added successfully to CHORD registry with ID ' + generatedCode);
 
     setTimeout(() => {
         openPage('schemes');
@@ -2493,6 +2531,7 @@ async function loadAdminDashboardData(){
         console.warn('Could not load live admin stats', e);
     }
     await loadVerificationUsers();
+    await loadAdminSchemes();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

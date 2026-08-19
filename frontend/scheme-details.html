@@ -883,10 +883,12 @@ function iconSVG(name, size=17){
  
 /* ---------- 4. Render functions — one per section, kept modular ---------- */
 function renderHero(s){
+  const code = s.scheme_code || s.schemeCode || ('SCH-' + (s.category ? s.category.substring(0,3).toUpperCase() : 'GEN') + '-' + s.id);
   document.getElementById('heroTags').innerHTML = `
+    <span class="hero-tag" style="font-family:'IBM Plex Mono', monospace; font-weight:700; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.35);">${code}</span>
     <span class="hero-tag">${s.category}</span>
-    <span class="hero-tag">${s.govLevel}</span>
-    <span class="hero-tag status">${s.status}</span>
+    <span class="hero-tag">${s.govLevel || 'Central Government'}</span>
+    <span class="hero-tag status">${s.status || 'Active'}</span>
   `;
   document.getElementById('heroTitle').textContent = s.name;
   document.getElementById('heroSub').textContent = s.objective;
@@ -894,10 +896,12 @@ function renderHero(s){
 }
  
 function renderOverview(s){
+  const code = s.scheme_code || s.schemeCode || ('SCH-' + (s.category ? s.category.substring(0,3).toUpperCase() : 'GEN') + '-' + s.id);
   document.getElementById('overviewGrid').innerHTML = `
-    <div class="overview-cell"><div class="k">Objective</div><div class="v">${s.objective}</div></div>
-    <div class="overview-cell"><div class="k">Description</div><div class="v">${s.description}</div></div>
-    <div class="overview-cell"><div class="k">Target Beneficiaries</div><div class="v">${s.beneficiaries}</div></div>
+    <div class="overview-cell"><div class="k">Unique Scheme ID</div><div class="v" style="font-family:'IBM Plex Mono', monospace; color:var(--navy); font-weight:700;">${code}</div></div>
+    <div class="overview-cell"><div class="k">Objective</div><div class="v">${s.objective || 'Not specified'}</div></div>
+    <div class="overview-cell"><div class="k">Description</div><div class="v">${s.description || s.objective || 'Not specified'}</div></div>
+    <div class="overview-cell"><div class="k">Target Beneficiaries</div><div class="v">${s.beneficiaries || 'All eligible citizens'}</div></div>
   `;
 }
  

@@ -251,29 +251,29 @@ header{
   
   <div class="card" style="padding:0; overflow:hidden;">
     <div class="info-data-grid" id="profileParamsGrid">
-      <div class="info-cell"><div class="k">Full Name</div><div class="v" id="viewName">Chetan Rawat</div></div>
-      <div class="info-cell"><div class="k">Date of Birth</div><div class="v" id="viewDob">14 Jun 1998</div></div>
-      <div class="info-cell"><div class="k">Gender</div><div class="v" id="viewGender">Male</div></div>
-      <div class="info-cell"><div class="k">State / UT</div><div class="v" id="viewState">Uttarakhand</div></div>
-      <div class="info-cell"><div class="k">District</div><div class="v" id="viewDistrict">Dehradun</div></div>
-      <div class="info-cell"><div class="k">Primary Occupation</div><div class="v" id="viewOccupation">Farmer</div></div>
-      <div class="info-cell"><div class="k">Annual Income</div><div class="v" id="viewIncome">₹2,85,000 / year</div></div>
-      <div class="info-cell"><div class="k">Category / Caste</div><div class="v" id="viewCategory">OBC</div></div>
-      <div class="info-cell"><div class="k">Highest Education</div><div class="v" id="viewEducation">12th Pass</div></div>
-      <div class="info-cell"><div class="k">Disability Status</div><div class="v" id="viewDisability">No</div></div>
-      <div class="info-cell"><div class="k">Contact Mobile</div><div class="v secure" id="viewPhone">+91 98765 43210</div></div>
-      <div class="info-cell"><div class="k">Registered Email</div><div class="v secure" id="viewEmail">chetan.rawat@example.com</div></div>
+      <div class="info-cell"><div class="k">Full Name</div><div class="v" id="viewName"><span style="color:var(--ink-faint);">Loading...</span></div></div>
+      <div class="info-cell"><div class="k">Date of Birth</div><div class="v" id="viewDob"><span style="color:var(--ink-faint);">Loading...</span></div></div>
+      <div class="info-cell"><div class="k">Gender</div><div class="v" id="viewGender"><span style="color:var(--ink-faint);">Loading...</span></div></div>
+      <div class="info-cell"><div class="k">State / UT</div><div class="v" id="viewState"><span style="color:var(--ink-faint);">Loading...</span></div></div>
+      <div class="info-cell"><div class="k">District</div><div class="v" id="viewDistrict"><span style="color:var(--ink-faint);">Loading...</span></div></div>
+      <div class="info-cell"><div class="k">Primary Occupation</div><div class="v" id="viewOccupation"><span style="color:var(--ink-faint);">Loading...</span></div></div>
+      <div class="info-cell"><div class="k">Annual Income</div><div class="v" id="viewIncome"><span style="color:var(--ink-faint);">Loading...</span></div></div>
+      <div class="info-cell"><div class="k">Category / Caste</div><div class="v" id="viewCategory"><span style="color:var(--ink-faint);">Loading...</span></div></div>
+      <div class="info-cell"><div class="k">Highest Education</div><div class="v" id="viewEducation"><span style="color:var(--ink-faint);">Loading...</span></div></div>
+      <div class="info-cell"><div class="k">Disability Status</div><div class="v" id="viewDisability"><span style="color:var(--ink-faint);">Loading...</span></div></div>
+      <div class="info-cell"><div class="k">Contact Mobile</div><div class="v secure" id="viewPhone"><span style="color:var(--ink-faint);">Loading...</span></div></div>
+      <div class="info-cell"><div class="k">Registered Email</div><div class="v secure" id="viewEmail"><span style="color:var(--ink-faint);">Loading...</span></div></div>
     </div>
   </div>
 
   <!-- SECTION 2: UPLOADED DOCUMENTS REPOSITORY -->
   <div class="section-title-wrap">
     <h2>2. Uploaded Document Records</h2>
-    <span id="docCountBadge">5 Documents Stored</span>
+    <span id="docCountBadge">Loading Stored Proofs...</span>
   </div>
 
   <div class="doc-card-grid" id="docCardsContainer">
-    <!-- Populated dynamically from storage and fallback default data -->
+    <!-- Populated dynamically from API -->
   </div>
 
 </div>
@@ -301,7 +301,39 @@ if (!api.getToken()) {
 
 let activeDocs = [];
 
+function formatINR(amount) {
+  if (!amount || isNaN(amount)) return '₹0 / year';
+  return '₹' + Number(amount).toLocaleString('en-IN') + ' / year';
+}
+
+async function loadProfileParameters() {
+  try {
+    const profile = await api.get('/profile/');
+    if (profile) {
+      document.getElementById('viewName').textContent = profile.fullName || profile.name || 'Citizen User';
+      document.getElementById('viewDob').textContent = profile.dob || 'Not Provided';
+      document.getElementById('viewGender').textContent = profile.gender || 'Not Provided';
+      document.getElementById('viewState').textContent = profile.state || profile.stateName || 'All India';
+      document.getElementById('viewDistrict').textContent = profile.district || 'Not Provided';
+      document.getElementById('viewOccupation').textContent = profile.occupation || 'General';
+      document.getElementById('viewIncome').textContent = formatINR(profile.income);
+      document.getElementById('viewCategory').textContent = profile.category || 'General';
+      document.getElementById('viewEducation').textContent = profile.education || 'General';
+      document.getElementById('viewDisability').textContent = profile.hasDisability ? (profile.disabilityType || 'Yes') : 'No';
+      document.getElementById('viewPhone').textContent = profile.phone || 'Not Provided';
+      document.getElementById('viewEmail').textContent = profile.email || 'Not Provided';
+    }
+  } catch (e) {
+    const localUser = api.getUser();
+    if (localUser) {
+      document.getElementById('viewName').textContent = localUser.fullName || 'Citizen User';
+      document.getElementById('viewEmail').textContent = localUser.email || 'Not Provided';
+    }
+  }
+}
+
 async function loadAndHydrateDocuments(){
+  await loadProfileParameters();
   try {
     const docs = await api.get('/documents/');
     if (docs && Array.isArray(docs)) {

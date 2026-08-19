@@ -584,6 +584,8 @@ def scheme_list_view(request):
 
         scheme_list.append({
             'id': s.id,
+            'scheme_code': s.scheme_code or f"SCH-{(s.category[:3].upper()) if s.category else 'GEN'}-{s.id:04d}",
+            'schemeCode': s.scheme_code or f"SCH-{(s.category[:3].upper()) if s.category else 'GEN'}-{s.id:04d}",
             'slug': s.slug,
             'name': s.name,
             'ministry': s.ministry,
@@ -613,7 +615,9 @@ def scheme_detail_view(request, scheme_id_or_slug):
     if not scheme:
         scheme = Scheme.objects.filter(slug=str(scheme_id_or_slug)).first()
     if not scheme:
-        # Fallback to scheme 1
+        scheme = Scheme.objects.filter(scheme_code=str(scheme_id_or_slug)).first()
+    if not scheme:
+        # Fallback to first scheme
         scheme = Scheme.objects.first()
 
     if not scheme:
@@ -624,6 +628,8 @@ def scheme_detail_view(request, scheme_id_or_slug):
 
     data = {
         'id': scheme.id,
+        'scheme_code': scheme.scheme_code or f"SCH-{(scheme.category[:3].upper()) if scheme.category else 'GEN'}-{scheme.id:04d}",
+        'schemeCode': scheme.scheme_code or f"SCH-{(scheme.category[:3].upper()) if scheme.category else 'GEN'}-{scheme.id:04d}",
         'slug': scheme.slug,
         'name': scheme.name,
         'category': scheme.category,
@@ -1019,6 +1025,8 @@ def admin_schemes_crud_view(request, scheme_id=None):
         for s in schemes:
             res.append({
                 'id': s.id,
+                'scheme_code': s.scheme_code or f"SCH-{(s.category[:3].upper()) if s.category else 'GEN'}-{s.id:04d}",
+                'schemeCode': s.scheme_code or f"SCH-{(s.category[:3].upper()) if s.category else 'GEN'}-{s.id:04d}",
                 'name': s.name,
                 'category': s.category,
                 'state': s.state_coverage,
@@ -1059,7 +1067,9 @@ def admin_schemes_crud_view(request, scheme_id=None):
         return json_response({
             'status': 'success',
             'message': f'Scheme "{name}" added successfully.',
-            'id': scheme.id
+            'id': scheme.id,
+            'scheme_code': scheme.scheme_code,
+            'schemeCode': scheme.scheme_code
         }, status=201)
 
     elif request.method in ['PUT', 'PATCH']:
@@ -1080,7 +1090,8 @@ def admin_schemes_crud_view(request, scheme_id=None):
 
         return json_response({
             'status': 'success',
-            'message': f'Scheme "{scheme.name}" updated successfully.'
+            'message': f'Scheme "{scheme.name}" updated successfully.',
+            'scheme_code': scheme.scheme_code
         })
 
     elif request.method == 'DELETE':
@@ -1093,6 +1104,76 @@ def admin_schemes_crud_view(request, scheme_id=None):
         })
 
     return json_error('Method not allowed', 405)
+
+
+@csrf_exempt
+def bulk_ingest_schemes_view(request):
+    """
+    Bulk scheme ingestion endpoint for admin tools and external sync.
+    Accepts list of scheme dictionaries, executes chunked upserts, auto-generates scheme IDs.
+    """
+    if request.method != 'POST':
+        return json_error('Method not allowed', 405)
+
+    data = parse_body(request)
+    records = data if isinstance(data, list) else data.get('schemes', [])
+    if not records or not isinstance(records, list):
+        return json_error('Expected JSON array of scheme objects', 400)
+
+    created_count = 0
+    updated_count = 0
+
+    from django.db import transaction
+    with transaction.atomic():
+        for item in records:
+            name = (item.get('name') or item.get('scheme_name') or '').strip()
+            if not name:
+                continue
+            slug = item.get('slug') or name.lower().replace(' ', '-').replace('/', '-')[:60]
+            category = item.get('category') or 'Social Welfare'
+
+            scheme = Scheme.objects.filter(slug=slug).first()
+            if not scheme:
+                cat_prefix = category[:3].upper().ljust(3, 'X')
+                rand_code = uuid.uuid4().hex[:6].upper()
+                scheme_code = item.get('scheme_code') or f"SCH-{cat_prefix}-{rand_code}"
+                Scheme.objects.create(
+                    scheme_code=scheme_code,
+                    slug=slug,
+                    name=name,
+                    category=category,
+                    ministry=item.get('ministry', 'Government of India'),
+                    gov_level=item.get('gov_level', 'Central Government'),
+                    state_coverage=item.get('state_coverage', 'All India'),
+                    status=item.get('status', 'Applications Open'),
+                    objective=item.get('objective', ''),
+                    description=item.get('description', ''),
+                    benefits_summary=item.get('benefits_summary', ''),
+                    benefits=item.get('benefits', []),
+                    eligibility=item.get('eligibility', []),
+                    documents=item.get('documents', []),
+                    deadline=item.get('deadline', 'Ongoing'),
+                    official_link=item.get('official_link', '#'),
+                    ai_score=int(item.get('ai_score', 95)),
+                    is_active=True
+                )
+                created_count += 1
+            else:
+                scheme.name = name
+                scheme.category = category
+                if 'benefits' in item: scheme.benefits = item['benefits']
+                if 'eligibility' in item: scheme.eligibility = item['eligibility']
+                if 'documents' in item: scheme.documents = item['documents']
+                scheme.save()
+                updated_count += 1
+
+    return json_response({
+        'status': 'success',
+        'message': f'Bulk ingestion complete: {created_count} created, {updated_count} updated.',
+        'createdCount': created_count,
+        'updatedCount': updated_count,
+        'totalActive': Scheme.objects.filter(is_active=True).count()
+    })
 
 
 @csrf_exempt

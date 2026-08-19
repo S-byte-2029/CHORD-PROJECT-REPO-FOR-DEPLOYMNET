@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Citizen Profile &amp; Records Overview — Chord</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Environment Configuration & Central API Client -->
+<script src="env-config.js"></script>
+<script src="api.js"></script>
+
+<style>
+:root{
+  --navy:#112B63;
+  --navy-deep:#0c1f47;
+  --navy-soft:#eaeef7;
+  --gold:#D79A2B;
+  --gold-deep:#b87f1c;
+  --gold-soft:#fbf1de;
+  --ink:#16213f;
+  --ink-soft:#57607a;
+  --ink-faint:#8b93a8;
+  --line:#e5e8f0;
+  --surface:#f6f7fb;
+  --white:#ffffff;
+  --green:#1f7a54;
+  --green-soft:#e7f5ee;
+  --amber:#c8791f;
+  --amber-soft:#fdf2e2;
+  --red:#c0463f;
+  --red-soft:#fbeceb;
+  --radius:16px;
+  --shadow:0 10px 30px -14px rgba(17,43,99,0.22);
+  --shadow-lg:0 20px 46px -18px rgba(17,43,99,0.3);
+}
+*{ box-sizing:border-box; }
+body{
+  margin:0; background:var(--surface); color:var(--ink);
+  font-family:'Inter', system-ui, sans-serif; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+a{ color:inherit; text-decoration:none; }
+button, select, input{ font-family:inherit; }
+
+/* Top Nav */
+header{
+  position:sticky; top:0; z-index:60;
+  background:rgba(255,255,255,0.94); backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav{
+  max-width:1280px; margin:0 auto; padding:0 28px; height:68px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.brand{ display:flex; align-items:center; gap:10px; font-weight:800; font-size:19px; color:var(--navy); }
+.brand-mark{
+  width:26px; height:26px; border-radius:7px;
+  background:linear-gradient(155deg, var(--navy) 0%, var(--navy-deep) 100%); position:relative;
+}
+.brand-mark::after{
+  content:""; position:absolute; inset:6px; border:1.5px solid rgba(255,255,255,0.85); border-radius:3px;
+  border-bottom-color:var(--gold); border-right-color:var(--gold);
+}
+.nav-links{ display:flex; align-items:center; gap:6px; list-style:none; margin:0; padding:0; }
+.nav-links a{
+  padding:8px 14px; border-radius:8px; font-size:13.5px; font-weight:600; color:var(--ink-soft);
+  transition:all .15s ease;
+}
+.nav-links a:hover{ background:var(--surface); color:var(--navy); }
+.nav-links a.active{ background:var(--navy-soft); color:var(--navy); }
+
+.nav-right{ display:flex; align-items:center; gap:12px; }
+.avatar-badge{
+  width:36px; height:36px; border-radius:50%; background:var(--navy); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px;
+}
+
+/* Page Shell */
+.page{ max-width:1280px; margin:0 auto; padding:36px 28px 100px; }
+.page-head{
+  display:flex; justify-content:space-between; align-items:flex-end;
+  margin-bottom:30px; flex-wrap:wrap; gap:16px;
+}
+.page-head h1{ font-size:clamp(24px, 3vw, 32px); color:var(--navy); margin:6px 0 0; }
+.page-head p{ color:var(--ink-soft); font-size:14.5px; margin:0; }
+
+/* Citizen Summary Banner */
+.citizen-hero-card{
+  background:#fff; border:1px solid var(--line); border-radius:var(--radius);
+  padding:28px 32px; display:flex; justify-content:space-between; align-items:center;
+  margin-bottom:28px; box-shadow:var(--shadow); flex-wrap:wrap; gap:24px;
+}
+.citizen-meta{ display:flex; align-items:center; gap:20px; }
+.citizen-avatar-large{
+  width:64px; height:64px; border-radius:16px; background:linear-gradient(135deg, var(--navy) 0%, var(--navy-deep) 100%);
+  color:#fff; display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:800;
+  box-shadow:0 8px 18px rgba(17,43,99,0.25);
+}
+.citizen-title h2{ margin:0; font-size:22px; color:var(--navy); }
+.citizen-title .sub{ color:var(--ink-soft); font-size:13.5px; margin-top:3px; display:flex; gap:12px; flex-wrap:wrap; }
+.citizen-title .sub span{ display:inline-flex; align-items:center; gap:4px; }
+
+.citizen-stats{ display:flex; gap:24px; flex-wrap:wrap; }
+.stat-pill{
+  background:var(--surface); border:1px solid var(--line); border-radius:12px;
+  padding:12px 18px; text-align:center; min-width:110px;
+}
+.stat-pill .num{ font-size:20px; font-weight:800; color:var(--navy); font-family:'IBM Plex Mono', monospace; }
+.stat-pill .lbl{ font-size:11px; font-weight:700; color:var(--ink-faint); text-transform:uppercase; margin-top:2px; }
+
+/* Section Titles */
+.section-title-wrap{
+  display:flex; justify-content:space-between; align-items:center;
+  margin:32px 0 16px; padding-bottom:8px; border-bottom:2px solid var(--line);
+}
+.section-title-wrap h3{ font-size:17px; color:var(--navy); margin:0; }
+.section-title-wrap span{ font-size:12px; color:var(--ink-faint); font-weight:600; }
+
+/* Grid */
+.info-data-grid{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+  gap:1px; background:var(--line); border:1px solid var(--line);
+  border-radius:14px; overflow:hidden; box-shadow:var(--shadow);
+}
+.info-cell{ background:#fff; padding:18px 22px; }
+.info-cell .k{
+  font-family:'IBM Plex Mono', monospace; font-size:11px; text-transform:uppercase;
+  letter-spacing:0.04em; color:var(--ink-faint); font-weight:600;
+}
+.info-cell .v{ font-size:14.5px; font-weight:700; color:var(--ink); margin-top:4px; }
+.info-cell .v.secure{ font-family:'IBM Plex Mono', monospace; color:var(--navy); }
+
+/* Document Cards */
+.doc-card-grid{
+  display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:20px;
+}
+.doc-box{
+  border:1px solid var(--line); border-radius:14px; padding:20px;
+  background:#fff; box-shadow:var(--shadow); transition:transform .15s ease;
+  display:flex; flex-direction:column; justify-content:space-between;
+}
+.doc-box:hover{ transform:translateY(-2px); border-color:#cfd7e6; }
+.doc-type-badge{
+  font-family:'IBM Plex Mono', monospace; font-size:10.5px; font-weight:700;
+  padding:4px 8px; border-radius:6px; background:var(--navy-soft); color:var(--navy);
+  text-transform:uppercase;
+}
+.doc-title{ font-size:14.5px; font-weight:700; color:var(--navy); margin:12px 0 4px; word-break:break-all; }
+.doc-meta-text{ font-size:12px; color:var(--ink-faint); }
+
+.status-badge{
+  display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700;
+  padding:3px 8px; border-radius:20px; font-family:'IBM Plex Mono', monospace;
+}
+.status-badge.verified{ background:var(--green-soft); color:var(--green); }
+.status-badge.review{ background:var(--amber-soft); color:var(--amber); }
+
+/* Buttons */
+.btn{
+  padding:8px 18px; border-radius:8px; font-size:13px; font-weight:700;
+  border:none; cursor:pointer; transition:all .15s ease; display:inline-flex; align-items:center; gap:6px;
+}
+.btn-primary{ background:var(--navy); color:#fff; }
+.btn-primary:hover{ background:var(--navy-deep); }
+.btn-outline{ background:#fff; border:1px solid var(--line); color:var(--ink-soft); }
+.btn-outline:hover{ border-color:var(--navy); color:var(--navy); }
+.btn-sm{ padding:6px 12px; font-size:12px; }
+
+/* Skeletons */
+.skeleton{
+  background:linear-gradient(90deg, #edf0f5 25%, #f6f8fb 50%, #edf0f5 75%);
+  background-size:200% 100%; animation:loading 1.4s infinite ease-in-out;
+  border-radius:6px; display:inline-block;
+}
+@keyframes loading{ 0%{background-position:200% 0;} 100%{background-position:-200% 0;} }
+
+.empty-state{
+  text-align:center; padding:48px 24px; background:#fff; border:1px solid var(--line);
+  border-radius:var(--radius); color:var(--ink-soft); font-size:14px;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="land.html" class="brand">
+      <span class="brand-mark"></span>
+      Chord
+    </a>
+    <ul class="nav-links">
+      <li><a href="land.html">Home</a></li>
+      <li><a href="dashboard.html">Dashboard</a></li>
+      <li><a href="profile.html">Profile Hub</a></li>
+      <li><a href="search.html">Search Schemes</a></li>
+      <li><a href="view-user.html" class="active">My Account &amp; Proofs</a></li>
+    </ul>
+    <div class="nav-right">
+      <div class="avatar-badge" id="navAvatarInitial">U</div>
+      <button type="button" class="btn btn-outline btn-sm" id="logoutBtn">Sign Out</button>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- TOP PROFILE CARD -->
+  <div class="citizen-hero-card" id="userHeroCard">
+    <div class="citizen-meta">
+      <div class="citizen-avatar-large" id="userAvatarLarge">U</div>
+      <div class="citizen-title">
+        <h2 id="userNameDisplay"><span class="skeleton" style="width:180px; height:24px;"></span></h2>
+        <div class="sub">
+          <span id="userEmailDisplay"><span class="skeleton" style="width:200px; height:16px;"></span></span>
+          <span id="userPhoneDisplay"></span>
+          <span id="userRoleBadge" style="font-family:'IBM Plex Mono', monospace; font-size:11px; padding:2px 8px; border-radius:12px; background:var(--navy-soft); color:var(--navy); font-weight:700;">CITIZEN</span>
+        </div>
+      </div>
+    </div>
+    <div class="citizen-stats">
+      <div class="stat-pill">
+        <div class="num" id="statCompleteness">--%</div>
+        <div class="lbl">Profile Score</div>
+      </div>
+      <div class="stat-pill">
+        <div class="num" id="statDocsCount">0</div>
+        <div class="lbl">Stored Proofs</div>
+      </div>
+      <div class="stat-pill">
+        <div class="num" id="statAppsCount">0</div>
+        <div class="lbl">Applications</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-head" style="margin-bottom:14px;">
+    <div>
+      <span style="font-family:'IBM Plex Mono', monospace; font-size:11.5px; font-weight:700; text-transform:uppercase; color:var(--navy);">
+        Live Welfare Twin Parameters
+      </span>
+      <h1 style="font-size:22px;">Verified Eligibility Profile</h1>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <a href="edit-profile.html" class="btn btn-outline">&larr; Edit Details</a>
+      <a href="document-upload.html" class="btn btn-primary">+ Upload Proof</a>
+    </div>
+  </div>
+
+  <!-- SECTION 1: PROFILE PARAMETERS -->
+  <div class="info-data-grid" id="profileGrid">
+    <div class="info-cell"><div class="k">Full Name</div><div class="v" id="gridName"><span class="skeleton" style="width:140px; height:18px;"></span></div></div>
+    <div class="info-cell"><div class="k">Date of Birth</div><div class="v" id="gridDob"><span class="skeleton" style="width:100px; height:18px;"></span></div></div>
+    <div class="info-cell"><div class="k">Gender</div><div class="v" id="gridGender"><span class="skeleton" style="width:80px; height:18px;"></span></div></div>
+    <div class="info-cell"><div class="k">State / UT</div><div class="v" id="gridState"><span class="skeleton" style="width:120px; height:18px;"></span></div></div>
+    <div class="info-cell"><div class="k">District</div><div class="v" id="gridDistrict"><span class="skeleton" style="width:100px; height:18px;"></span></div></div>
+    <div class="info-cell"><div class="k">Primary Occupation</div><div class="v" id="gridOccupation"><span class="skeleton" style="width:110px; height:18px;"></span></div></div>
+    <div class="info-cell"><div class="k">Annual Household Income</div><div class="v" id="gridIncome"><span class="skeleton" style="width:120px; height:18px;"></span></div></div>
+    <div class="info-cell"><div class="k">Social Category / Caste</div><div class="v" id="gridCategory"><span class="skeleton" style="width:80px; height:18px;"></span></div></div>
+    <div class="info-cell"><div class="k">Highest Education</div><div class="v" id="gridEducation"><span class="skeleton" style="width:110px; height:18px;"></span></div></div>
+    <div class="info-cell"><div class="k">Disability Status</div><div class="v" id="gridDisability"><span class="skeleton" style="width:60px; height:18px;"></span></div></div>
+    <div class="info-cell"><div class="k">Contact Mobile</div><div class="v secure" id="gridPhone"><span class="skeleton" style="width:120px; height:18px;"></span></div></div>
+    <div class="info-cell"><div class="k">Registered Email</div><div class="v secure" id="gridEmail"><span class="skeleton" style="width:160px; height:18px;"></span></div></div>
+  </div>
+
+  <!-- SECTION 2: DOCUMENTS LOCKER -->
+  <div class="section-title-wrap">
+    <h3>Digital Document Repository &amp; Credentials</h3>
+    <span id="docLockerBadge">Loading Stored Proofs...</span>
+  </div>
+
+  <div class="doc-card-grid" id="docCardsContainer">
+    <!-- Populated Dynamically -->
+    <div class="empty-state" style="grid-column:1/-1;">Loading verified document credentials...</div>
+  </div>
+
+</div>
+
+<script>
+// Auth Guard: Require login to view citizen records
+if (!api.getToken()) {
+  window.location.href = 'login.html';
+}
+
+function formatINR(amount) {
+  if (!amount || isNaN(amount)) return '₹0 / year';
+  return '₹' + Number(amount).toLocaleString('en-IN') + ' / year';
+}
+
+async function loadUserProfileAndDocuments() {
+  try {
+    const profile = await api.get('/profile/');
+    if (profile) {
+      const name = profile.fullName || profile.name || 'Citizen User';
+      const email = profile.email || 'No email registered';
+      const initial = name.charAt(0).toUpperCase() || 'U';
+
+      // Update Nav & Large Avatar
+      document.getElementById('navAvatarInitial').textContent = initial;
+      document.getElementById('userAvatarLarge').textContent = initial;
+      document.getElementById('userNameDisplay').textContent = name;
+      document.getElementById('userEmailDisplay').textContent = email;
+      document.getElementById('userPhoneDisplay').textContent = profile.phone ? `· ${profile.phone}` : '';
+      document.getElementById('userRoleBadge').textContent = (profile.role || 'citizen').toUpperCase();
+
+      // Stats
+      document.getElementById('statCompleteness').textContent = `${profile.completeness || 0}%`;
+      document.getElementById('statDocsCount').textContent = profile.documentsCount || 0;
+      document.getElementById('statAppsCount').textContent = profile.applicationsCount || 0;
+
+      // Grid Cells
+      document.getElementById('gridName').textContent = name;
+      document.getElementById('gridDob').textContent = profile.dob || 'Not Provided';
+      document.getElementById('gridGender').textContent = profile.gender || 'Not Provided';
+      document.getElementById('gridState').textContent = profile.state || profile.stateName || 'All India';
+      document.getElementById('gridDistrict').textContent = profile.district || 'Not Provided';
+      document.getElementById('gridOccupation').textContent = profile.occupation || 'General';
+      document.getElementById('gridIncome').textContent = formatINR(profile.income);
+      document.getElementById('gridCategory').textContent = profile.category || 'General';
+      document.getElementById('gridEducation').textContent = profile.education || 'General';
+      document.getElementById('gridDisability').textContent = profile.hasDisability ? (profile.disabilityType || 'Yes') : 'No';
+      document.getElementById('gridPhone').textContent = profile.phone || 'Not Provided';
+      document.getElementById('gridEmail').textContent = email;
+    }
+  } catch (err) {
+    const localUser = api.getUser();
+    if (localUser) {
+      document.getElementById('userNameDisplay').textContent = localUser.fullName || 'Citizen User';
+      document.getElementById('userEmailDisplay').textContent = localUser.email || '';
+      document.getElementById('gridName').textContent = localUser.fullName || 'Citizen User';
+      document.getElementById('gridEmail').textContent = localUser.email || '';
+    }
+  }
+
+  // Load User Documents
+  try {
+    const docs = await api.get('/documents/');
+    const container = document.getElementById('docCardsContainer');
+    const badge = document.getElementById('docLockerBadge');
+
+    if (Array.isArray(docs) && docs.length > 0) {
+      badge.textContent = `${docs.length} Documents Stored`;
+      document.getElementById('statDocsCount').textContent = docs.length;
+
+      container.innerHTML = docs.map(d => `
+        <div class="doc-box">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+              <span class="doc-type-badge">${d.typeBadge || d.docKey + ' Proof'}</span>
+              <span class="status-badge ${d.status === 'Verified' || d.status === 'Approved' ? 'verified' : 'review'}">
+                ${d.status === 'Verified' || d.status === 'Approved' ? '✓ Verified' : '● ' + d.status}
+              </span>
+            </div>
+            <div class="doc-title">${d.name}</div>
+            <div class="doc-meta-text">${d.format || 'PDF'} · ${d.size || '1.0 MB'}</div>
+            <div class="doc-meta-text" style="margin-top:2px;">Uploaded: ${d.uploadedDate || 'Recently'}</div>
+          </div>
+          <div style="margin-top:16px; padding-top:12px; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:11.5px; color:var(--green); font-weight:700;">✓ Encrypted Record</span>
+            <a href="document-upload.html" class="btn btn-outline btn-sm" style="color:var(--navy);">Update / Replace</a>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      badge.textContent = '0 Documents Stored';
+      container.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1;">
+          <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="var(--ink-faint)" stroke-width="1.6" style="margin:0 auto 12px;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+          <div style="font-weight:700; font-size:15px; color:var(--navy);">No Documents Uploaded Yet</div>
+          <p style="margin:4px 0 16px; font-size:13px; color:var(--ink-soft);">Upload mandatory proofs (ID, Income, Domicile) to unlock instant scheme applications.</p>
+          <a href="document-upload.html" class="btn btn-primary btn-sm">+ Upload First Document</a>
+        </div>
+      `;
+    }
+  } catch (err) {
+    document.getElementById('docCardsContainer').innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1;">
+        <div style="font-weight:700; color:var(--navy);">No Document Records Found</div>
+        <p style="margin:4px 0 12px; font-size:13px;">Upload proofs to verify your identity and auto-fill scheme forms.</p>
+        <a href="document-upload.html" class="btn btn-primary btn-sm">+ Upload Document</a>
+      </div>
+    `;
+  }
+}
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  api.logout();
+});
+
+document.addEventListener('DOMContentLoaded', loadUserProfileAndDocuments);
+</script>
+</body>
+</html>
