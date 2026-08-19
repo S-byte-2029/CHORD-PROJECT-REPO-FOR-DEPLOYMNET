@@ -447,18 +447,4 @@ CHORD aims to make scheme discovery more centralized, understandable, and access
 
 ---
 
-## 🔒 Public Repository Notice
 
-This repository's public documentation intentionally avoids exposing:
-
-- Passwords or secret keys
-- API tokens
-- Private credentials
-- Production database URLs
-- Internal infrastructure configuration
-- Private datasets
-- Detailed authentication implementation
-- Sensitive deployment configuration
-- Internal testing credentials
-
-Before pushing code to a public repository, verify that `.env`, credential files, local databases containing real user data, private datasets, and generated secret/configuration files are included in `.gitignore`.
