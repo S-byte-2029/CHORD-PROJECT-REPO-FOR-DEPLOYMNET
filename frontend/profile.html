@@ -314,23 +314,12 @@ header {
         <div class="card-head">
           <h2>Bookmarked Entitlements</h2>
           <div style="display:flex; gap:8px;">
-            <a href="view-uploaded-info.html" class="btn btn-primary btn-sm">View User Details &rarr;</a>
+            <a href="view-user.html" class="btn btn-primary btn-sm">View User Details &rarr;</a>
             <a href="search.html" class="btn btn-outline btn-sm">+ Find More</a>
           </div>
         </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 0; border-bottom:1px solid var(--line);">
-          <div>
-            <h3 style="margin:0; font-size:16px; color:var(--navy);">PM-KISAN Samman Nidhi</h3>
-            <p style="margin:4px 0 0; font-size:13px; color:var(--ink-soft);">₹6,000 / year direct transfer &middot; Ministry of Agriculture</p>
-          </div>
-          <a href="scheme-details.html?id=1" class="btn btn-primary btn-sm">View Details &rarr;</a>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 0;">
-          <div>
-            <h3 style="margin:0; font-size:16px; color:var(--navy);">Ayushman Bharat &mdash; PM-JAY</h3>
-            <p style="margin:4px 0 0; font-size:13px; color:var(--ink-soft);">₹5,00,000 health cover &middot; Ministry of Health</p>
-          </div>
-          <a href="scheme-details.html?id=4" class="btn btn-primary btn-sm">View Details &rarr;</a>
+        <div id="savedSchemesList" style="text-align:center; padding:36px 16px; color:var(--ink-soft);">
+          <p style="font-weight:600; font-size:15px; margin:0 0 6px;">Loading saved schemes...</p>
         </div>
       </div>
     </div>
@@ -347,19 +336,8 @@ header {
           <h2>Submitted Applications</h2>
           <a href="track-applications.html" class="btn btn-outline btn-sm">Open Full Tracker &rarr;</a>
         </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-bottom:1px solid var(--line);">
-          <div>
-            <b>PM-KISAN Samman Nidhi</b>
-            <div style="font-size:12px; color:var(--ink-faint); font-family:'IBM Plex Mono', monospace;">ID: PMK-2026-00451</div>
-          </div>
-          <span class="badge badge-green">Approved</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 0;">
-          <div>
-            <b>National Means-cum-Merit Scholarship</b>
-            <div style="font-size:12px; color:var(--ink-faint); font-family:'IBM Plex Mono', monospace;">ID: NMMS-2026-00877</div>
-          </div>
-          <span class="badge badge-amber">Under Review</span>
+        <div id="trackApplicationsList" style="text-align:center; padding:36px 16px; color:var(--ink-soft);">
+          <p style="font-weight:600; font-size:15px; margin:0 0 6px;">Loading submitted applications...</p>
         </div>
       </div>
     </div>
@@ -368,24 +346,21 @@ header {
     <div id="tab-settings" class="content-panel">
       <div class="panel-header">
         <h1>Account Settings</h1>
-        <p>Configure notification preferences and privacy configurations.</p>
+        <p>Manage notifications, privacy, and account security.</p>
       </div>
 
       <div class="card">
-        <div class="card-head"><h2>Alert Preferences</h2></div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid var(--line);">
-          <div>
-            <b>Email Alerts for New Schemes</b>
-            <div style="font-size:12px; color:var(--ink-faint);">Receive alerts whenever a newly matched scheme opens.</div>
-          </div>
-          <input type="checkbox" checked style="accent-color:var(--navy); width:18px; height:18px;">
+        <div class="card-head">
+          <h2>Notification Preferences</h2>
+          <span class="badge badge-green">Active</span>
         </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0;">
-          <div>
-            <b>SMS Application Status Updates</b>
-            <div style="font-size:12px; color:var(--ink-faint);">Receive text notifications when your application progresses.</div>
-          </div>
-          <input type="checkbox" checked style="accent-color:var(--navy); width:18px; height:18px;">
+        <div style="padding:14px 0; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center;">
+          <div><b>Email Notifications</b><div style="font-size:13px; color:var(--ink-soft);">Receive application updates via email</div></div>
+          <input type="checkbox" checked style="width:18px; height:18px; accent-color:var(--navy);">
+        </div>
+        <div style="padding:14px 0; display:flex; justify-content:space-between; align-items:center;">
+          <div><b>SMS Alerts</b><div style="font-size:13px; color:var(--ink-soft);">Receive critical DBT and deadline SMS alerts</div></div>
+          <input type="checkbox" checked style="width:18px; height:18px; accent-color:var(--navy);">
         </div>
       </div>
     </div>
@@ -396,7 +371,7 @@ header {
 <script src="env-config.js"></script>
 <script src="api.js"></script>
 <script>
-// Auth Guard: Require login to view profile
+// Auth Guard: Require login to view profile hub
 if (!api.getToken()) {
   window.location.href = 'login.html';
 }
@@ -417,75 +392,121 @@ async function loadProfileHubData() {
     const user = await api.get('/profile/');
     if (user) {
       const avatarEl = document.querySelector('.avatar-badge');
-      if (avatarEl && user.fullName) {
-        avatarEl.textContent = user.fullName.charAt(0).toUpperCase();
+      if (avatarEl) {
+        const initial = (user.fullName || user.email || 'U').charAt(0).toUpperCase();
+        avatarEl.textContent = initial;
       }
     }
   } catch (e) {
     const localUser = api.getUser();
-    if (localUser && localUser.fullName) {
+    if (localUser) {
       const avatarEl = document.querySelector('.avatar-badge');
-      if (avatarEl) avatarEl.textContent = localUser.fullName.charAt(0).toUpperCase();
+      if (avatarEl) avatarEl.textContent = (localUser.fullName || localUser.email || 'U').charAt(0).toUpperCase();
     }
   }
+
   // 1. Bookmarks
+  const savedCard = document.getElementById('tab-saved').querySelector('.card');
   try {
     const bookmarks = await api.get('/bookmarks/');
-    const savedCard = document.querySelector('#tab-saved .card');
-    if (savedCard && bookmarks && bookmarks.length > 0) {
-      const headerHTML = `
-        <div class="card-head">
-          <h2>Bookmarked Entitlements (${bookmarks.length})</h2>
-          <div style="display:flex; gap:8px;">
-            <a href="view-uploaded-info.html" class="btn btn-primary btn-sm">View User Details &rarr;</a>
-            <a href="search.html" class="btn btn-outline btn-sm">+ Find More</a>
+    if (savedCard) {
+      if (Array.isArray(bookmarks) && bookmarks.length > 0) {
+        const headerHTML = `
+          <div class="card-head">
+            <h2>Bookmarked Entitlements (${bookmarks.length})</h2>
+            <div style="display:flex; gap:8px;">
+              <a href="view-user.html" class="btn btn-primary btn-sm">View User Details &rarr;</a>
+              <a href="search.html" class="btn btn-outline btn-sm">+ Find More</a>
+            </div>
           </div>
-        </div>
-      `;
-      const rowsHTML = bookmarks.map((b, idx) => `
-        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 0; ${idx < bookmarks.length - 1 ? 'border-bottom:1px solid var(--line);' : ''}">
-          <div>
-            <h3 style="margin:0; font-size:16px; color:var(--navy);">${b.name}</h3>
-            <p style="margin:4px 0 0; font-size:13px; color:var(--ink-soft);">${b.benefit} &middot; ${b.ministry}</p>
+        `;
+        const rowsHTML = bookmarks.map((b, idx) => `
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 0; ${idx < bookmarks.length - 1 ? 'border-bottom:1px solid var(--line);' : ''}">
+            <div>
+              <h3 style="margin:0; font-size:16px; color:var(--navy);">${b.name}</h3>
+              <p style="margin:4px 0 0; font-size:13px; color:var(--ink-soft);">${b.benefit || 'Direct Benefit'} &middot; ${b.ministry || 'Government of India'}</p>
+            </div>
+            <a href="scheme-details.html?id=${b.id}" class="btn btn-primary btn-sm">View Details &rarr;</a>
           </div>
-          <a href="scheme-details.html?id=${b.id}" class="btn btn-primary btn-sm">View Details &rarr;</a>
-        </div>
-      `).join('');
-      savedCard.innerHTML = headerHTML + rowsHTML;
+        `).join('');
+        savedCard.innerHTML = headerHTML + rowsHTML;
+      } else {
+        savedCard.innerHTML = `
+          <div class="card-head">
+            <h2>Bookmarked Entitlements (0)</h2>
+            <div style="display:flex; gap:8px;">
+              <a href="view-user.html" class="btn btn-primary btn-sm">View User Details &rarr;</a>
+              <a href="search.html" class="btn btn-outline btn-sm">+ Find More</a>
+            </div>
+          </div>
+          <div style="text-align:center; padding:36px 16px; color:var(--ink-soft);">
+            <p style="font-weight:600; font-size:15px; margin:0 0 6px; color:var(--navy);">No saved schemes yet</p>
+            <p style="font-size:13px; margin:0 0 16px;">Bookmark schemes from the catalog for quick access and tracking.</p>
+            <a href="search.html" class="btn btn-primary btn-sm">+ Search Schemes</a>
+          </div>
+        `;
+      }
     }
   } catch (e) {
-    console.log('Using default bookmarks markup');
+    if (savedCard) {
+      savedCard.innerHTML = `
+        <div class="card-head"><h2>Bookmarked Entitlements (0)</h2><a href="search.html" class="btn btn-outline btn-sm">+ Find More</a></div>
+        <div style="text-align:center; padding:36px 16px; color:var(--ink-soft);">
+          <p style="font-weight:600; font-size:15px; margin:0 0 6px; color:var(--navy);">No saved schemes yet</p>
+          <a href="search.html" class="btn btn-primary btn-sm">+ Search Schemes</a>
+        </div>
+      `;
+    }
   }
 
   // 2. Applications
+  const appCard = document.getElementById('tab-track').querySelector('.card');
   try {
     const res = await api.get('/applications/');
-    const apps = res.applications || [];
-    const appCard = document.querySelector('#tab-track .card');
-    if (appCard && apps.length > 0) {
-      const headerHTML = `
-        <div class="card-head">
-          <h2>Submitted Applications (${apps.length})</h2>
-          <a href="track-applications.html" class="btn btn-outline btn-sm">Open Full Tracker &rarr;</a>
-        </div>
-      `;
-      const rowsHTML = apps.slice(0, 3).map((a, idx) => {
-        const badgeClass = a.status === 'approved' ? 'badge-green' : (a.status === 'rejected' ? 'badge-red' : 'badge-amber');
-        const badgeLabel = a.status === 'approved' ? 'Approved' : (a.status === 'rejected' ? 'Rejected' : 'Under Review');
-        return `
-          <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 0; ${idx < Math.min(apps.length, 3) - 1 ? 'border-bottom:1px solid var(--line);' : ''}">
-            <div>
-              <b>${a.schemeName}</b>
-              <div style="font-size:12px; color:var(--ink-faint); font-family:'IBM Plex Mono', monospace;">ID: ${a.applicationId}</div>
-            </div>
-            <span class="badge ${badgeClass}">${badgeLabel}</span>
+    const apps = res.applications || (Array.isArray(res) ? res : []);
+    if (appCard) {
+      if (Array.isArray(apps) && apps.length > 0) {
+        const headerHTML = `
+          <div class="card-head">
+            <h2>Submitted Applications (${apps.length})</h2>
+            <a href="track-applications.html" class="btn btn-outline btn-sm">Open Full Tracker &rarr;</a>
           </div>
         `;
-      }).join('');
-      appCard.innerHTML = headerHTML + rowsHTML;
+        const rowsHTML = apps.slice(0, 3).map((a, idx) => {
+          const badgeClass = a.status === 'approved' ? 'badge-green' : (a.status === 'rejected' ? 'badge-red' : 'badge-amber');
+          const badgeLabel = a.status === 'approved' ? 'Approved' : (a.status === 'rejected' ? 'Rejected' : 'Under Review');
+          return `
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 0; ${idx < Math.min(apps.length, 3) - 1 ? 'border-bottom:1px solid var(--line);' : ''}">
+              <div>
+                <b>${a.schemeName}</b>
+                <div style="font-size:12px; color:var(--ink-faint); font-family:'IBM Plex Mono', monospace;">ID: ${a.applicationId}</div>
+              </div>
+              <span class="badge ${badgeClass}">${badgeLabel}</span>
+            </div>
+          `;
+        }).join('');
+        appCard.innerHTML = headerHTML + rowsHTML;
+      } else {
+        appCard.innerHTML = `
+          <div class="card-head">
+            <h2>Submitted Applications (0)</h2>
+            <a href="track-applications.html" class="btn btn-outline btn-sm">Open Full Tracker &rarr;</a>
+          </div>
+          <div style="text-align:center; padding:36px 16px; color:var(--ink-soft);">
+            <p style="font-weight:600; font-size:15px; margin:0 0 6px; color:var(--navy);">No submitted applications yet</p>
+            <p style="font-size:13px; margin:0 0 16px;">Apply to verified welfare schemes to monitor your application progress.</p>
+            <a href="search.html" class="btn btn-primary btn-sm">Discover Eligible Schemes</a>
+          </div>
+        `;
+      }
     }
   } catch (e) {
-    console.log('Using default applications markup');
+    if (appCard) {
+      appCard.innerHTML = `
+        <div class="card-head"><h2>Submitted Applications (0)</h2></div>
+        <div style="text-align:center; padding:36px 16px; color:var(--ink-soft);"><p>No submitted applications yet</p></div>
+      `;
+    }
   }
 }
 

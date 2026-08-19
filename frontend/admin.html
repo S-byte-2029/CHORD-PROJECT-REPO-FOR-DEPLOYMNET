@@ -1249,129 +1249,11 @@ tr:last-child td{
                 </thead>
 
                 <tbody id="schemeTable">
-
                     <tr>
-
-                        <td class="scheme-name">
-                            PM Scholarship Scheme
+                        <td colspan="5" style="text-align:center; padding:32px; color:var(--ink-soft);">
+                            Loading government schemes from database...
                         </td>
-
-                        <td>Education</td>
-
-                        <td>All India</td>
-
-                        <td>
-                            <span class="badge green">
-                                Active
-                            </span>
-                        </td>
-
-                        <td>
-
-                            <div class="action-buttons">
-
-                                <button
-                                    class="btn btn-secondary"
-                                    onclick="editScheme(this)"
-                                >
-                                    Edit
-                                </button>
-
-                                <button
-                                    class="btn btn-danger"
-                                    onclick="deleteScheme(this)"
-                                >
-                                    Delete
-                                </button>
-
-                            </div>
-
-                        </td>
-
                     </tr>
-
-
-                    <tr>
-
-                        <td class="scheme-name">
-                            Skill India Mission
-                        </td>
-
-                        <td>Employment</td>
-
-                        <td>All India</td>
-
-                        <td>
-                            <span class="badge green">
-                                Active
-                            </span>
-                        </td>
-
-                        <td>
-
-                            <div class="action-buttons">
-
-                                <button
-                                    class="btn btn-secondary"
-                                    onclick="editScheme(this)"
-                                >
-                                    Edit
-                                </button>
-
-                                <button
-                                    class="btn btn-danger"
-                                    onclick="deleteScheme(this)"
-                                >
-                                    Delete
-                                </button>
-
-                            </div>
-
-                        </td>
-
-                    </tr>
-
-
-                    <tr>
-
-                        <td class="scheme-name">
-                            Kisan Support Scheme
-                        </td>
-
-                        <td>Agriculture</td>
-
-                        <td>All India</td>
-
-                        <td>
-                            <span class="badge amber">
-                                Review
-                            </span>
-                        </td>
-
-                        <td>
-
-                            <div class="action-buttons">
-
-                                <button
-                                    class="btn btn-secondary"
-                                    onclick="editScheme(this)"
-                                >
-                                    Edit
-                                </button>
-
-                                <button
-                                    class="btn btn-danger"
-                                    onclick="deleteScheme(this)"
-                                >
-                                    Delete
-                                </button>
-
-                            </div>
-
-                        </td>
-
-                    </tr>
-
                 </tbody>
 
             </table>
@@ -2326,32 +2208,40 @@ async function setDocVerdict(userId, docKey, verdict) {
 const schemeForm = document.getElementById('schemeForm');
 
 async function loadAdminSchemes() {
+    let schemes = [];
     try {
-        const schemes = await api.get('/admin/schemes/');
-        const table = document.getElementById('schemeTable');
-        if (table && Array.isArray(schemes) && schemes.length > 0) {
-            table.innerHTML = schemes.map(s => {
-                const code = s.scheme_code || s.schemeCode || ('SCH-' + (s.category ? s.category.substring(0,3).toUpperCase() : 'GEN') + '-' + s.id);
-                return `
-                <tr data-id="${s.id}">
-                    <td class="scheme-name">
-                        <span style="font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:700; color:var(--blue); background:var(--surface-2); padding:2px 7px; border-radius:4px; margin-right:8px;">${code}</span>
-                        ${s.name}
-                    </td>
-                    <td>${s.category || 'General'}</td>
-                    <td>${s.state || 'All India'}</td>
-                    <td><span class="badge ${s.status === 'Active' ? 'green' : 'amber'}">${s.status || 'Active'}</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn btn-secondary" onclick="editScheme(this)">Edit</button>
-                            <button class="btn btn-danger" onclick="deleteScheme(this, ${s.id})">Delete</button>
-                        </div>
-                    </td>
-                </tr>`;
-            }).join('');
-        }
+        schemes = await api.get('/admin/schemes/');
     } catch(e) {
-        console.warn('Could not load live admin schemes:', e);
+        try {
+            schemes = await api.get('/schemes/');
+        } catch(e2) {
+            console.warn('Could not load live admin schemes:', e2);
+        }
+    }
+
+    const table = document.getElementById('schemeTable');
+    if (table && Array.isArray(schemes) && schemes.length > 0) {
+        table.innerHTML = schemes.map(s => {
+            const code = s.scheme_code || s.schemeCode || ('SCH-' + (s.category ? s.category.substring(0,3).toUpperCase() : 'GEN') + '-' + s.id);
+            return `
+            <tr data-id="${s.id}">
+                <td class="scheme-name">
+                    <span style="font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:700; color:var(--blue); background:var(--surface-2); padding:2px 7px; border-radius:4px; margin-right:8px;">${code}</span>
+                    ${s.name}
+                </td>
+                <td>${s.category || 'General'}</td>
+                <td>${s.state || s.state_coverage || 'All India'}</td>
+                <td><span class="badge ${s.status === 'Active' || s.status === 'Applications Open' ? 'green' : 'amber'}">${s.status || 'Active'}</span></td>
+                <td>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="editScheme(this)">Edit</button>
+                        <button class="btn btn-danger" onclick="deleteScheme(this, ${s.id})">Delete</button>
+                    </div>
+                </td>
+            </tr>`;
+        }).join('');
+    } else if (table) {
+        table.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:24px; color:var(--ink-soft);">No schemes registered in database. Use the 'Add Scheme' tab to create one.</td></tr>`;
     }
 }
 

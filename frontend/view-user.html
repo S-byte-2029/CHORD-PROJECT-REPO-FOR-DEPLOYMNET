@@ -288,49 +288,72 @@ function formatINR(amount) {
   return '₹' + Number(amount).toLocaleString('en-IN') + ' / year';
 }
 
+function setProfileData(data) {
+  const name = data.fullName || data.name || (data.email ? data.email.split('@')[0] : 'Citizen User');
+  const email = data.email || 'No email registered';
+  const initial = name.charAt(0).toUpperCase() || 'U';
+
+  // Update Nav & Large Avatar
+  const navAvatar = document.getElementById('navAvatarInitial');
+  if (navAvatar) navAvatar.textContent = initial;
+  const userAvatar = document.getElementById('userAvatarLarge');
+  if (userAvatar) userAvatar.textContent = initial;
+
+  document.getElementById('userNameDisplay').textContent = name;
+  document.getElementById('userEmailDisplay').textContent = email;
+  document.getElementById('userPhoneDisplay').textContent = data.phone ? `· ${data.phone}` : '';
+  document.getElementById('userRoleBadge').textContent = (data.role || 'citizen').toUpperCase();
+
+  // Calculate completeness if missing
+  let comp = data.completeness;
+  if (comp === undefined || comp === null || isNaN(comp)) {
+    const fields = [data.fullName, data.dob, data.gender, data.state, data.district, data.occupation, data.income, data.category, data.education];
+    const filled = fields.filter(f => f && String(f).trim() && String(f) !== '0' && String(f) !== 'Not Provided').length;
+    comp = Math.round((filled / fields.length) * 100);
+  }
+  document.getElementById('statCompleteness').textContent = `${comp}%`;
+  document.getElementById('statDocsCount').textContent = data.documentsCount || 0;
+  document.getElementById('statAppsCount').textContent = data.applicationsCount || 0;
+
+  // Grid Cells
+  document.getElementById('gridName').textContent = name;
+  document.getElementById('gridDob').textContent = data.dob || 'Not Provided';
+  document.getElementById('gridGender').textContent = data.gender || 'Not Provided';
+  document.getElementById('gridState').textContent = data.state || data.stateName || 'All India';
+  document.getElementById('gridDistrict').textContent = data.district || 'Not Provided';
+  document.getElementById('gridOccupation').textContent = data.occupation || 'General';
+  document.getElementById('gridIncome').textContent = formatINR(data.income);
+  document.getElementById('gridCategory').textContent = data.category || 'General';
+  document.getElementById('gridEducation').textContent = data.education || 'General';
+  document.getElementById('gridDisability').textContent = data.hasDisability ? (data.disabilityType || 'Yes') : 'No';
+  document.getElementById('gridPhone').textContent = data.phone || 'Not Provided';
+  document.getElementById('gridEmail').textContent = email;
+}
+
 async function loadUserProfileAndDocuments() {
   try {
     const profile = await api.get('/profile/');
     if (profile) {
-      const name = profile.fullName || profile.name || 'Citizen User';
-      const email = profile.email || 'No email registered';
-      const initial = name.charAt(0).toUpperCase() || 'U';
-
-      // Update Nav & Large Avatar
-      document.getElementById('navAvatarInitial').textContent = initial;
-      document.getElementById('userAvatarLarge').textContent = initial;
-      document.getElementById('userNameDisplay').textContent = name;
-      document.getElementById('userEmailDisplay').textContent = email;
-      document.getElementById('userPhoneDisplay').textContent = profile.phone ? `· ${profile.phone}` : '';
-      document.getElementById('userRoleBadge').textContent = (profile.role || 'citizen').toUpperCase();
-
-      // Stats
-      document.getElementById('statCompleteness').textContent = `${profile.completeness || 0}%`;
-      document.getElementById('statDocsCount').textContent = profile.documentsCount || 0;
-      document.getElementById('statAppsCount').textContent = profile.applicationsCount || 0;
-
-      // Grid Cells
-      document.getElementById('gridName').textContent = name;
-      document.getElementById('gridDob').textContent = profile.dob || 'Not Provided';
-      document.getElementById('gridGender').textContent = profile.gender || 'Not Provided';
-      document.getElementById('gridState').textContent = profile.state || profile.stateName || 'All India';
-      document.getElementById('gridDistrict').textContent = profile.district || 'Not Provided';
-      document.getElementById('gridOccupation').textContent = profile.occupation || 'General';
-      document.getElementById('gridIncome').textContent = formatINR(profile.income);
-      document.getElementById('gridCategory').textContent = profile.category || 'General';
-      document.getElementById('gridEducation').textContent = profile.education || 'General';
-      document.getElementById('gridDisability').textContent = profile.hasDisability ? (profile.disabilityType || 'Yes') : 'No';
-      document.getElementById('gridPhone').textContent = profile.phone || 'Not Provided';
-      document.getElementById('gridEmail').textContent = email;
+      setProfileData(profile);
     }
   } catch (err) {
-    const localUser = api.getUser();
-    if (localUser) {
-      document.getElementById('userNameDisplay').textContent = localUser.fullName || 'Citizen User';
-      document.getElementById('userEmailDisplay').textContent = localUser.email || '';
-      document.getElementById('gridName').textContent = localUser.fullName || 'Citizen User';
-      document.getElementById('gridEmail').textContent = localUser.email || '';
-    }
+    const localUser = api.getUser() || {};
+    setProfileData({
+      fullName: localUser.fullName || localUser.email || 'Citizen User',
+      email: localUser.email || 'Citizen User',
+      phone: localUser.phone || '',
+      role: localUser.role || 'citizen',
+      dob: 'Not Provided',
+      gender: 'Not Provided',
+      state: 'Not Provided',
+      district: 'Not Provided',
+      occupation: 'Not Provided',
+      income: 0,
+      category: 'Not Provided',
+      education: 'Not Provided',
+      hasDisability: false,
+      completeness: 15
+    });
   }
 
   // Load User Documents
