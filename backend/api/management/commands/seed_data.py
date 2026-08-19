@@ -446,9 +446,15 @@ class Command(BaseCommand):
         for sdata in schemes_data:
             s_id = sdata['id']
             slug = sdata['slug']
+            cat = sdata.get('category', 'Social')
+            cat_prefix = (cat[:3].upper()) if cat else 'GEN'
+            if len(cat_prefix) < 3: cat_prefix = cat_prefix.ljust(3, 'X')
+            default_code = f"SCH-{cat_prefix}-{s_id:04d}"
+
             obj, created = Scheme.objects.get_or_create(
                 id=s_id,
                 defaults={
+                    'scheme_code': default_code,
                     'slug': slug,
                     'name': sdata['name'],
                     'ministry': sdata['ministry'],
@@ -471,6 +477,9 @@ class Command(BaseCommand):
                     'is_active': True
                 }
             )
+            if not obj.scheme_code:
+                obj.scheme_code = default_code
+                obj.save(update_fields=['scheme_code'])
             created_schemes[s_id] = obj
 
         # 3. Documents for Chetan
