@@ -848,6 +848,104 @@ tr:last-child td{
     .page-heading{ align-items:flex-start; gap:12px; flex-direction:column; }
 }
 
+/* CSV Upload Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(16, 25, 43, 0.6);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+}
+.modal-overlay.active {
+    display: flex;
+}
+.modal-card {
+    background: var(--surface);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 680px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    border: 1px solid var(--line);
+    overflow: hidden;
+    animation: modalIn 0.2s ease-out;
+}
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.96) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface-2);
+}
+.modal-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--ink);
+}
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    line-height: 1;
+    color: var(--ink-soft);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+.modal-close:hover {
+    background: var(--line);
+    color: var(--ink);
+}
+.modal-body {
+    padding: 24px;
+    max-height: 75vh;
+    overflow-y: auto;
+}
+.csv-dropzone {
+    border: 2px dashed var(--blue);
+    background: rgba(27, 63, 139, 0.03);
+    border-radius: 12px;
+    padding: 36px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.csv-dropzone:hover, .csv-dropzone.dragover {
+    background: rgba(27, 63, 139, 0.08);
+    border-color: var(--blue-deep);
+}
+.csv-dropzone svg {
+    stroke: var(--blue);
+    margin-bottom: 12px;
+}
+.csv-preview {
+    margin-top: 16px;
+    background: var(--surface-2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 13px;
+    color: var(--ink);
+}
+.modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: var(--surface-2);
+}
 </style>
 </head>
 
@@ -1208,9 +1306,15 @@ tr:last-child td{
             <p>Add, edit or remove government welfare schemes.</p>
         </div>
 
-        <button class="btn btn-primary" onclick="openPage('addScheme')">
-            + Add Scheme
-        </button>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <button class="btn btn-secondary" onclick="openCsvModal()" style="display:inline-flex; align-items:center; gap:8px; font-weight:600;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Upload Schemes CSV
+            </button>
+            <button class="btn btn-primary" onclick="openPage('addScheme')">
+                + Add Scheme
+            </button>
+        </div>
 
     </div>
 
@@ -1971,6 +2075,54 @@ tr:last-child td{
 
 </div>
 
+<!-- CSV UPLOAD MODAL -->
+<div class="modal-overlay" id="csvUploadModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Upload Schemes Dataset (CSV / JSON)</h3>
+            <button class="modal-close" onclick="closeCsvModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="font-size:13.5px; color:var(--ink-soft); margin-top:0; margin-bottom:16px;">
+                Upload a CSV spreadsheet with scheme records. New schemes will be registered with auto-generated scheme IDs, and existing schemes will be updated.
+            </p>
+
+            <div class="csv-dropzone" id="csvDropzone">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <div style="font-weight:600; color:var(--ink); font-size:15px; margin-bottom:4px;">Click to browse or drag and drop CSV file</div>
+                <div style="font-size:12.5px; color:var(--ink-soft);">Supports .csv and .json files (up to 10 MB)</div>
+                <input type="file" id="csvFileInput" accept=".csv, .json" style="display:none;">
+            </div>
+
+            <div id="csvFileInfo" style="display:none;" class="csv-preview">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <strong id="csvFileName">schemes.csv</strong>
+                        <span id="csvFileSize" style="color:var(--ink-soft); margin-left:8px;">(24 KB)</span>
+                    </div>
+                    <span id="csvRowCount" style="color:var(--blue); font-weight:600;">0 records detected</span>
+                </div>
+            </div>
+
+            <div style="margin-top:16px; padding:12px 16px; background:var(--surface-2); border-radius:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <span style="font-size:12.5px; color:var(--ink-soft);">Need the standard format? Download the template:</span>
+                <a href="../schemes_template.csv" download="schemes_template.csv" class="btn btn-secondary" style="padding:5px 12px; font-size:12px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; font-weight:600;">
+                    ⬇ Download CSV Template
+                </a>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeCsvModal()">Cancel</button>
+            <button class="btn btn-primary" id="btnUploadCsvSubmit" onclick="submitCsvUpload()" disabled>
+                Upload & Ingest Schemes
+            </button>
+        </div>
+    </div>
+</div>
 
 <!-- TOAST -->
 
@@ -2420,12 +2572,145 @@ async function loadAdminDashboardData(){
     await loadAdminSchemes();
 }
 
+/* =========================================
+   CSV SCHEME BULK UPLOAD HANDLERS
+========================================= */
+
+let selectedCsvFile = null;
+
+function openCsvModal(){
+    const modal = document.getElementById('csvUploadModal');
+    if(modal) modal.classList.add('active');
+    resetCsvModalState();
+}
+
+function closeCsvModal(){
+    const modal = document.getElementById('csvUploadModal');
+    if(modal) modal.classList.remove('active');
+    resetCsvModalState();
+}
+
+function resetCsvModalState(){
+    selectedCsvFile = null;
+    const fileInput = document.getElementById('csvFileInput');
+    if(fileInput) fileInput.value = '';
+    const fileInfo = document.getElementById('csvFileInfo');
+    if(fileInfo) fileInfo.style.display = 'none';
+    const submitBtn = document.getElementById('btnUploadCsvSubmit');
+    if(submitBtn){
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Upload & Ingest Schemes';
+    }
+}
+
+function handleCsvFile(file){
+    if(!file) return;
+    if(!file.name.endsWith('.csv') && !file.name.endsWith('.json')){
+        fireToast('Please select a valid .csv or .json file');
+        return;
+    }
+    selectedCsvFile = file;
+    const fileInfo = document.getElementById('csvFileInfo');
+    const fileNameEl = document.getElementById('csvFileName');
+    const fileSizeEl = document.getElementById('csvFileSize');
+    const rowCountEl = document.getElementById('csvRowCount');
+    const submitBtn = document.getElementById('btnUploadCsvSubmit');
+
+    if(fileNameEl) fileNameEl.textContent = file.name;
+    if(fileSizeEl) fileSizeEl.textContent = `(${Math.round(file.size / 1024)} KB)`;
+    
+    // Quick row count estimate
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const text = e.target.result;
+        if(file.name.endsWith('.json')){
+            try {
+                const j = JSON.parse(text);
+                const count = Array.isArray(j) ? j.length : (j.schemes ? j.schemes.length : 1);
+                if(rowCountEl) rowCountEl.textContent = `${count} scheme records detected`;
+            } catch(err) {
+                if(rowCountEl) rowCountEl.textContent = 'JSON file ready';
+            }
+        } else {
+            const lines = text.split('\n').filter(l => l.trim().length > 0);
+            const count = Math.max(0, lines.length - 1);
+            if(rowCountEl) rowCountEl.textContent = `${count} scheme rows detected`;
+        }
+    };
+    reader.readAsText(file);
+
+    if(fileInfo) fileInfo.style.display = 'block';
+    if(submitBtn) submitBtn.disabled = false;
+}
+
+async function submitCsvUpload(){
+    if(!selectedCsvFile){
+        fireToast('Please select a CSV file first.');
+        return;
+    }
+
+    const submitBtn = document.getElementById('btnUploadCsvSubmit');
+    if(submitBtn){
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Uploading & Parsing...';
+    }
+
+    const formData = new FormData();
+    formData.append('file', selectedCsvFile);
+
+    try {
+        const res = await api.upload('/schemes/upload-csv/', formData);
+        fireToast(res.message || '✓ CSV schemes ingested successfully!');
+        closeCsvModal();
+        await loadAdminSchemes();
+        await loadAdminDashboardData();
+    } catch(err){
+        console.error('CSV upload failed:', err);
+        fireToast('Upload failed: ' + (err.message || 'Server error parsing CSV file.'));
+        if(submitBtn){
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Upload & Ingest Schemes';
+        }
+    }
+}
+
+// Setup drag and drop for CSV dropzone
 document.addEventListener('DOMContentLoaded', () => {
     const sInput = document.getElementById('vSearchInput');
     const sFilter = document.getElementById('vStatusFilter');
     if(sInput) sInput.addEventListener('input', renderVerificationUI);
     if(sFilter) sFilter.addEventListener('change', renderVerificationUI);
     loadAdminDashboardData();
+
+    const dropzone = document.getElementById('csvDropzone');
+    const fileInput = document.getElementById('csvFileInput');
+
+    if(dropzone && fileInput){
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            if(e.target.files && e.target.files.length > 0){
+                handleCsvFile(e.target.files[0]);
+            }
+        });
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if(e.dataTransfer.files && e.dataTransfer.files.length > 0){
+                handleCsvFile(e.dataTransfer.files[0]);
+            }
+        });
+    }
 });
 
 </script>

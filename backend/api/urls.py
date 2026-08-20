@@ -28,6 +28,7 @@ urlpatterns = [
     # Schemes
     path('schemes/', views.scheme_list_view, name='scheme_list'),
     path('schemes/bulk-ingest/', views.bulk_ingest_schemes_view, name='bulk_ingest_schemes'),
+    path('schemes/upload-csv/', views.bulk_ingest_schemes_view, name='upload_schemes_csv'),
     path('schemes/<int:scheme_id>/bookmark/', views.scheme_bookmark_view, name='scheme_bookmark'),
     path('schemes/<int:scheme_id>/feedback/', views.scheme_feedback_view, name='scheme_feedback'),
     path('schemes/<int:scheme_id>/report/', views.scheme_report_view, name='scheme_report'),

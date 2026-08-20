@@ -1122,15 +1122,69 @@ def admin_schemes_crud_view(request, scheme_id=None):
 def bulk_ingest_schemes_view(request):
     """
     Bulk scheme ingestion endpoint for admin tools and external sync.
-    Accepts list of scheme dictionaries, executes chunked upserts, auto-generates scheme IDs.
+    Accepts CSV file upload (multipart/form-data), raw CSV text, or JSON array of scheme objects.
     """
     if request.method != 'POST':
         return json_error('Method not allowed', 405)
 
-    data = parse_body(request)
-    records = data if isinstance(data, list) else data.get('schemes', [])
+    import io
+    import csv
+
+    records = []
+
+    # Check for uploaded file (CSV or JSON)
+    uploaded_file = request.FILES.get('file') or request.FILES.get('csv') or request.FILES.get('dataset')
+    if uploaded_file:
+        content = uploaded_file.read().decode('utf-8', errors='ignore')
+        if uploaded_file.name.endswith('.json') or content.strip().startswith('['):
+            try:
+                parsed = json.loads(content)
+                records = parsed if isinstance(parsed, list) else parsed.get('schemes', [])
+            except Exception as e:
+                return json_error(f'Invalid JSON file: {str(e)}', 400)
+        else:
+            # Parse CSV
+            try:
+                reader = csv.DictReader(io.StringIO(content))
+                for row in reader:
+                    records.append(row)
+            except Exception as e:
+                return json_error(f'Invalid CSV file: {str(e)}', 400)
+    else:
+        # Check for JSON payload or raw body
+        if request.content_type == 'text/csv' or (request.body and request.body.decode('utf-8', errors='ignore').strip().startswith('name,') or request.body.decode('utf-8', errors='ignore').strip().startswith('"name"')):
+            try:
+                content = request.body.decode('utf-8', errors='ignore')
+                reader = csv.DictReader(io.StringIO(content))
+                for row in reader:
+                    records.append(row)
+            except Exception as e:
+                return json_error(f'Invalid CSV content: {str(e)}', 400)
+        else:
+            data = parse_body(request)
+            records = data if isinstance(data, list) else data.get('schemes', [])
+
     if not records or not isinstance(records, list):
-        return json_error('Expected JSON array of scheme objects', 400)
+        return json_error('No scheme records found. Please upload a valid CSV or JSON dataset.', 400)
+
+    # Process and sanitize fields
+    def parse_list_field(val):
+        if not val:
+            return []
+        if isinstance(val, list):
+            return val
+        if isinstance(val, str):
+            val_str = val.strip()
+            if val_str.startswith('[') and val_str.endswith(']'):
+                try:
+                    return json.loads(val_str)
+                except Exception:
+                    pass
+            # Split by semicolon or comma if no semicolon
+            if ';' in val_str:
+                return [x.strip() for x in val_str.split(';') if x.strip()]
+            return [x.strip() for x in val_str.split(',') if x.strip()]
+        return []
 
     created_count = 0
     updated_count = 0
@@ -1141,47 +1195,104 @@ def bulk_ingest_schemes_view(request):
             name = (item.get('name') or item.get('scheme_name') or '').strip()
             if not name:
                 continue
-            slug = item.get('slug') or name.lower().replace(' ', '-').replace('/', '-')[:60]
-            category = item.get('category') or 'Social Welfare'
+            slug = item.get('slug') or name.lower().replace(' ', '-').replace('/', '-').replace('—', '-')[:60]
+            category = (item.get('category') or item.get('schemeCategory') or 'Social Welfare').strip()
+
+            eligibility_list = parse_list_field(item.get('eligibility') or item.get('eligibility_criteria'))
+            documents_list = parse_list_field(item.get('documents') or item.get('required_documents'))
+            target_occs = parse_list_field(item.get('target_occupations') or item.get('occupation'))
+            target_secs = parse_list_field(item.get('target_sectors') or item.get('sector'))
+            
+            benefits_val = item.get('benefits')
+            benefits_list = []
+            if isinstance(benefits_val, list):
+                benefits_list = benefits_val
+            elif isinstance(benefits_val, str) and benefits_val.strip():
+                if benefits_val.strip().startswith('['):
+                    try:
+                        benefits_list = json.loads(benefits_val)
+                    except Exception:
+                        benefits_list = [{'title': 'Benefit', 'desc': benefits_val, 'icon': 'award'}]
+                else:
+                    benefits_list = [{'title': 'Benefit', 'desc': b.strip(), 'icon': 'award'} for b in benefits_val.split(';') if b.strip()]
+            elif item.get('benefits_summary') or item.get('estimated_benefit'):
+                b_text = item.get('benefits_summary') or item.get('estimated_benefit') or 'Direct Entitlement'
+                benefits_list = [{'title': 'Direct Benefit', 'desc': b_text, 'icon': 'award'}]
+
+            max_inc = 1200000
+            try:
+                if item.get('max_income'):
+                    max_inc = int(float(str(item.get('max_income')).replace('₹', '').replace(',', '').strip()))
+            except Exception:
+                pass
+
+            ai_sc = 95
+            try:
+                if item.get('ai_score'):
+                    ai_sc = int(float(str(item.get('ai_score')).strip()))
+            except Exception:
+                pass
 
             scheme = Scheme.objects.filter(slug=slug).first()
             if not scheme:
                 cat_prefix = category[:3].upper().ljust(3, 'X')
                 rand_code = uuid.uuid4().hex[:6].upper()
                 scheme_code = item.get('scheme_code') or f"SCH-{cat_prefix}-{rand_code}"
+                
                 Scheme.objects.create(
                     scheme_code=scheme_code,
                     slug=slug,
                     name=name,
                     category=category,
-                    ministry=item.get('ministry', 'Government of India'),
+                    ministry=item.get('ministry', item.get('provider', 'Government of India')),
                     gov_level=item.get('gov_level', 'Central Government'),
-                    state_coverage=item.get('state_coverage', 'All India'),
+                    state_coverage=item.get('state_coverage', item.get('state', 'All India')),
                     status=item.get('status', 'Applications Open'),
-                    objective=item.get('objective', ''),
-                    description=item.get('description', ''),
-                    benefits_summary=item.get('benefits_summary', ''),
-                    benefits=item.get('benefits', []),
-                    eligibility=item.get('eligibility', []),
-                    documents=item.get('documents', []),
+                    objective=item.get('objective', item.get('description', '')),
+                    description=item.get('description', item.get('objective', '')),
+                    beneficiaries=item.get('beneficiaries', ''),
+                    benefits_summary=item.get('benefits_summary', item.get('estimated_benefit', '')),
+                    benefits=benefits_list,
+                    eligibility=eligibility_list,
+                    documents=documents_list,
                     deadline=item.get('deadline', 'Ongoing'),
-                    official_link=item.get('official_link', '#'),
-                    ai_score=int(item.get('ai_score', 95)),
+                    official_link=item.get('official_link', item.get('application_url', '#')),
+                    ai_score=ai_sc,
+                    estimated_benefit=item.get('estimated_benefit', item.get('benefits_summary', 'Direct Benefit')),
+                    target_occupations=target_occs if target_occs else ['All', 'Farmer', 'Student', 'Daily Wage Worker', 'Business Owner', 'General'],
+                    target_sectors=target_secs if target_secs else [category, 'Social Welfare'],
+                    max_income=max_inc,
                     is_active=True
                 )
                 created_count += 1
             else:
                 scheme.name = name
                 scheme.category = category
-                if 'benefits' in item: scheme.benefits = item['benefits']
-                if 'eligibility' in item: scheme.eligibility = item['eligibility']
-                if 'documents' in item: scheme.documents = item['documents']
+                scheme.ministry = item.get('ministry', scheme.ministry)
+                if item.get('state_coverage') or item.get('state'):
+                    scheme.state_coverage = item.get('state_coverage', item.get('state'))
+                if item.get('benefits_summary'):
+                    scheme.benefits_summary = item.get('benefits_summary')
+                if benefits_list:
+                    scheme.benefits = benefits_list
+                if eligibility_list:
+                    scheme.eligibility = eligibility_list
+                if documents_list:
+                    scheme.documents = documents_list
+                if target_occs:
+                    scheme.target_occupations = target_occs
+                if target_secs:
+                    scheme.target_sectors = target_secs
+                if item.get('deadline'):
+                    scheme.deadline = item.get('deadline')
+                if item.get('official_link'):
+                    scheme.official_link = item.get('official_link')
                 scheme.save()
                 updated_count += 1
 
     return json_response({
         'status': 'success',
-        'message': f'Bulk ingestion complete: {created_count} created, {updated_count} updated.',
+        'message': f'CSV Ingestion complete: {created_count} schemes created, {updated_count} schemes updated.',
         'createdCount': created_count,
         'updatedCount': updated_count,
         'totalActive': Scheme.objects.filter(is_active=True).count()
